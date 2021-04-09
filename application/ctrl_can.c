@@ -20,7 +20,9 @@
 #include "main.h"
 
 extern CAN_HandleTypeDef hcan1;
+#if CAN2_IS_ENABLE
 extern CAN_HandleTypeDef hcan2;
+#endif /* CAN2_IS_ENABLE */
 
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/

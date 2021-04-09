@@ -38,6 +38,10 @@
 #define __END_DECLS
 #endif /* __cplusplus */
 
+#ifndef CAN2_IS_ENABLE
+#define CAN2_IS_ENABLE 0
+#endif /* CAN2_IS_ENABLE */
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported functions prototypes ---------------------------------------------*/
 

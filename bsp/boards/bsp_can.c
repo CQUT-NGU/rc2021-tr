@@ -22,7 +22,9 @@
 #include "main.h"
 
 extern CAN_HandleTypeDef hcan1;
+#if CAN2_IS_ENABLE
 extern CAN_HandleTypeDef hcan2;
+#endif /* CAN2_IS_ENABLE */
 
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -59,6 +61,7 @@ void can_filter_init(void)
     /*!< FIFO 0 message pending interrupt */
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
+#if CAN2_IS_ENABLE
     /*!< Select the start filter bank for the slave CAN instance */
     can_filter.SlaveStartFilterBank = 14;
     /*!< Specifies the filter bank which will be initialized */
@@ -68,6 +71,7 @@ void can_filter_init(void)
 
     /*!< FIFO 0 message pending interrupt */
     HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING);
+#endif /* CAN2_IS_ENABLE */
 }
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/
