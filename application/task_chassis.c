@@ -401,6 +401,11 @@ static void chassis_mode_ctrl(float *         vx_set,
         *vy_set = 0;
         *wz_set = 0;
 
+        move->data_pc->c = 0;
+        move->data_pc->x = 0;
+        move->data_pc->y = 0;
+        move->data_pc->z = 0;
+
         break;
     }
 

@@ -61,7 +61,7 @@ typedef struct
 {
     /* the point to remote control */
     const ctrl_rc_t *data_rc;
-    const ctrl_pc_t *data_pc;
+    ctrl_pc_t *      data_pc;
 
     /* the point to the euler angle of gyro sensor */
     const float *angle_ins;
