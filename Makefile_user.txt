@@ -5,7 +5,9 @@ C_SOURCES += bsp/boards/bsp_flash.c
 C_SOURCES += bsp/boards/bsp_led.c
 C_SOURCES += bsp/boards/bsp_buzzer.c
 C_SOURCES += bsp/boards/bsp_usart.c
+C_SOURCES += bsp/boards/bsp_spi.c
 C_SOURCES += bsp/boards/bsp_can.c
+C_SOURCES += bsp/boards/bsp_imu_pwm.c
 
 C_SOURCES += application/ctrl_can.c
 C_SOURCES += application/ctrl_rc.c
@@ -13,13 +15,19 @@ C_SOURCES += application/ctrl_pc.c
 
 C_SOURCES += application/task_led.c
 C_SOURCES += application/task_chassis.c
+C_SOURCES += application/task_imu.c
 
 C_SOURCES += component/controller/cc_pid.c
 C_SOURCES += component/controller/cc_lpf.c
 C_SOURCES += component/controller/cc_math.c
+C_SOURCES += component/controller/ahrs.c
+
+C_SOURCES += component/devices/mpu6500.c
+C_SOURCES += component/devices/imu_ahrs.c
 
 C_INCLUDES += -I.
 
 C_INCLUDES += -Ibsp/boards
 C_INCLUDES += -Iapplication
 C_INCLUDES += -Icomponent/controller
+C_INCLUDES += -Icomponent/devices

@@ -15,9 +15,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
-#include "bsp_delay.h"
-#include "bsp_led.h"
-#include "cmsis_os.h"
 
 #include <stdint.h>
 

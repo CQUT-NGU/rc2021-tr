@@ -22,17 +22,16 @@
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 #include "bsp.h"
 #include "ctrl.h"
-#include "task_chassis.h"
-#include "task_led.h"
+#include "mpu6500.h"
 
 /* USER CODE END Includes */
 
@@ -102,6 +101,8 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   MX_CAN1_Init();
+  MX_SPI5_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
     delay_init();
     buzzer_start();
@@ -109,6 +110,7 @@ int main(void)
     ctrl_rc_init();
     ctrl_pc_init();
     can_filter_init();
+    mpu_device_init();
   /* USER CODE END 2 */
 
   /* Init scheduler */

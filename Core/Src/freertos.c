@@ -71,7 +71,19 @@ const osThreadAttr_t chassis_attributes = {
   .stack_size = sizeof(chassisBuffer),
   .cb_mem = &chassisControlBlock,
   .cb_size = sizeof(chassisControlBlock),
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for imu */
+osThreadId_t imuHandle;
+uint32_t imuBuffer[ 512 ];
+osStaticThreadDef_t imuControlBlock;
+const osThreadAttr_t imu_attributes = {
+  .name = "imu",
+  .stack_mem = &imuBuffer[0],
+  .stack_size = sizeof(imuBuffer),
+  .cb_mem = &imuControlBlock,
+  .cb_size = sizeof(imuControlBlock),
+  .priority = (osPriority_t) osPriorityHigh,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,6 +93,7 @@ const osThreadAttr_t chassis_attributes = {
 
 void task_led(void *argument);
 extern void task_chassis(void *argument);
+extern void task_imu(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -116,6 +129,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of chassis */
   chassisHandle = osThreadNew(task_chassis, NULL, &chassis_attributes);
+
+  /* creation of imu */
+  imuHandle = osThreadNew(task_imu, NULL, &imu_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

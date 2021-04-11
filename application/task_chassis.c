@@ -20,6 +20,8 @@
 #include "ctrl.h"
 #include "main.h"
 
+extern imu_t imu;
+
 /* Private define ------------------------------------------------------------*/
 
 /* in the beginning of task ,wait a time */
@@ -182,9 +184,7 @@ static void chassis_init(chassis_move_t *move)
     move->data_pc = ctrl_pc_point();
 
     /* get gyro sensor euler angle point */
-#if 0
-    move->angle_ins = angle_ins_point();
-#endif
+    move->imu = &imu;
 
     /* get gimbal motor data point */
 
@@ -430,6 +430,21 @@ static void chassis_mode_ctrl(float *         vx_set,
         break;
     }
 
+    case CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW:
+    {
+        chassis_rc(vx_set, vy_set, move);
+
+        *wz_set = -3.14159265f * move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL] / 660;
+
+        switch (move->data_pc->c)
+        {
+        default:
+            break;
+        }
+
+        break;
+    }
+
     default:
         break;
     }
@@ -466,22 +481,20 @@ static void chassis_loop_set(chassis_move_t *move)
 
         /* set control relative angle set-point */
         move->angle_set = const_rad(angle_set);
-
 #if 0
         /* calculate ratation speed */
-        move->wz_set = -cc_pid(&move->pid_angle, move->yaw_motor->relative_angle,
-                               move->angle_set);
+        move->wz_set = -cc_pid(&move->pid_angle, move->yaw_motor->relative_angle, move->angle_set);
 #endif
-
         /* speed limit */
         move->vx_set = LIMIT(move->vx_set, move->vx_min, move->vx_max);
         move->vy_set = LIMIT(move->vy_set, move->vy_min, move->vy_max);
     }
     else if (move->mode == CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW)
     {
-        float delat_angle = 0.0f;
+        float delat_angle;
 
         /* set chassis yaw angle set-point */
+        move->yaw     = const_rad(move->imu->yaw / 57.3f);
         move->yaw_set = const_rad(angle_set);
         delat_angle   = const_rad(move->yaw_set - move->yaw);
 

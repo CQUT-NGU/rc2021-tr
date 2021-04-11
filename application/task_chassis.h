@@ -17,6 +17,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "cc.h"
 #include "ctrl.h"
+#include "mpu6500.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -64,7 +65,8 @@ typedef struct
     ctrl_pc_t *      data_pc;
 
     /* the point to the euler angle of gyro sensor */
-    const float *angle_ins;
+    imu_t *imu;
+    //const float *angle_ins;
 
     chassis_mode_e  mode;     /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */
