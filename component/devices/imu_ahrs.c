@@ -36,13 +36,11 @@ extern imu_t imu;
 */
 static float ht_get(void);
 
-#if 0
 /**
  * @brief        Gets the sampling cycle time
  * @return       float
 */
 static float t_get(void);
-#endif
 
 /* Private user code ---------------------------------------------------------*/
 
@@ -58,7 +56,6 @@ static float ht_get(void)
     return ret;
 }
 
-#if 0
 static float t_get(void)
 {
     static volatile uint32_t update_last;
@@ -70,7 +67,6 @@ static float t_get(void)
 
     return ret;
 }
-#endif
 
 /**
  * @brief        Initialize quaternion
@@ -89,7 +85,9 @@ void imu_update_ahrs(void)
     volatile float a[3] = {imu.ax, imu.ay, imu.az};
     volatile float m[3] = {imu.mx, imu.my, imu.mz};
 
-    ahrs_mahony(g, a, m, ht_get());
+    ahrs_madgwick(g, a, m, t_get());
+    //ahrs_mahony(g, a, m, ht_get());
+    //ahrs_mahony_imu(g, a, ht_get());
 }
 
 /**

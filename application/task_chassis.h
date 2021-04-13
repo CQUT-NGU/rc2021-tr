@@ -52,17 +52,21 @@ typedef enum
 typedef struct
 {
     const motor_t *measure;
-    float          accel;
-    float          v;
-    float          v_set;
-    int16_t        i_current;
+
+    float accel;
+    float v;
+    float v_set;
+
+    int16_t i_current;
 } chassis_motor_t;
 
 typedef struct
 {
     /* the point to remote control */
     const ctrl_rc_t *data_rc;
-    ctrl_pc_t *      data_pc;
+
+    /* the point to pc */
+    ctrl_pc_t *data_pc;
 
     /* the point to the euler angle of gyro sensor */
     imu_t *imu;

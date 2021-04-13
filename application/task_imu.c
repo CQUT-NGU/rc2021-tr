@@ -92,6 +92,18 @@ void task_imu(void *pvParameters)
             imu_pwm_set((uint16_t)temp_pid.out);
         }
 
+#if 0
+        os_printf("%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+                  mpu.gx,
+                  mpu.gy,
+                  mpu.gz,
+                  mpu.ax,
+                  mpu.ay,
+                  mpu.az,
+                  mpu.mx,
+                  mpu.my,
+                  mpu.mz);
+#elif 1
         os_putf(imu.rol, 3);
         os_printf(",");
         os_putf(imu.pit, 3);
@@ -100,6 +112,7 @@ void task_imu(void *pvParameters)
         os_printf(",");
         os_putf(imu.temp, 3);
         os_printf("\r\n");
+#endif
 
         osDelay(2U);
     }

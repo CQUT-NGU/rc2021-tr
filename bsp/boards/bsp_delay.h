@@ -51,7 +51,7 @@ extern void delay_us(uint16_t nus);
 
 /**
  * @brief        Delay millisecond
- * @param[in]    nus: 0x0000 ~ 0xFFFF
+ * @param[in]    nms: 0x0000 ~ 0xFFFF
 */
 extern void delay_ms(uint16_t nms);
 

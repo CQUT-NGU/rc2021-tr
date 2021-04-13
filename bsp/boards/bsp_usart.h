@@ -32,9 +32,9 @@ extern UART_HandleTypeDef huart6;
 #define huart_os huart6
 
 /* Exported macro ------------------------------------------------------------*/
-
 #undef __BEGIN_DECLS
 #undef __END_DECLS
+
 #if defined(__cplusplus)
 #define __BEGIN_DECLS \
     extern "C"        \

@@ -29,6 +29,11 @@
 void task_led(void *pvParameters)
 {
     delay_init();
+    buzzer_start();
+    buzzer_set(0, 0x3FFFU);
+    osDelay(1000U);
+    buzzer_set(0, 0);
+    buzzer_stop();
 
     int8_t count = 0;
 

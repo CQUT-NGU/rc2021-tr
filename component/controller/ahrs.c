@@ -363,6 +363,7 @@ void ahrs_mahony(volatile float g[3],
         /* Estimated direction of gravity and magnetic field (v and w) */
         float vx = 2.0f * (q1q3 - q0q2);
         float vy = 2.0f * (q0q1 + q2q3);
+        //float vz = 2.0f * (q0q0 - 0.5f + q3q3);
         float vz = q0q0 - q1q1 - q2q2 + q3q3;
         float wx = 2.0f * (bx * (0.5f - q2q2 - q3q3) + (q1q3 - q0q2) * bz);
         float wy = 2.0f * (bx * (q1q2 - q0q3) + (q0q1 + q2q3) * bz);
@@ -431,6 +432,7 @@ void ahrs_mahony_imu(volatile float g[3],
         /* Estimated direction of gravity and magnetic field (v and w) */
         float vx = 2.0f * (q1q3 - q0q2);
         float vy = 2.0f * (q0q1 + q2q3);
+        //float vz = 2.0f * (q0q0 - 0.5f + q3q3);
         float vz = q0q0 - q1q1 - q2q2 + q3q3;
 
         /**

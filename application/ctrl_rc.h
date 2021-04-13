@@ -107,13 +107,13 @@ __BEGIN_DECLS
 /**
  * @brief        Remote control init
 */
-void ctrl_rc_init(void);
+extern void ctrl_rc_init(void);
 
 /**
  * @brief        Get remote control data point
  * @return       ctrl_rc_t remote control data point
 */
-const ctrl_rc_t *ctrl_rc_point(void);
+extern const ctrl_rc_t *ctrl_rc_point(void);
 
 __END_DECLS
 

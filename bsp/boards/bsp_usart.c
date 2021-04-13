@@ -214,7 +214,8 @@ void os_printf(const char *format, ...)
 void os_putf(float x, uint8_t l)
 {
     static char buff[32U] = {0U};
-    uint8_t     n         = sprintf(buff, "%li", (long)x);
+
+    uint8_t n = sprintf(buff, "%li", (long)x);
 
     if (l)
     {

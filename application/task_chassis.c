@@ -16,9 +16,12 @@
 /* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
 #include "cc.h"
-#include "cmsis_os.h"
 #include "ctrl.h"
 #include "main.h"
+
+#if USED_OS
+#include "cmsis_os.h"
+#endif /* USED_OS */
 
 extern imu_t imu;
 
@@ -337,6 +340,7 @@ static void chassis_rc(float *         vx_set,
     cc_lpf(&move->vy_slow, vy_set_channel);
 
     /* stop command, need not slow change, set zero derectly */
+#if 0
     if (vx_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN &&
         vx_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
     {
@@ -348,6 +352,7 @@ static void chassis_rc(float *         vx_set,
     {
         move->vy_slow.out = 0.0f;
     }
+#endif
 
     *vx_set = move->vx_slow.out;
     *vy_set = move->vy_slow.out;
@@ -412,7 +417,7 @@ static void chassis_mode_ctrl(float *         vx_set,
     case CHASSIS_VECTOR_NO_FOLLOW_YAW:
     {
         chassis_rc(vx_set, vy_set, move);
-        *wz_set = -move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL] * CHASSIS_WZ_RC_SEN;
+        *wz_set = move->data_rc->rc.ch[4] * CHASSIS_WZ_RC_SEN;
 
         switch (move->data_pc->c)
         {
@@ -434,7 +439,7 @@ static void chassis_mode_ctrl(float *         vx_set,
     {
         chassis_rc(vx_set, vy_set, move);
 
-        *wz_set = -3.14159265f * move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL] / 660;
+        *wz_set = 3.14159265f * move->data_rc->rc.ch[4] / 660;
 
         switch (move->data_pc->c)
         {
@@ -499,7 +504,7 @@ static void chassis_loop_set(chassis_move_t *move)
         delat_angle   = const_rad(move->yaw_set - move->yaw);
 
         /* calculate rotation speed */
-        move->wz_set = cc_pid(&move->pid_angle, 0.0f, delat_angle);
+        move->wz_set = cc_pid(&move->pid_angle, 0, delat_angle);
 
         /* speed limit */
         move->vx_set = LIMIT(vx_set, move->vx_min, move->vx_max);
@@ -517,9 +522,10 @@ static void chassis_loop_set(chassis_move_t *move)
     {
         /* in raw mode, set-point is sent to CAN bus */
 
-        move->vx_set      = vx_set;
-        move->vy_set      = vy_set;
-        move->wz_set      = angle_set;
+        move->vx_set = vx_set;
+        move->vy_set = vy_set;
+        move->wz_set = angle_set;
+
         move->vx_slow.out = 0.0f;
         move->vy_slow.out = 0.0f;
     }
