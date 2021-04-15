@@ -73,7 +73,7 @@ void task_imu(void *pvParameters)
     imu_pwm_start();
 
     mpu_data_update();
-    imu_quaternion_init();
+    imu_quat_init();
 
     for (;;)
     {

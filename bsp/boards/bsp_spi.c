@@ -36,8 +36,6 @@ void spi_dma_init(SPI_HandleTypeDef *hspi)
 
     /*!< Enable the SPI peripheral */
     __HAL_SPI_ENABLE(hspi);
-    /*!< Enable Transfer complete interrupt */
-    __HAL_DMA_ENABLE_IT(hspi->hdmarx, DMA_IT_TC);
 
     do
     {
@@ -46,11 +44,13 @@ void spi_dma_init(SPI_HandleTypeDef *hspi)
     } while (hspi->hdmarx->Instance->CR & DMA_SxCR_EN);
 
     /*!< Clear the DMA Stream pending flags Transfer complete flag */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmarx,
-                         __HAL_DMA_GET_TC_FLAG_INDEX(hspi->hdmarx));
+    BSP_DMA_CLEAR_TC(hspi->hdmarx);
 
     /*!< DMA stream x peripheral address register */
     hspi->hdmarx->Instance->PAR = (uint32_t) & (hspi->Instance->DR);
+
+    /*!< Enable Transfer complete interrupt */
+    __HAL_DMA_ENABLE_IT(hspi->hdmarx, DMA_IT_TC);
 
     do
     {
@@ -59,11 +59,10 @@ void spi_dma_init(SPI_HandleTypeDef *hspi)
     } while (hspi->hdmatx->Instance->CR & DMA_SxCR_EN);
 
     /*!< Clear the DMA Stream pending flags Transfer complete flag */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmatx,
-                         __HAL_DMA_GET_TC_FLAG_INDEX(hspi->hdmatx));
+    BSP_DMA_CLEAR_TC(hspi->hdmatx);
 
     /*!< DMA stream x peripheral address register */
-    hspi->hdmarx->Instance->PAR = (uint32_t) & (hspi->Instance->DR);
+    hspi->hdmatx->Instance->PAR = (uint32_t) & (hspi->Instance->DR);
 }
 
 void spi_dma_start(SPI_HandleTypeDef *hspi,
@@ -83,37 +82,9 @@ void spi_dma_start(SPI_HandleTypeDef *hspi,
         __HAL_DMA_DISABLE(hspi->hdmatx);
     } while (hspi->hdmatx->Instance->CR & DMA_SxCR_EN);
 
-    /*!< Transfer complete interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmarx,
-                         __HAL_DMA_GET_TC_FLAG_INDEX(hspi->hdmarx));
-    /*!< Half transfer complete interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmarx,
-                         __HAL_DMA_GET_HT_FLAG_INDEX(hspi->hdmarx));
-    /*!< Transfer error interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmarx,
-                         __HAL_DMA_GET_TE_FLAG_INDEX(hspi->hdmarx));
-    /*!< Direct mode error interrupt */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmarx,
-                         __HAL_DMA_GET_DME_FLAG_INDEX(hspi->hdmarx));
-    /*!< FIFO error interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmarx,
-                         __HAL_DMA_GET_FE_FLAG_INDEX(hspi->hdmarx));
-
-    /*!< Transfer complete interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmatx,
-                         __HAL_DMA_GET_TC_FLAG_INDEX(hspi->hdmatx));
-    /*!< Half transfer complete interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmatx,
-                         __HAL_DMA_GET_HT_FLAG_INDEX(hspi->hdmatx));
-    /*!< Transfer error interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmatx,
-                         __HAL_DMA_GET_TE_FLAG_INDEX(hspi->hdmatx));
-    /*!< Direct mode error interrupt */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmatx,
-                         __HAL_DMA_GET_DME_FLAG_INDEX(hspi->hdmatx));
-    /*!< FIFO error interrupt mask */
-    __HAL_DMA_CLEAR_FLAG(hspi->hdmatx,
-                         __HAL_DMA_GET_FE_FLAG_INDEX(hspi->hdmatx));
+    /* Clear all DMA flag */
+    BSP_DMA_CLEAR_FLAG(hspi->hdmarx);
+    BSP_DMA_CLEAR_FLAG(hspi->hdmatx);
 
     /*!< DMA stream x memory 0 address register   */
     hspi->hdmarx->Instance->M0AR = buf_rx;

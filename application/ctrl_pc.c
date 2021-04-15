@@ -19,15 +19,15 @@
 
 #include <stdlib.h>
 
-extern UART_HandleTypeDef huart6;
+extern UART_HandleTypeDef huart_os;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
 #undef hpc
-#define hpc huart6
+#define hpc huart_os
 #undef PC_IRQHandler
-#define PC_IRQHandler USART6_IRQHandler
+#define PC_IRQHandler USART_OS##_IRQHandler
 
 /* Private macro -------------------------------------------------------------*/
 

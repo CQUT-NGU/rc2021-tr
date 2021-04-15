@@ -19,6 +19,7 @@
 #define __BSP_USART_H__
 
 /* Includes ------------------------------------------------------------------*/
+#include "bsp_dma.h"
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -29,6 +30,7 @@ extern UART_HandleTypeDef huart6;
 
 /* Exported constants --------------------------------------------------------*/
 
+#define USART_OS USART6
 #define huart_os huart6
 
 /* Exported macro ------------------------------------------------------------*/
@@ -138,7 +140,7 @@ __END_DECLS
 
 static inline void usart_init(void)
 {
-    usart_dma_init(&huart6);
+    usart_dma_init(&huart_os);
     usart_dma_rx_init(&huart1);
 }
 

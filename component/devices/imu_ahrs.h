@@ -39,7 +39,7 @@ __BEGIN_DECLS
 /**
  * @brief        Initialize quaternion
 */
-extern void imu_quaternion_init(void);
+extern void imu_quat_init(void);
 
 /**
  * @brief        Update ahrs by imu

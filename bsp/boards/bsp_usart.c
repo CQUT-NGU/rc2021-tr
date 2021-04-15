@@ -25,27 +25,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
-
-#define BSP_DMA_CLEAR_FLAG(_)                                     \
-                                                                  \
-    do                                                            \
-    {                                                             \
-        /*!< Clear Complete Transmit flag */                      \
-        __HAL_DMA_CLEAR_FLAG(_, __HAL_DMA_GET_TC_FLAG_INDEX(_));  \
-        /*!< Clear Half Complete Transmit flag */                 \
-        __HAL_DMA_CLEAR_FLAG(_, __HAL_DMA_GET_HT_FLAG_INDEX(_));  \
-        /*!< Transfer error interrupt mask */                     \
-        __HAL_DMA_CLEAR_FLAG(_, __HAL_DMA_GET_TE_FLAG_INDEX(_));  \
-        /*!< Direct mode error interrupt */                       \
-        __HAL_DMA_CLEAR_FLAG(_, __HAL_DMA_GET_DME_FLAG_INDEX(_)); \
-        /*!< FIFO error interrupt mask */                         \
-        __HAL_DMA_CLEAR_FLAG(_, __HAL_DMA_GET_FE_FLAG_INDEX(_));  \
-    } while (0)
-
-#define BSP_DMA_WAIT_TC(_) \
-                           \
-    while (!__HAL_DMA_GET_FLAG(_, __HAL_DMA_GET_TC_FLAG_INDEX(_)))
-
 /* Private typedef -----------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/

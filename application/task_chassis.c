@@ -31,26 +31,26 @@ extern imu_t imu;
 #define CHASSIS_TASK_INIT_TIME 357
 
 /* the channel num of controlling horizontal speed */
-#define CHASSIS_Y_CHANNEL 2
+#define CHASSIS_X_CHANNEL 0
 /* the channel num of controlling vertial speed */
-#define CHASSIS_X_CHANNEL 3
+#define CHASSIS_Y_CHANNEL 1
 
 /* in some mode, can use remote control to control rotation speed */
-#define CHASSIS_WZ_CHANNEL 0
+#define CHASSIS_WZ_CHANNEL 2
 
 /* the channel of choosing chassis mode */
 #define CHASSIS_MODE_CHANNEL 0
 /* rocker value (max 660) change to horizontal speed (m/s) */
-#define CHASSIS_VY_RC_SEN 0.005f
+#define CHASSIS_VX_RC_SEN 0.005f
 /* rocker value (max 660) change to vertial speed (m/s) */
-#define CHASSIS_VX_RC_SEN 0.006f
+#define CHASSIS_VY_RC_SEN 0.005f
 /* in following yaw angle mode, rocker value add to angle */
 #define CHASSIS_ANGLE_Z_RC_SEN 0.000002f
 /* in not following yaw angle mode, rocker value change to rotation speed */
 #define CHASSIS_WZ_RC_SEN 0.01f
 
-#define CHASSIS_ACCEL_X_NUM 0.1666666667f
-#define CHASSIS_ACCEL_Y_NUM 0.3333333333f
+#define CHASSIS_ACCEL_X_NUM 0.3333333333f
+#define CHASSIS_ACCEL_Y_NUM 0.1666666667f
 
 /* rocker value deadline */
 #define CHASSIS_RC_DEADLINE 10
@@ -84,9 +84,9 @@ extern imu_t imu;
 /* single chassis motor max speed */
 #define MAX_WHEEL_SPEED 4.0f
 /* chassis forward or back max speed */
-#define NORMAL_MAX_CHASSIS_SPEED_X 2.0f
+#define NORMAL_MAX_CHASSIS_SPEED_Y 2.0f
 /* chassis left or right max speed */
-#define NORMAL_MAX_CHASSIS_SPEED_Y 1.5f
+#define NORMAL_MAX_CHASSIS_SPEED_X 2.0f
 
 #define CHASSIS_WZ_SET_SCALE 0.1f
 
@@ -268,17 +268,12 @@ static void chassis_update(chassis_move_t *move)
      * calculate chassis euler angle,
      * if chassis add a new gyro sensor,please change this code
     */
-#if 0
-    move->yaw =
-        const_rad(*(move->angle_ins + INS_YAW_ADDRESS_OFFSET));
-    // - move->yaw_motor->relative_angle);
+#if 1
+    move->roll = const_rad(move->imu->rol);
 
-    move->pitch =
-        const_rad(*(move->angle_ins + INS_PITCH_ADDRESS_OFFSET));
-    //- move->pitch_motor->relative_angle);
+    move->pitch = move->imu->pit;
 
-    move->roll =
-        *(move->angle_ins + INS_ROLL_ADDRESS_OFFSET);
+    move->yaw = const_rad(move->imu->yaw);
 #endif
 }
 
@@ -303,10 +298,10 @@ static void chassis_rc(float *         vx_set,
      * deadline, because some remote control need be calibrated,
      * the value of rocker is not zero in middle place 
     */
-    vx_channel = LIMIT_RC(move->data_rc->rc.ch[CHASSIS_Y_CHANNEL],
+    vx_channel = LIMIT_RC(move->data_rc->rc.ch[CHASSIS_X_CHANNEL],
                           CHASSIS_RC_DEADLINE);
 
-    vy_channel = LIMIT_RC(move->data_rc->rc.ch[CHASSIS_X_CHANNEL],
+    vy_channel = LIMIT_RC(move->data_rc->rc.ch[CHASSIS_Y_CHANNEL],
                           CHASSIS_RC_DEADLINE);
 
     vx_set_channel = vx_channel * CHASSIS_VX_RC_SEN;
@@ -499,7 +494,6 @@ static void chassis_loop_set(chassis_move_t *move)
         float delat_angle;
 
         /* set chassis yaw angle set-point */
-        move->yaw     = const_rad(move->imu->yaw / 57.3f);
         move->yaw_set = const_rad(angle_set);
         delat_angle   = const_rad(move->yaw_set - move->yaw);
 
@@ -520,8 +514,6 @@ static void chassis_loop_set(chassis_move_t *move)
     }
     else if (move->mode == CHASSIS_VECTOR_STOP)
     {
-        /* in raw mode, set-point is sent to CAN bus */
-
         move->vx_set = vx_set;
         move->vy_set = vy_set;
         move->wz_set = angle_set;

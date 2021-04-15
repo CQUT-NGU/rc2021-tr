@@ -28,6 +28,9 @@ extern imu_t imu;
 /* Private typedef -----------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+
+static float quat[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+
 /* Private function prototypes -----------------------------------------------*/
 
 /**
@@ -71,9 +74,9 @@ static float t_get(void)
 /**
  * @brief        Initialize quaternion
 */
-void imu_quaternion_init(void)
+void imu_quat_init(void)
 {
-    ahrs_quaternion_init(imu.mx, imu.my);
+    ahrs_quat_init(quat, imu.mx, imu.my);
 }
 
 /**
@@ -85,9 +88,9 @@ void imu_update_ahrs(void)
     volatile float a[3] = {imu.ax, imu.ay, imu.az};
     volatile float m[3] = {imu.mx, imu.my, imu.mz};
 
-    ahrs_madgwick(g, a, m, t_get());
-    //ahrs_mahony(g, a, m, ht_get());
-    //ahrs_mahony_imu(g, a, ht_get());
+    ahrs_madgwick(quat, g, a, m, t_get());
+    //ahrs_mahony(quat, g, a, m, ht_get());
+    //ahrs_mahony_imu(quat, g, a, ht_get());
 }
 
 /**
@@ -95,7 +98,7 @@ void imu_update_ahrs(void)
 */
 void imu_update_attitude(void)
 {
-    ahrs_euler_angle(&imu.rol, &imu.pit, &imu.yaw);
+    ahrs_euler_angle(quat, &imu.rol, &imu.pit, &imu.yaw);
 }
 
 /************************ (C) COPYRIGHT tqfx *******************END OF FILE****/
