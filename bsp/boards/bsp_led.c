@@ -59,17 +59,17 @@ extern TIM_HandleTypeDef htim;
     } while (0)
 
 #undef LED_R
-#define LED_R(GPIOx, PIN, STATE)       \
-    do                                 \
-    {                                  \
-        if ((GPIOx->IDR & PIN) == PIN) \
-        {                              \
-            STATE = LED_OFF;           \
-        }                              \
-        else                           \
-        {                              \
-            STATE = LED_ON;            \
-        }                              \
+#define LED_R(GPIOx, PIN, STATE) \
+    do                           \
+    {                            \
+        if (GPIOx->IDR & PIN)    \
+        {                        \
+            STATE = LED_OFF;     \
+        }                        \
+        else                     \
+        {                        \
+            STATE = LED_ON;      \
+        }                        \
     } while (0)
 
 #undef LED_T

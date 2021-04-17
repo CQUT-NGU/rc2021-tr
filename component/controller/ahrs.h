@@ -114,6 +114,7 @@ extern void ahrs_madgwick_imu(volatile float q[4],
                               volatile float g[3],
                               volatile float a[3],
                               volatile float t);
+
 __END_DECLS
 
 /* Private defines -----------------------------------------------------------*/
