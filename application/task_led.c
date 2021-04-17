@@ -3,7 +3,7 @@
  * @file         task_led.c/h
  * @brief        led task
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
@@ -29,6 +29,7 @@
 void task_led(void *pvParameters)
 {
     delay_init();
+
     buzzer_start();
     buzzer_set(0, 0x3FFFU);
     osDelay(1000U);
@@ -46,7 +47,7 @@ void task_led(void *pvParameters)
             for (uint8_t i = 0U; i < 8U; i++)
             {
                 led_line(tmp);
-                osDelay(100);
+                osDelay(100U);
                 tmp >>= 1U;
                 if (i > 1U)
                 {
@@ -60,7 +61,7 @@ void task_led(void *pvParameters)
             for (uint8_t i = 0U; i < 8U; i++)
             {
                 led_line(tmp);
-                osDelay(100);
+                osDelay(100U);
                 tmp <<= 1U;
                 if (i < 6U)
                 {

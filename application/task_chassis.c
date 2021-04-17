@@ -3,7 +3,7 @@
  * @file         task_chassis.c/h
  * @brief        task chassis
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
@@ -175,8 +175,6 @@ static void chassis_init(chassis_move_t *move)
     const static float lpf_x = {CHASSIS_ACCEL_X_NUM};
     const static float lpf_y = {CHASSIS_ACCEL_Y_NUM};
 
-    uint8_t i; /* conut */
-
     /* in beginning， chassis mode is stop */
     move->mode = CHASSIS_VECTOR_STOP;
 
@@ -192,7 +190,7 @@ static void chassis_init(chassis_move_t *move)
     /* get gimbal motor data point */
 
     /* get chassis motor data point, initialize motor speed PID */
-    for (i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0U; i != 4U; ++i)
     {
         move->motor[i].measure = chassis_point(i);
         cc_pid_position(&move->pid_speed[i],
@@ -229,9 +227,7 @@ static void chassis_init(chassis_move_t *move)
 */
 static void chassis_update(chassis_move_t *move)
 {
-    uint8_t i;
-
-    for (i = 0U; i != 4; ++i)
+    for (uint8_t i = 0U; i != 4U; ++i)
     {
         /* update motor speed, accel is differential of speed PID */
         move->motor[i].v = move->motor[i].measure->v_rpm *
@@ -376,6 +372,11 @@ static void chassis_mode_set(chassis_move_t *move)
     else if (move->data_rc->rc.s[CHASSIS_MODE_CHANNEL] == RC_SW_DOWN)
     {
         move->mode = CHASSIS_VECTOR_STOP;
+
+        move->data_pc->c = 0;
+        move->data_pc->x = 0;
+        move->data_pc->y = 0;
+        move->data_pc->z = 0;
     }
 }
 
@@ -401,18 +402,14 @@ static void chassis_mode_ctrl(float *         vx_set,
         *vy_set = 0;
         *wz_set = 0;
 
-        move->data_pc->c = 0;
-        move->data_pc->x = 0;
-        move->data_pc->y = 0;
-        move->data_pc->z = 0;
-
         break;
     }
 
     case CHASSIS_VECTOR_NO_FOLLOW_YAW:
     {
         chassis_rc(vx_set, vy_set, move);
-        *wz_set = move->data_rc->rc.ch[4] * CHASSIS_WZ_RC_SEN;
+
+        *wz_set = -move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL] * CHASSIS_WZ_RC_SEN;
 
         switch (move->data_pc->c)
         {
@@ -434,7 +431,7 @@ static void chassis_mode_ctrl(float *         vx_set,
     {
         chassis_rc(vx_set, vy_set, move);
 
-        *wz_set = 3.14159265f * move->data_rc->rc.ch[4] / 660;
+        *wz_set = -3.14159265f * move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL] / 660;
 
         switch (move->data_pc->c)
         {
@@ -557,8 +554,6 @@ static void chassis_loop(chassis_move_t *move)
 
     float wheel_speed[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
-    uint8_t i;
-
     /* omni4 wheel speed calculation */
     chassis_omni4(move->vx_set,
                   move->vy_set,
@@ -566,7 +561,7 @@ static void chassis_loop(chassis_move_t *move)
                   wheel_speed);
 
     /* calculate the max speed in four wheels, limit the max speed */
-    for (i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0U; i != 4U; ++i)
     {
         move->motor[i].v_set = wheel_speed[i];
 
@@ -582,14 +577,14 @@ static void chassis_loop(chassis_move_t *move)
     {
         vector = MAX_WHEEL_SPEED / vector_max;
 
-        for (i = 0U; i != 4U; ++i)
+        for (uint8_t i = 0U; i != 4U; ++i)
         {
             move->motor[i].v_set *= vector;
         }
     }
 
     /* calculate pid */
-    for (i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0U; i != 4U; ++i)
     {
         move->motor[i].i_current = (int16_t)cc_pid(&move->pid_speed[i],
                                                    move->motor[i].v,

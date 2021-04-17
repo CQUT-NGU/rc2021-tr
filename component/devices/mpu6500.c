@@ -22,14 +22,15 @@
 
 #include <string.h>
 
-extern SPI_HandleTypeDef hspi5;
-
 /* Private define ------------------------------------------------------------*/
 
 #undef hspi
 #define hspi         hspi5
 #define MPU_NSS_PIN  GPIO_PIN_6
 #define MPU_NSS_PORT GPIOF
+
+/* Private includes ----------------------------------------------------------*/
+extern SPI_HandleTypeDef hspi;
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -38,6 +39,7 @@ extern SPI_HandleTypeDef hspi5;
 #else
 #define MPU_DELAY delay_ms
 #endif /* USED_OS */
+
 #define MPU_NSS_LOW  MPU_NSS_PORT->BSRR = (uint32_t)MPU_NSS_PIN << 16U
 #define MPU_NSS_HIGH MPU_NSS_PORT->BSRR = MPU_NSS_PIN
 
@@ -347,7 +349,7 @@ static void mpu_set_accel_fsr(uint8_t fsr)
 */
 void mpu_offset_call(void)
 {
-    for (int i = 0; i < 300; i++)
+    for (uint16_t i = 0U; i < 300U; ++i)
     {
         mpu_read_bytes(MPU6500_ACCEL_XOUT_H, buff_mpu, 14U);
 
@@ -386,11 +388,11 @@ void mpu_device_init(void)
         {MPU6500_CONFIG, 0x04},         /* LPF 41Hz */
         {MPU6500_GYRO_CONFIG, 0x18},    /* +-2000dps */
         {MPU6500_ACCEL_CONFIG, 0x10},   /* +-8G */
-        {MPU6500_ACCEL_CONFIG_2, 0x02}, /* Enable LowPassFilter  Set Acc LPF */
+        {MPU6500_ACCEL_CONFIG_2, 0x02}, /* Enable LowPassFilter Set Acc LPF */
         {MPU6500_USER_CTRL, 0x20},
     }; /* Enable AUX */
 
-    for (uint8_t i = 0; i < 10; i++)
+    for (uint8_t i = 0U; i != 10U; ++i)
     {
         mpu_write_byte(data[i][0], data[i][1]);
         MPU_DELAY(1U);

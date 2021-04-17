@@ -3,7 +3,7 @@
  * @file         mpu6500.c/h
  * @brief        mpu6500
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode

@@ -2,8 +2,8 @@
  * *****************************************************************************
  * @file         imu_ahrs.c/h
  * @brief        Automatic Heading Reference System by imu
- * @author       tqfx
- * @date         20210101
+ * @author       ngu
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode
@@ -39,11 +39,13 @@ static float quat[4] = {1.0f, 0.0f, 0.0f, 0.0f};
 */
 static float ht_get(void);
 
+#if 0
 /**
  * @brief        Gets the sampling cycle time
  * @return       float
 */
 static float t_get(void);
+#endif
 
 /* Private user code ---------------------------------------------------------*/
 
@@ -59,6 +61,7 @@ static float ht_get(void)
     return ret;
 }
 
+#if 0
 static float t_get(void)
 {
     static volatile uint32_t update_last;
@@ -70,6 +73,7 @@ static float t_get(void)
 
     return ret;
 }
+#endif
 
 /**
  * @brief        Initialize quaternion
@@ -88,8 +92,8 @@ void imu_update_ahrs(void)
     volatile float a[3] = {imu.ax, imu.ay, imu.az};
     volatile float m[3] = {imu.mx, imu.my, imu.mz};
 
-    ahrs_madgwick(quat, g, a, m, t_get());
-    //ahrs_mahony(quat, g, a, m, ht_get());
+    //ahrs_madgwick(quat, g, a, m, 2 * ht_get());
+    ahrs_mahony(quat, g, a, m, ht_get());
     //ahrs_mahony_imu(quat, g, a, ht_get());
 }
 
@@ -101,4 +105,4 @@ void imu_update_attitude(void)
     ahrs_euler_angle(quat, &imu.rol, &imu.pit, &imu.yaw);
 }
 
-/************************ (C) COPYRIGHT tqfx *******************END OF FILE****/
+/************************ (C) COPYRIGHT ngu ********************END OF FILE****/

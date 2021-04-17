@@ -3,7 +3,7 @@
  * @file         task_imu.c/h
  * @brief        The task of imu update
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode

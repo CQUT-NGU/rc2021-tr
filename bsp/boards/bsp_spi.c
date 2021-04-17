@@ -2,16 +2,11 @@
  * *****************************************************************************
  * @file         bsp_spi.c/h
  * @brief        spi of boards
- * @author       ngu
- * @date         20210101
+ * @author       tqfx
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
- * @details      
- *               SPI5_SCK  ------> PF7
- *               SPI5_NSS  ------> PF6
- *               SPI5_MOSI ------> PF9
- *               SPI5_MISO ------> PF8
  * *****************************************************************************
 */
 
@@ -31,8 +26,8 @@
 
 void spi_dma_init(SPI_HandleTypeDef *hspi)
 {
-    SET_BIT(hspi->Instance->CR2, SPI_CR2_TXDMAEN); /*!< Tx Buffer DMA Enable */
     SET_BIT(hspi->Instance->CR2, SPI_CR2_RXDMAEN); /*!< Rx Buffer DMA Enable */
+    SET_BIT(hspi->Instance->CR2, SPI_CR2_TXDMAEN); /*!< Tx Buffer DMA Enable */
 
     /*!< Enable the SPI peripheral */
     __HAL_SPI_ENABLE(hspi);
@@ -102,4 +97,4 @@ void spi_dma_start(SPI_HandleTypeDef *hspi,
     __HAL_DMA_ENABLE(hspi->hdmatx);
 }
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT tqfx *******************END OF FILE****/

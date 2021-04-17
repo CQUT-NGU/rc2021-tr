@@ -3,7 +3,7 @@
  * @file         bsp_led.c/h
  * @brief        led of boards
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
@@ -27,10 +27,6 @@
 /* Private includes ----------------------------------------------------------*/
 #include "main.h"
 
-#if LED_PWM
-extern TIM_HandleTypeDef htim1;
-#endif /* LED_PWM */
-
 /* Private define ------------------------------------------------------------*/
 
 #if LED_PWM
@@ -38,6 +34,12 @@ extern TIM_HandleTypeDef htim1;
 #define htim htim1
 #undef LED_CHANNEL
 #define LED_CHANNEL TIM_CHANNEL_2
+#endif /* LED_PWM */
+
+/* Includes ------------------------------------------------------------------*/
+
+#if LED_PWM
+extern TIM_HandleTypeDef htim;
 #endif /* LED_PWM */
 
 /* Private macro -------------------------------------------------------------*/

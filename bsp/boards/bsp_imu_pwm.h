@@ -3,7 +3,7 @@
  * @file         bsp_imu_pwm.c/h
  * @brief        The IMU temperature is controlled by PWM
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode
@@ -61,4 +61,4 @@ __END_DECLS
 /* __BSP_IMU_PWM_H__ ---------------------------------------------------------*/
 #endif /* __BSP_IMU_PWM_H__ */
 
-/************************ (C) COPYRIGHT tqfx *******************END OF FILE****/
+/************************ (C) COPYRIGHT ngu ********************END OF FILE****/

@@ -3,7 +3,7 @@
  * @file         ctrl_pc.c/h
  * @brief        control by usart
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
@@ -19,7 +19,6 @@
 #include <stdint.h>
 
 /* Exported constants --------------------------------------------------------*/
-
 #define PC_RX_BUFSIZ 128U
 
 /* Exported macro ------------------------------------------------------------*/
@@ -43,9 +42,10 @@
 
 typedef struct
 {
-    float   x;
-    float   y;
-    float   z;
+    float x;
+    float y;
+    float z;
+
     uint8_t c;
 } ctrl_pc_t;
 

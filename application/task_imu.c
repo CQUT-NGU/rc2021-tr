@@ -3,7 +3,7 @@
  * @file         task_imu.c/h
  * @brief        The task of imu update
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode
@@ -93,7 +93,7 @@ void task_imu(void *pvParameters)
         }
 
 #if 0
-        os_printf("%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
+        os_printf("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
                   mpu.gx,
                   mpu.gy,
                   mpu.gz,
@@ -102,13 +102,14 @@ void task_imu(void *pvParameters)
                   mpu.az,
                   mpu.mx,
                   mpu.my,
-                  mpu.mz);
+                  mpu.mz,
+                  mpu.temp);
 #elif 1
-        os_putf(imu.rol, 3);
+        os_putf(imu.rol, 5);
         os_printf(",");
-        os_putf(imu.pit, 3);
+        os_putf(imu.pit, 5);
         os_printf(",");
-        os_putf(imu.yaw, 3);
+        os_putf(imu.yaw, 5);
         os_printf(",");
         os_putf(imu.temp, 3);
         os_printf("\r\n");

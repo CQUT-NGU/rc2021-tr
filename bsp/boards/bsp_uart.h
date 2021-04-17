@@ -1,21 +1,31 @@
 /**
  * *****************************************************************************
- * @file         imu_ahrs.c/h
- * @brief        Automatic Heading Reference System by imu
+ * @file         bsp_uart.c/h
+ * @brief        uart of boards
  * @author       ngu
- * @date         20210427
+ * @date         20210417
  * @version      1
- * @copyright    Copyright (C) 2021
+ * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
+ * @details
+ *               UART7_TX ------> PE8
+ *               UART7_RX ------> PE7
+ *               UART8_TX ------> PE1
+ *               UART8_RX ------> PE0
  * *****************************************************************************
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __IMU_AHRS_H__
-#define __IMU_AHRS_H__
+#ifndef __BSP_UART_H__
+#define __BSP_UART_H__
 
 /* Includes ------------------------------------------------------------------*/
+#include "bsp_dma.h"
+#include "main.h"
+
 /* Private includes ----------------------------------------------------------*/
+#include <stdint.h>
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
@@ -36,26 +46,11 @@
 
 __BEGIN_DECLS
 
-/**
- * @brief        Initialize quaternion
-*/
-extern void imu_quat_init(void);
-
-/**
- * @brief        Update ahrs by imu
-*/
-extern void imu_update_ahrs(void);
-
-/**
- * @brief        update imu attitude
-*/
-extern void imu_update_attitude(void);
-
 __END_DECLS
 
 /* Private defines -----------------------------------------------------------*/
 
-/* __IMU_AHRS_H__ ------------------------------------------------------------*/
-#endif /* __IMU_AHRS_H__ */
+/* __BSP_UART_H__ ------------------------------------------------------------*/
+#endif /* __BSP_UART_H__ */
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/

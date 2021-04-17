@@ -3,11 +3,10 @@
  * @file         bsp_buzzer.c/h
  * @brief        buzzer of boards
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode
- * @details      TIM12_CH1(PH6) 2700Hz
  * *****************************************************************************
 */
 
@@ -17,14 +16,15 @@
 /* Private includes ----------------------------------------------------------*/
 #include "main.h"
 
-extern TIM_HandleTypeDef htim12;
-
 /* Private define ------------------------------------------------------------*/
 
 #undef htim
 #define htim htim12
 #undef BUZZER_CHANNEL
 #define BUZZER_CHANNEL TIM_CHANNEL_1
+
+/* Private includes ----------------------------------------------------------*/
+extern TIM_HandleTypeDef htim;
 
 /* Private macro -------------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/

@@ -1,9 +1,9 @@
 /**
  * *****************************************************************************
- * @file         bsp_dma.c/h
+ * @file         bsp_dma.h
  * @brief        flash of boards
- * @author       ngu
- * @date         20210101
+ * @author       tqfx
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode
@@ -18,7 +18,6 @@
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
-
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
@@ -118,4 +117,4 @@ __END_DECLS
 /* __BSP_DMA_H__ -------------------------------------------------------------*/
 #endif /* __BSP_DMA_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT tqfx *******************END OF FILE****/

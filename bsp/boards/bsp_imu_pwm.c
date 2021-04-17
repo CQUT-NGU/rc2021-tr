@@ -3,7 +3,7 @@
  * @file         bsp_imu_pwm.c/h
  * @brief        The IMU temperature is controlled by PWM
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode
@@ -16,8 +16,6 @@
 /* Private includes ----------------------------------------------------------*/
 #include "main.h"
 
-extern TIM_HandleTypeDef htim3;
-
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 
@@ -25,6 +23,9 @@ extern TIM_HandleTypeDef htim3;
 #define htim htim3
 #undef IMU_CHANNEL
 #define IMU_CHANNEL TIM_CHANNEL_2
+
+/* Private includes ----------------------------------------------------------*/
+extern TIM_HandleTypeDef htim;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -56,4 +57,4 @@ void imu_pwm_set(uint16_t pwm)
     __HAL_TIM_SetCompare(&htim, IMU_CHANNEL, pwm & 0x3FFFU);
 }
 
-/************************ (C) COPYRIGHT tqfx *******************END OF FILE****/
+/************************ (C) COPYRIGHT ngu ********************END OF FILE****/

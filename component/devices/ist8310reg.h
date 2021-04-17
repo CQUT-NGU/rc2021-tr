@@ -1,9 +1,9 @@
 /**
  * *****************************************************************************
- * @file         ist8310reg.c/h
+ * @file         ist8310reg.h
  * @brief        ist8310 of divices
  * @author       ngu
- * @date         20210101
+ * @date         20210427
  * @version      1
  * @copyright    Copyright (c) 2021
  * @code         utf-8                                                  @endcode

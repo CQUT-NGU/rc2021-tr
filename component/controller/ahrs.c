@@ -37,30 +37,30 @@
 
 #undef NORM3
 /* Normalise 3 measurement */
-#define NORM3(_x_, _y_, _z_)                                      \
-                                                                  \
-    do                                                            \
-    {                                                             \
-        /* Fast inverse square-root */                            \
-        float norm = inv_sqrt(_x_ * _x_ + _y_ * _y_ + _z_ * _z_); \
-        _x_ *= norm;                                              \
-        _y_ *= norm;                                              \
-        _z_ *= norm;                                              \
+#define NORM3(_x, _y, _z)                                   \
+                                                            \
+    do                                                      \
+    {                                                       \
+        /* Fast inverse square-root */                      \
+        float norm = inv_sqrt(_x * _x + _y * _y + _z * _z); \
+        _x *= norm;                                         \
+        _y *= norm;                                         \
+        _z *= norm;                                         \
     } while (0);
 
 #undef NORM4
 /* Normalise 4 measurement */
-#define NORM4(_w_, _x_, _y_, _z_)                     \
-                                                      \
-    do                                                \
-    {                                                 \
-        /* Fast inverse square-root */                \
-        float norm = inv_sqrt(_w_ * _w_ + _x_ * _x_ + \
-                              _y_ * _y_ + _z_ * _z_); \
-        _w_ *= norm;                                  \
-        _x_ *= norm;                                  \
-        _y_ *= norm;                                  \
-        _z_ *= norm;                                  \
+#define NORM4(_w, _x, _y, _z)                     \
+                                                  \
+    do                                            \
+    {                                             \
+        /* Fast inverse square-root */            \
+        float norm = inv_sqrt(_w * _w + _x * _x + \
+                              _y * _y + _z * _z); \
+        _w *= norm;                               \
+        _x *= norm;                               \
+        _y *= norm;                               \
+        _z *= norm;                               \
     } while (0);
 
 /* Private variables ---------------------------------------------------------*/
