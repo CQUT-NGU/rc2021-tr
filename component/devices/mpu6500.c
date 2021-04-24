@@ -34,7 +34,7 @@ extern SPI_HandleTypeDef hspi;
 
 /* Private macro -------------------------------------------------------------*/
 
-#if !USED_OS
+#if 0
 #define MPU_DELAY osDelay
 #else
 #define MPU_DELAY delay_ms
@@ -401,7 +401,11 @@ void mpu_device_init(void)
     mpu_set_gyro_fsr(3U);
     mpu_set_accel_fsr(2U);
 
-    ist_init();
+    if (ist_init())
+    {
+        led_pwm_start();
+        led_pwm_set(0x3FFF);
+    }
     mpu_offset_call();
 }
 

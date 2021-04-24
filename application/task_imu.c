@@ -104,7 +104,7 @@ void task_imu(void *pvParameters)
                   mpu.my,
                   mpu.mz,
                   mpu.temp);
-#elif 1
+#elif 0
         os_putf(imu.rol, 5);
         os_printf(",");
         os_putf(imu.pit, 5);

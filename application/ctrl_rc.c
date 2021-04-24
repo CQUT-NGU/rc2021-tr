@@ -19,7 +19,7 @@
 
 /* Private define ------------------------------------------------------------*/
 #undef hrc
-#define hrc huart_os
+#define hrc huart_rc
 
 /* Private includes ----------------------------------------------------------*/
 extern UART_HandleTypeDef hrc;
@@ -68,9 +68,9 @@ void RC_IRQHandler(void)
     }
     else if (hrc.Instance->SR & UART_FLAG_IDLE)
     {
-        static uint16_t len_rx = 0;
-
         __HAL_UART_CLEAR_PEFLAG(&hrc); /* Clears the UART PE pending flag */
+
+        static uint16_t len_rx = 0;
 
         /*!< DMA stream x configuration register */
         if ((hrc.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)

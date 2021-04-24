@@ -34,7 +34,6 @@ extern imu_t imu;
 #define CHASSIS_X_CHANNEL 0
 /* the channel num of controlling vertial speed */
 #define CHASSIS_Y_CHANNEL 1
-
 /* in some mode, can use remote control to control rotation speed */
 #define CHASSIS_WZ_CHANNEL 2
 
@@ -49,9 +48,9 @@ extern imu_t imu;
 /* in not following yaw angle mode, rocker value change to rotation speed */
 #define CHASSIS_WZ_RC_SEN 0.01f
 
-#define CHASSIS_ACCEL_X_NUM 0.1f
-#define CHASSIS_ACCEL_Y_NUM 0.1f
-#define CHASSIS_ACCEL_Z_NUM 0.1f
+#define CHASSIS_ACCEL_X_NUM 0.2f
+#define CHASSIS_ACCEL_Y_NUM 0.2f
+#define CHASSIS_ACCEL_Z_NUM 0.2f
 
 /* rocker value deadline */
 #define CHASSIS_RC_DEADLINE 10
@@ -60,7 +59,7 @@ extern imu_t imu;
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_VY 0.25f
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_WZ 0.25f
 
-#define MOTOR_DISTANCE_TO_CENTER 0.2f
+#define MOTOR_DISTANCE_TO_CENTER 0.68f
 
 /* chassis task control time 2ms */
 #define CHASSIS_CONTROL_TIME_MS 2
@@ -104,11 +103,11 @@ extern imu_t imu;
 #define M3505_MOTOR_SPEED_PID_MAX_IOUT 2000.0f
 
 /* chassis follow angle PID */
-#define CHASSIS_FOLLOW_GIMBAL_PID_KP       40.0f
+#define CHASSIS_FOLLOW_GIMBAL_PID_KP       10.0f
 #define CHASSIS_FOLLOW_GIMBAL_PID_KI       0.0f
 #define CHASSIS_FOLLOW_GIMBAL_PID_KD       0.0f
-#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT  6.0f
-#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT 0.2f
+#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT  PI
+#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT 0.1f
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -444,9 +443,9 @@ static void chassis_mode_ctrl(float *         vx_set,
     {
         chassis_rc(vx_set, vy_set, move);
 
-        cc_lpf(&move->wz_slow, move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL]);
-
-        *wz_set = -3.14159265f * move->wz_slow.out / 660;
+        *wz_set = const_rad(move->yaw_set -
+                            move->data_rc->rc.ch[CHASSIS_WZ_CHANNEL] *
+                                CHASSIS_ANGLE_Z_RC_SEN);
 
         switch (move->data_pc->c)
         {
@@ -609,6 +608,8 @@ static void chassis_loop(chassis_move_t *move)
 
 void task_chassis(void *pvParameters)
 {
+    can_filter_init();
+
     osDelay(CHASSIS_TASK_INIT_TIME);
 
     chassis_init(&move);

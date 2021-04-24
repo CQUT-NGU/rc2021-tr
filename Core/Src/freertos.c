@@ -71,7 +71,7 @@ const osThreadAttr_t chassis_attributes = {
   .stack_size = sizeof(chassisBuffer),
   .cb_mem = &chassisControlBlock,
   .cb_size = sizeof(chassisControlBlock),
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for imu */
 osThreadId_t imuHandle;
@@ -83,7 +83,7 @@ const osThreadAttr_t imu_attributes = {
   .stack_size = sizeof(imuBuffer),
   .cb_mem = &imuControlBlock,
   .cb_size = sizeof(imuControlBlock),
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 
 /* Private function prototypes -----------------------------------------------*/
