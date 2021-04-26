@@ -105,6 +105,7 @@ void task_imu(void *pvParameters)
                   mpu.mz,
                   mpu.temp);
 #elif 0
+        os_printf("a:");
         os_putf(imu.rol, 5);
         os_printf(",");
         os_putf(imu.pit, 5);
@@ -114,6 +115,11 @@ void task_imu(void *pvParameters)
         os_putf(imu.temp, 3);
         os_printf("\r\n");
 #endif
+        os_pushf(imu.rol);
+        os_pushf(imu.pit);
+        os_pushf(imu.yaw);
+        os_pushf(imu.temp);
+        os_tail();
 
         osDelay(2U);
     }
