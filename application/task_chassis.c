@@ -159,14 +159,14 @@ static void chassis_loop(chassis_move_t *move);
 static void chassis_init(chassis_move_t *move)
 {
     /* chassis motor speed PID */
-    const static float pid_v[3] = {
+    const static float kpid_v[3] = {
         M3505_MOTOR_SPEED_PID_KP,
         M3505_MOTOR_SPEED_PID_KI,
         M3505_MOTOR_SPEED_PID_KD,
     };
 
     /* chassis angle PID */
-    const static float pid_yaw[3] = {
+    const static float kpid_yaw[3] = {
         CHASSIS_FOLLOW_GIMBAL_PID_KP,
         CHASSIS_FOLLOW_GIMBAL_PID_KI,
         CHASSIS_FOLLOW_GIMBAL_PID_KD,
@@ -194,17 +194,19 @@ static void chassis_init(chassis_move_t *move)
     for (uint8_t i = 0U; i != 4U; ++i)
     {
         move->motor[i].measure = chassis_point(i);
-        cc_pid_position(&move->pid_speed[i],
-                        pid_v,
-                        M3505_MOTOR_SPEED_PID_MAX_OUT,
-                        M3505_MOTOR_SPEED_PID_MAX_IOUT);
+        cc_pid_f32_position(&move->pid_speed[i],
+                            kpid_v,
+                            -M3505_MOTOR_SPEED_PID_MAX_OUT,
+                            M3505_MOTOR_SPEED_PID_MAX_OUT,
+                            M3505_MOTOR_SPEED_PID_MAX_IOUT);
     }
 
     /* initialize angle PID */
-    cc_pid_position(&move->pid_angle,
-                    pid_yaw,
-                    CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
-                    CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
+    cc_pid_f32_position(&move->pid_angle,
+                        kpid_yaw,
+                        -CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
+                        CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
+                        CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
 
     /* first order low-pass filter  replace ramp function */
     cc_lpf_init(&move->vx_slow, lpf_x, CHASSIS_CONTROL_TIME);
@@ -235,7 +237,7 @@ static void chassis_update(chassis_move_t *move)
         move->motor[i].v = move->motor[i].measure->v_rpm *
                            CHASSIS_MOTOR_RPM_TO_VECTOR_SEN;
 
-        move->motor[i].accel = move->pid_speed[i].buf_d[0] *
+        move->motor[i].accel = (move->pid_speed[i].x[0] - move->pid_speed[i].x[1]) *
                                CHASSIS_CONTROL_FREQUENCE;
     }
 
@@ -267,11 +269,9 @@ static void chassis_update(chassis_move_t *move)
      * if chassis add a new gyro sensor,please change this code
     */
 #if 1
-    move->roll = const_rad(move->imu->rol);
-
+    move->yaw   = const_rad(move->imu->yaw);
     move->pitch = move->imu->pit;
-
-    move->yaw = const_rad(move->imu->yaw);
+    move->roll  = const_rad(move->imu->rol);
 #endif
 }
 
@@ -494,7 +494,7 @@ static void chassis_loop_set(chassis_move_t *move)
         move->angle_set = const_rad(angle_set);
 #if 0
         /* calculate ratation speed */
-        move->wz_set = -cc_pid(&move->pid_angle, move->yaw_motor->relative_angle, move->angle_set);
+        move->wz_set = -cc_pid_f32(&move->pid_angle, move->yaw_motor->relative_angle, move->angle_set);
 #endif
         /* speed limit */
         move->vx_set = LIMIT(move->vx_set, move->vx_min, move->vx_max);
@@ -509,7 +509,7 @@ static void chassis_loop_set(chassis_move_t *move)
         delat_angle   = const_rad(move->yaw_set - move->yaw);
 
         /* calculate rotation speed */
-        move->wz_set = cc_pid(&move->pid_angle, 0, delat_angle);
+        move->wz_set = cc_pid_f32(&move->pid_angle, 0, delat_angle);
 
         /* speed limit */
         move->vx_set = LIMIT(vx_set, move->vx_min, move->vx_max);
@@ -600,9 +600,9 @@ static void chassis_loop(chassis_move_t *move)
     /* calculate pid */
     for (uint8_t i = 0U; i != 4U; ++i)
     {
-        move->motor[i].i_current = (int16_t)cc_pid(&move->pid_speed[i],
-                                                   move->motor[i].v,
-                                                   move->motor[i].v_set);
+        move->motor[i].i_current = (int16_t)cc_pid_f32(&move->pid_speed[i],
+                                                       move->motor[i].v,
+                                                       move->motor[i].v_set);
     }
 }
 

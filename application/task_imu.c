@@ -46,23 +46,24 @@ extern mpu_t mpu;
 /* Private function prototypes -----------------------------------------------*/
 /* Private user code ---------------------------------------------------------*/
 
-static cc_pid_t temp_pid;
+static cc_pid_f32_t pid_temp;
 
 static void ctrl_temp_init(void)
 {
-    static const float temp_pid_k[3] = {
+    static const float kpid_temp[3] = {
         TEMPERATURE_PID_KP,
         TEMPERATURE_PID_KI,
         TEMPERATURE_PID_KD,
     };
 #if 1
-    cc_pid_position(&temp_pid,
-                    temp_pid_k,
-                    TEMPERATURE_PID_MAX_OUT,
-                    TEMPERATURE_PID_MAX_IOUT);
+    cc_pid_f32_position(&pid_temp,
+                        kpid_temp,
+                        0,
+                        TEMPERATURE_PID_MAX_OUT,
+                        TEMPERATURE_PID_MAX_IOUT);
 #else
-    cc_pid_delta(&temp_pid,
-                 temp_pid_k,
+    cc_pid_delta(&pid_temp,
+                 kpid_temp,
                  TEMPERATURE_PID_MAX_OUT);
 #endif
 }
@@ -81,29 +82,20 @@ void task_imu(void *pvParameters)
         imu_update_ahrs();
         imu_update_attitude();
 
-        cc_pid(&temp_pid, imu.temp, 45.0f);
-        if (temp_pid.out < 0)
-        {
-            temp_pid.out = 0;
-            imu_pwm_set(0U);
-        }
-        else
-        {
-            imu_pwm_set((uint16_t)temp_pid.out);
-        }
+        imu_pwm_set((uint16_t)cc_pid_f32(&pid_temp, imu.temp, 45.0f));
 
 #if 0
-        os_printf("%i,%i,%i,%i,%i,%i,%i,%i,%i,%i\r\n",
-                  mpu.gx,
-                  mpu.gy,
-                  mpu.gz,
-                  mpu.ax,
-                  mpu.ay,
-                  mpu.az,
-                  mpu.mx,
-                  mpu.my,
-                  mpu.mz,
-                  mpu.temp);
+        os_justfloat(10U,
+                     mpu.gx,
+                     mpu.gy,
+                     mpu.gz,
+                     mpu.ax,
+                     mpu.ay,
+                     mpu.az,
+                     mpu.mx,
+                     mpu.my,
+                     mpu.mz,
+                     mpu.temp);
 #elif 0
         os_printf("a:");
         os_putf(imu.rol, 5);
@@ -114,12 +106,15 @@ void task_imu(void *pvParameters)
         os_printf(",");
         os_putf(imu.temp, 3);
         os_printf("\r\n");
-#endif
+#elif 0
         os_pushf(imu.rol);
         os_pushf(imu.pit);
         os_pushf(imu.yaw);
         os_pushf(imu.temp);
         os_tail();
+#elif 1
+        os_justfloat(4U, imu.rol, imu.pit, imu.yaw, imu.temp);
+#endif
 
         osDelay(2U);
     }

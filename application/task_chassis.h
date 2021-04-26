@@ -75,8 +75,8 @@ typedef struct
     chassis_mode_e  mode;     /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */
 
-    cc_pid_t pid_speed[4]; /* motor speed PID */
-    cc_pid_t pid_angle;    /* follow angle PID */
+    cc_pid_f32_t pid_speed[4]; /* motor speed PID */
+    cc_pid_f32_t pid_angle;    /* follow angle PID */
 
     /* use first order filter to slow set-point */
     cc_lpf_t vx_slow;
