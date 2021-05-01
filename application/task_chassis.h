@@ -15,7 +15,7 @@
 #define __TASK_CHASSIS_H__
 
 /* Includes ------------------------------------------------------------------*/
-#include "cc.h"
+#include "ca.h"
 #include "ctrl.h"
 #include "mpu6500.h"
 
@@ -75,15 +75,15 @@ typedef struct
     chassis_mode_e  mode;     /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */
 
-    cc_pid_f32_t pid_speed[4]; /* motor speed PID */
-    cc_pid_f32_t pid_angle;    /* follow angle PID */
+    ca_pid_f32_t pid_speed[4]; /* motor speed PID */
+    ca_pid_f32_t pid_angle;    /* follow angle PID */
 
     /* use first order filter to slow set-point */
-    cc_lpf_t vx_slow;
+    ca_lpf_f32_t vx_slow;
     /* use first order filter to slow set-point */
-    cc_lpf_t vy_slow;
+    ca_lpf_f32_t vy_slow;
     /* use first order filter to slow set-point */
-    cc_lpf_t wz_slow;
+    ca_lpf_f32_t wz_slow;
 
     /* chassis vertical speed, positive means forward,unit m/s */
     float vx;

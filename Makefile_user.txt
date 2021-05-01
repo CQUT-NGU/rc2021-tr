@@ -17,11 +17,7 @@ C_SOURCES += application/task_led.c
 C_SOURCES += application/task_chassis.c
 C_SOURCES += application/task_imu.c
 
-C_SOURCES += cc/cc_pid.c
-C_SOURCES += cc/cc_lpf.c
-C_SOURCES += cc/cc_math.c
-C_SOURCES += cc/ahrs.c
-C_SOURCES += cc/zyx.c
+C_SOURCES += ca/ca.c
 
 C_SOURCES += bsp/devices/mpu6500.c
 C_SOURCES += bsp/devices/imu_ahrs.c
@@ -31,8 +27,8 @@ C_SOURCES += DSP/Source/FastMathFunctions/FastMathFunctionsF16.c
 
 C_INCLUDES += -I.
 
-C_INCLUDES += -Icc
-C_INCLUDES += -Ibsp/boards
-C_INCLUDES += -Ibsp/devices
-C_INCLUDES += -Iapplication
-C_INCLUDES += -IDSP/Include
+C_INCLUDES += -I ca
+C_INCLUDES += -I bsp/boards
+C_INCLUDES += -I bsp/devices
+C_INCLUDES += -I application
+C_INCLUDES += -I DSP/Include

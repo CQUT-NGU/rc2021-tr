@@ -15,7 +15,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
-#include "cc.h"
+#include "ca.h"
 #include "imu_ahrs.h"
 #include "main.h"
 #include "mpu6500.h"
@@ -46,7 +46,7 @@ extern mpu_t mpu;
 /* Private function prototypes -----------------------------------------------*/
 /* Private user code ---------------------------------------------------------*/
 
-static cc_pid_f32_t pid_temp;
+static ca_pid_f32_t pid_temp;
 
 static void ctrl_temp_init(void)
 {
@@ -56,13 +56,13 @@ static void ctrl_temp_init(void)
         TEMPERATURE_PID_KD,
     };
 #if 1
-    cc_pid_f32_position(&pid_temp,
+    ca_pid_f32_position(&pid_temp,
                         kpid_temp,
                         0,
                         TEMPERATURE_PID_MAX_OUT,
                         TEMPERATURE_PID_MAX_IOUT);
 #else
-    cc_pid_delta(&pid_temp,
+    ca_pid_delta(&pid_temp,
                  kpid_temp,
                  TEMPERATURE_PID_MAX_OUT);
 #endif
@@ -82,7 +82,7 @@ void task_imu(void *pvParameters)
         imu_update_ahrs();
         imu_update_attitude();
 
-        imu_pwm_set((uint16_t)cc_pid_f32(&pid_temp, imu.temp, 45.0f));
+        imu_pwm_set((uint16_t)ca_pid_f32(&pid_temp, imu.temp, 45.0f));
 
 #if 0
         os_justfloat(10U,

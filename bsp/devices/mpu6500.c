@@ -15,7 +15,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
-#include "cc.h"
+#include "ca.h"
 #include "ist8310reg.h"
 #include "main.h"
 #include "mpu6500reg.h"

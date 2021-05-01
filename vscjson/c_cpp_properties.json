@@ -15,7 +15,7 @@
             ],
             "cStandard": "gnu11",
             "cppStandard": "gnu++11",
-            "compilerPath": "D:/Tools/msys64/mingw64/bin/arm-none-eabi-gcc.exe",
+            "compilerPath": "D:/Tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc.exe",
             "compilerArgs": [
                 "-mcpu=cortex-m4",
                 "-mthumb"

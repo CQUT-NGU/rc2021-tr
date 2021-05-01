@@ -214,6 +214,6 @@ clean:
 
 # *** EOF ***
 flash:
-	openocd -f ./openocd.cfg -c init -c halt -c "program $(BUILD_DIR)/$(TARGET).hex verify reset exit"
+	openocd -f E:/cqut-ngu/rc2021_stm32_tr/openocd.cfg -c init -c halt -c "program $(BUILD_DIR)/$(TARGET).hex verify reset exit"
 reset:
-	openocd -f ./openocd.cfg -c init -c halt -c reset -c shutdown
+	openocd -f E:/cqut-ngu/rc2021_stm32_tr/openocd.cfg -c init -c halt -c reset -c shutdown

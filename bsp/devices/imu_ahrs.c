@@ -15,7 +15,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 #include "ahrs.h"
-#include "cc.h"
+#include "ca.h"
 #include "main.h"
 #include "mpu6500.h"
 #include "zyx.h"
@@ -262,10 +262,10 @@ void imu_update_ahrs(void)
 void imu_update_attitude(void)
 {
     float a[3];
-    zyxf_quat_euler(quat, a);
-    imu.yaw = a[0];
-    imu.pit = a[1];
-    imu.rol = a[2];
+    zyx_f32_quat_euler(quat, a);
+    imu.yaw = a[ZYX_YAW];
+    imu.pit = a[ZYX_PITCH];
+    imu.rol = a[ZYX_ROLL];
 }
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/
