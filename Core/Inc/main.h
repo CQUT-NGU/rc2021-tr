@@ -58,6 +58,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define IMU_PWM_Pin GPIO_PIN_5
+#define IMU_PWM_GPIO_Port GPIOB
+#define SHIFTH_DIR_Pin GPIO_PIN_7
+#define SHIFTH_DIR_GPIO_Port GPIOI
+#define RELAY_Pin GPIO_PIN_6
+#define RELAY_GPIO_Port GPIOI
+#define SHIFTH_PWM_Pin GPIO_PIN_2
+#define SHIFTH_PWM_GPIO_Port GPIOI
 #define LED_G8_Pin GPIO_PIN_8
 #define LED_G8_GPIO_Port GPIOG
 #define LED_G7_Pin GPIO_PIN_7
@@ -72,12 +80,20 @@ void Error_Handler(void);
 #define LED_G4_GPIO_Port GPIOG
 #define LED_G3_Pin GPIO_PIN_3
 #define LED_G3_GPIO_Port GPIOG
+#define PITCH_Pin GPIO_PIN_15
+#define PITCH_GPIO_Port GPIOD
 #define LED_G2_Pin GPIO_PIN_2
 #define LED_G2_GPIO_Port GPIOG
 #define LED_G1_Pin GPIO_PIN_1
 #define LED_G1_GPIO_Port GPIOG
-#define buzzer_Pin GPIO_PIN_6
-#define buzzer_GPIO_Port GPIOH
+#define BUZZER_Pin GPIO_PIN_6
+#define BUZZER_GPIO_Port GPIOH
+#define SHIFTV_Pin GPIO_PIN_14
+#define SHIFTV_GPIO_Port GPIOD
+#define GETR_Pin GPIO_PIN_13
+#define GETR_GPIO_Port GPIOD
+#define GETL_Pin GPIO_PIN_12
+#define GETL_GPIO_Port GPIOD
 #define LED_R_PWM_Pin GPIO_PIN_11
 #define LED_R_PWM_GPIO_Port GPIOE
 #define LED_G9_Pin GPIO_PIN_14

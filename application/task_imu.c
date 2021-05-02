@@ -112,7 +112,7 @@ void task_imu(void *pvParameters)
         os_pushf(imu.yaw);
         os_pushf(imu.temp);
         os_tail();
-#elif 1
+#elif 0
         os_justfloat(4U, imu.rol, imu.pit, imu.yaw, imu.temp);
 #endif
 

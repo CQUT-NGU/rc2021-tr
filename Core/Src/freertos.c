@@ -85,6 +85,30 @@ const osThreadAttr_t imu_attributes = {
   .cb_size = sizeof(imuControlBlock),
   .priority = (osPriority_t) osPriorityRealtime,
 };
+/* Definitions for servo */
+osThreadId_t servoHandle;
+uint32_t servoBuffer[ 128 ];
+osStaticThreadDef_t servoControlBlock;
+const osThreadAttr_t servo_attributes = {
+  .name = "servo",
+  .stack_mem = &servoBuffer[0],
+  .stack_size = sizeof(servoBuffer),
+  .cb_mem = &servoControlBlock,
+  .cb_size = sizeof(servoControlBlock),
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for step */
+osThreadId_t stepHandle;
+uint32_t stepBuffer[ 128 ];
+osStaticThreadDef_t stepControlBlock;
+const osThreadAttr_t step_attributes = {
+  .name = "step",
+  .stack_mem = &stepBuffer[0],
+  .stack_size = sizeof(stepBuffer),
+  .cb_mem = &stepControlBlock,
+  .cb_size = sizeof(stepControlBlock),
+  .priority = (osPriority_t) osPriorityNormal,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -94,6 +118,8 @@ const osThreadAttr_t imu_attributes = {
 void task_led(void *argument);
 extern void task_chassis(void *argument);
 extern void task_imu(void *argument);
+extern void task_servo(void *argument);
+extern void task_step(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -132,6 +158,12 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of imu */
   imuHandle = osThreadNew(task_imu, NULL, &imu_attributes);
+
+  /* creation of servo */
+  servoHandle = osThreadNew(task_servo, NULL, &servo_attributes);
+
+  /* creation of step */
+  stepHandle = osThreadNew(task_step, NULL, &step_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

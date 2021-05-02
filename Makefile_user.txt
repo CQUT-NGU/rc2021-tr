@@ -2,6 +2,7 @@ C_SOURCES += $(wildcard *.c)
 
 C_SOURCES += bsp/boards/bsp_delay.c
 C_SOURCES += bsp/boards/bsp_flash.c
+C_SOURCES += bsp/boards/bsp_gpio.c
 C_SOURCES += bsp/boards/bsp_led.c
 C_SOURCES += bsp/boards/bsp_buzzer.c
 C_SOURCES += bsp/boards/bsp_usart.c
@@ -15,6 +16,8 @@ C_SOURCES += application/ctrl_pc.c
 
 C_SOURCES += application/task_led.c
 C_SOURCES += application/task_chassis.c
+C_SOURCES += application/task_servo.c
+C_SOURCES += application/task_step.c
 C_SOURCES += application/task_imu.c
 
 C_SOURCES += ca/ca.c
