@@ -39,12 +39,13 @@
 #define LED_PWM 0
 #endif /* LED_PWM */
 
-#define LED_PORT0 GPIOG /*!< line green */
-#define LED_PORT1 GPIOF /*!< green */
+#define LED_PORT0 GPIOG /* line green */
+#define LED_PORT1 GPIOF /* green */
 #if !LED_PWM
-
-#define LED_PORT2 GPIOE /*!< red */
-
+#define LED_PORT2 GPIOE /* red */
+#else
+#define LED_PWM_PSC 1U
+#define LED_PWM_MAX 0x10000U
 #endif /* LED_PWM */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -55,7 +56,8 @@
 #define __BEGIN_DECLS \
     extern "C"        \
     {
-#define __END_DECLS }
+#define __END_DECLS \
+    }
 #else
 #define __BEGIN_DECLS
 #define __END_DECLS
@@ -65,25 +67,24 @@
 
 typedef enum
 {
-    LED_ON  = 0,       /*!< turn on */
-    LED_OFF = !LED_ON, /*!< turn off */
+    LED_ON  = 0,       /* turn on */
+    LED_OFF = !LED_ON, /* turn off */
+
 } led_state_e;
 
 typedef enum
 {
-    LED_NUM_0 = GPIO_PIN_1,  /*!< green 0 */
-    LED_NUM_1 = GPIO_PIN_2,  /*!< green 1 */
-    LED_NUM_2 = GPIO_PIN_3,  /*!< green 2 */
-    LED_NUM_3 = GPIO_PIN_4,  /*!< green 3 */
-    LED_NUM_4 = GPIO_PIN_5,  /*!< green 4 */
-    LED_NUM_5 = GPIO_PIN_6,  /*!< green 5 */
-    LED_NUM_6 = GPIO_PIN_7,  /*!< green 6 */
-    LED_NUM_7 = GPIO_PIN_8,  /*!< green 7 */
-    LED_NUM_8 = GPIO_PIN_14, /*!< green */
+    LED_NUM_0 = GPIO_PIN_1,  /* green 0 */
+    LED_NUM_1 = GPIO_PIN_2,  /* green 1 */
+    LED_NUM_2 = GPIO_PIN_3,  /* green 2 */
+    LED_NUM_3 = GPIO_PIN_4,  /* green 3 */
+    LED_NUM_4 = GPIO_PIN_5,  /* green 4 */
+    LED_NUM_5 = GPIO_PIN_6,  /* green 5 */
+    LED_NUM_6 = GPIO_PIN_7,  /* green 6 */
+    LED_NUM_7 = GPIO_PIN_8,  /* green 7 */
+    LED_NUM_8 = GPIO_PIN_14, /* green */
 #if !LED_PWM
-
-    LED_NUM_9 = GPIO_PIN_11, /*!< red */
-
+    LED_NUM_9 = GPIO_PIN_11, /* red */
 #endif /* LED_PWM */
 } led_e;
 
@@ -146,7 +147,7 @@ extern void led_pwm_stop(void);
 
 /**
  * @brief        Set pwm of the red led
- * @param[in]    value: 0 ~ 0xFFFF
+ * @param[in]    value: 0 ~ LED_PWM_MAX
 */
 extern void led_pwm_set(uint16_t value);
 

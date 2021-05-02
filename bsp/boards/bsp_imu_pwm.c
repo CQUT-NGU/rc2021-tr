@@ -35,26 +35,26 @@ extern TIM_HandleTypeDef htim;
 
 void imu_pwm_start(void)
 {
-    /*!< Set the TIM Prescaler on runtime */
-    __HAL_TIM_SET_PRESCALER(&htim, 179U);
-    /*!< Set the TIM Autoreload Register value on runtime */
-    __HAL_TIM_SetAutoreload(&htim, 0x3FFEU);
-    /*!< Set the TIM Clock Division value on runtime */
+    /* Set the TIM Prescaler on runtime */
+    __HAL_TIM_SET_PRESCALER(&htim, IMU_PWM_PSC - 1U);
+    /* Set the TIM Autoreload Register value on runtime */
+    __HAL_TIM_SetAutoreload(&htim, IMU_PWM_MAX - 1U);
+    /* Set the TIM Clock Division value on runtime */
     __HAL_TIM_SetClockDivision(&htim, TIM_CLOCKDIVISION_DIV1);
-    /*!< Starts the PWM signal generation */
+    /* Starts the PWM signal generation */
     HAL_TIM_PWM_Start(&htim, IMU_CHANNEL);
 }
 
 void imu_pwm_stop(void)
 {
-    /*!< Stops the PWM signal generation */
+    /* Stops the PWM signal generation */
     HAL_TIM_PWM_Stop(&htim, IMU_CHANNEL);
 }
 
 void imu_pwm_set(uint16_t pwm)
 {
-    /*!< Set the TIM Capture Compare Register value on runtime */
-    __HAL_TIM_SetCompare(&htim, IMU_CHANNEL, pwm & 0x3FFFU);
+    /* Set the TIM Capture Compare Register value on runtime */
+    __HAL_TIM_SetCompare(&htim, IMU_CHANNEL, pwm & IMU_PWM_MAX);
 }
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/

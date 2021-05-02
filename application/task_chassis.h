@@ -39,25 +39,25 @@
 
 typedef enum
 {
+    /* chassis will stop */
+    CHASSIS_VECTOR_STOP,
     /* chassis will follow yaw gimbal motor relative angle */
     CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW,
     /* chassis will have yaw angle(chassis_yaw) close-looped control */
     CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW,
     /* chassis will have rotation speed control */
     CHASSIS_VECTOR_NO_FOLLOW_YAW,
-    /* control-current will be sent to CAN bus derectly */
-    CHASSIS_VECTOR_STOP,
 } chassis_mode_e;
 
 typedef struct
 {
     const motor_t *measure;
 
-    float accel;
-    float v;
-    float v_set;
+    float accel; /* accelerated speed */
+    float v;     /* velocity */
+    float v_set; /* velocity set-point */
 
-    int16_t i_current;
+    int16_t i_current; /* current value */
 } chassis_motor_t;
 
 typedef struct
@@ -70,7 +70,6 @@ typedef struct
 
     /* the point to the euler angle of gyro sensor */
     imu_t *imu;
-    //const float *angle_ins;
 
     chassis_mode_e  mode;     /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */

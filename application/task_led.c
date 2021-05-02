@@ -31,7 +31,7 @@ void task_led(void *pvParameters)
     delay_init();
 
     buzzer_start();
-    buzzer_set(0, 0x3FFFU);
+    buzzer_set(0, BUZZER_PWM_DIV2);
     osDelay(1000U);
     buzzer_set(0, 0);
     buzzer_stop();
@@ -44,7 +44,7 @@ void task_led(void *pvParameters)
 
         if (count < 0)
         {
-            for (uint8_t i = 0U; i < 8U; i++)
+            for (uint8_t i = 0U; i != 8U; ++i)
             {
                 led_line(tmp);
                 osDelay(100U);
@@ -58,7 +58,7 @@ void task_led(void *pvParameters)
         }
         else
         {
-            for (uint8_t i = 0U; i < 8U; i++)
+            for (uint8_t i = 0U; i != 8U; ++i)
             {
                 led_line(tmp);
                 osDelay(100U);
@@ -71,8 +71,6 @@ void task_led(void *pvParameters)
             }
         }
     }
-
-    osThreadExit();
 }
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/

@@ -19,6 +19,10 @@
 #include <stdint.h>
 
 /* Exported constants --------------------------------------------------------*/
+
+#define IMU_PWM_PSC 180U
+#define IMU_PWM_MAX 0x3FFFU
+
 /* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -27,7 +31,8 @@
 #define __BEGIN_DECLS \
     extern "C"        \
     {
-#define __END_DECLS }
+#define __END_DECLS \
+    }
 #else
 #define __BEGIN_DECLS
 #define __END_DECLS
@@ -50,7 +55,7 @@ extern void imu_pwm_stop(void);
 
 /**
  * @brief        Set pwm of the imu
- * @param[in]    pwm: 0x0000U ~ 0x3FFFU
+ * @param[in]    pwm: 0x0000U ~ IMU_PWM_MAX
 */
 extern void imu_pwm_set(uint16_t pwm);
 

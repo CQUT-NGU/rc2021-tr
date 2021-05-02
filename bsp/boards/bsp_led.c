@@ -198,7 +198,7 @@ void led_toggle(led_e pin)
 
 void led_line(uint8_t state)
 {
-    /*!< GPIO port bit set/reset register */
+    /* GPIO port bit set/reset register */
     LED_PORT0->BSRR = ((uint32_t)state << 1U) |
                       (~((uint32_t)state << 1U) << 16U);
 }
@@ -219,25 +219,25 @@ void led_red(led_state_e state)
 
 void led_pwm_start(void)
 {
-    /*!< Set the TIM Prescaler on runtime */
-    __HAL_TIM_SET_PRESCALER(&htim, 0U);
-    /*!< Set the TIM Autoreload Register value on runtime */
-    __HAL_TIM_SetAutoreload(&htim, 0xFFFFU);
-    /*!< Set the TIM Clock Division value on runtime */
+    /* Set the TIM Prescaler on runtime */
+    __HAL_TIM_SET_PRESCALER(&htim, LED_PWM_PSC - 1U);
+    /* Set the TIM Autoreload Register value on runtime */
+    __HAL_TIM_SetAutoreload(&htim, LED_PWM_MAX - 1U);
+    /* Set the TIM Clock Division value on runtime */
     __HAL_TIM_SetClockDivision(&htim, TIM_CLOCKDIVISION_DIV1);
-    /*!< Starts the PWM signal generation */
+    /* Starts the PWM signal generation */
     HAL_TIM_PWM_Start(&htim, LED_CHANNEL);
 }
 
 void led_pwm_stop(void)
 {
-    /*!< Stops the PWM signal generation */
+    /* Stops the PWM signal generation */
     HAL_TIM_PWM_Stop(&htim, LED_CHANNEL);
 }
 
 void led_pwm_set(uint16_t value)
 {
-    /*!< Set the TIM Capture Compare Register value on runtime */
+    /* Set the TIM Capture Compare Register value on runtime */
     __HAL_TIM_SetCompare(&htim, LED_CHANNEL, value);
 }
 

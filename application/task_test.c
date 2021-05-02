@@ -71,7 +71,8 @@ void task_test(void *pvParameters)
     {
         if (ctrl->c == 't')
         {
-            ctrl->c        = '\0';
+            ctrl->c = '\0';
+
             uint16_t count = 0;
             if (ctrl->y < 0)
             {
@@ -90,8 +91,6 @@ void task_test(void *pvParameters)
             HAL_TIM_PWM_Start_IT(&htim8, TIM_CHANNEL_4);
         }
     }
-
-    osThreadExit();
 }
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/

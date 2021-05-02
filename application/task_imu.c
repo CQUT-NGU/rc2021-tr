@@ -28,16 +28,16 @@ extern mpu_t mpu;
 /* Private define ------------------------------------------------------------*/
 
 /* kp of temperature control PID */
-#define TEMPERATURE_PID_KP 10000.0f
+#define TEMPERATURE_PID_KP 10000.0F
 /* ki of temperature control PID */
-#define TEMPERATURE_PID_KI 2.0f
+#define TEMPERATURE_PID_KI 2.0F
 /* kd of temperature control PID */
-#define TEMPERATURE_PID_KD 0.0f
+#define TEMPERATURE_PID_KD 0.0F
 
 /* max out of temperature control PID */
-#define TEMPERATURE_PID_MAX_OUT 0x3fff
+#define TEMPERATURE_PID_MAX_OUT BUZZER_PWM_MAX
 /* max iout of temperature control PID */
-#define TEMPERATURE_PID_MAX_IOUT 0xfff
+#define TEMPERATURE_PID_MAX_IOUT 0xFFF
 
 /* Private macro -------------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
@@ -82,7 +82,7 @@ void task_imu(void *pvParameters)
         imu_update_ahrs();
         imu_update_attitude();
 
-        imu_pwm_set((uint16_t)ca_pid_f32(&pid_temp, imu.temp, 45.0f));
+        imu_pwm_set((uint16_t)ca_pid_f32(&pid_temp, imu.temp, 45.0F));
 
 #if 0
         os_justfloat(10U,
@@ -118,8 +118,6 @@ void task_imu(void *pvParameters)
 
         osDelay(2U);
     }
-
-    osThreadExit();
 }
 
 /************************ (C) COPYRIGHT ngu ********************END OF FILE****/
