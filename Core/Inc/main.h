@@ -66,8 +66,16 @@ void Error_Handler(void);
 #define RELAY_GPIO_Port GPIOI
 #define SHIFTH_PWM_Pin GPIO_PIN_2
 #define SHIFTH_PWM_GPIO_Port GPIOI
+#define POWER1_Pin GPIO_PIN_2
+#define POWER1_GPIO_Port GPIOH
+#define POWER2_Pin GPIO_PIN_3
+#define POWER2_GPIO_Port GPIOH
+#define POWER3_Pin GPIO_PIN_4
+#define POWER3_GPIO_Port GPIOH
 #define LED_G8_Pin GPIO_PIN_8
 #define LED_G8_GPIO_Port GPIOG
+#define POWER4_Pin GPIO_PIN_5
+#define POWER4_GPIO_Port GPIOH
 #define LED_G7_Pin GPIO_PIN_7
 #define LED_G7_GPIO_Port GPIOG
 #define LED_G6_Pin GPIO_PIN_6

@@ -64,25 +64,24 @@ static void step_init(void)
 
 static void shifth_update(const ctrl_rc_t *rc)
 {
-    if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
+    if (switch_is_down(rc->rc.s[RC_SW_L]) &&
         switch_is_down(rc->rc.s[RC_SW_R]))
     {
-        int16_t fr = rc->rc.ch[RC_CH_LV] << 1U;
+        int16_t fr = rc->rc.ch[RC_CH_LH];
 
-        if (fr > LIMIT_LOW_SHIFTH)
+        if (fr > 10)
         {
             gpio_pin_set(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
         }
-        else if (fr < -LIMIT_LOW_SHIFTH)
+        else if (fr < -10)
         {
             gpio_pin_reset(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
             fr = -fr;
         }
 
-        fr = ca_lpf_f32(&lpf, fr);
-
-        if (fr > LIMIT_LOW_SHIFTH)
+        if (fr > 100 && rc->rc.ch[RC_CH_LV] < -650)
         {
+            fr = ca_lpf_f32(&lpf, fr * 3);
             shifth_set(fr);
 
             if (!(step_flag_run & FLAG_RUN_SHIFTH))
@@ -93,21 +92,12 @@ static void shifth_update(const ctrl_rc_t *rc)
         }
         else
         {
+            lpf.out = 0;
             if (step_flag_run & FLAG_RUN_SHIFTH)
             {
                 CLEAR_BIT(step_flag_run, FLAG_RUN_SHIFTH);
                 HAL_TIM_PWM_Stop(&SHIFTH_TIM, SHIFTH_CHANNEL);
             }
-        }
-
-        /* relay control */
-        if (rc->rc.ch[RC_CH_S] > 440)
-        {
-            gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
-        }
-        else
-        {
-            gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
         }
     }
 }
@@ -117,13 +107,29 @@ void task_step(void *pvParameters)
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     step_init();
-    ca_lpf_f32_init(&lpf, 0.1, 0.002F);
+    ca_lpf_f32_init(&lpf, 0.1F, 0.002F);
 
     osDelay(1000);
 
     while (1)
     {
         shifth_update(rc);
+
+        if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
+            switch_is_down(rc->rc.s[RC_SW_R]))
+        {
+            /* relay control */
+            if (rc->rc.ch[RC_CH_S] > -440)
+            {
+                gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
+                gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
+            }
+            else
+            {
+                gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
+                gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
+            }
+        }
 
         osDelay(2U);
     }

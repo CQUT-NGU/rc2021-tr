@@ -100,12 +100,14 @@ void task_servo(void *pvParameters)
 
     ca_lpf_f32_t lpf;
 
-    ca_lpf_f32_init(&lpf, 0.5F, 0.002F);
+    ca_lpf_f32_init(&lpf, 0.7F, 0.002F);
 
     osDelay(999);
 
     servo_init();
     servo_start();
+
+    int16_t pwm_get = 0;
 
     while (1)
     {
@@ -136,10 +138,24 @@ void task_servo(void *pvParameters)
                 shiftv_set(1000U);
             }
 
-            ca_lpf_f32(&lpf, rc->rc.ch[RC_CH_LV] * 50 / 33);
-            get_set((int16_t)lpf.out);
-
-            pitch_set(1500 - (int16_t)rc->rc.ch[RC_CH_RV]);
+            if (rc->rc.ch[RC_CH_RV] > 0 && rc->rc.ch[RC_CH_LV] < -650)
+            {
+                pitch_set(1300 - rc->rc.ch[RC_CH_RV]);
+            }
+            else if (rc->rc.ch[RC_CH_RV] < 0 && rc->rc.ch[RC_CH_LV] < -650)
+            {
+                int16_t delta = pwm_get + rc->rc.ch[RC_CH_RV] * 5 / 4;
+                if (delta < 0)
+                {
+                    pwm_get++;
+                    get_set(pwm_get);
+                }
+                else if (delta > 0)
+                {
+                    pwm_get--;
+                    get_set(pwm_get);
+                }
+            }
         }
 
         osDelay(2U);
