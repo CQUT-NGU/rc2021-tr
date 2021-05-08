@@ -115,22 +115,6 @@ void task_step(void *pvParameters)
     {
         shifth_update(rc);
 
-        if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
-            switch_is_down(rc->rc.s[RC_SW_R]))
-        {
-            /* relay control */
-            if (rc->rc.ch[RC_CH_S] > -440)
-            {
-                gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
-                gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
-            }
-            else
-            {
-                gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
-                gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
-            }
-        }
-
         osDelay(2U);
     }
 }

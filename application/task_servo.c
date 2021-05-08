@@ -107,6 +107,12 @@ void task_servo(void *pvParameters)
     servo_init();
     servo_start();
 
+    get_set(0);
+    pitch_set(1280);
+    shiftv_set(1000);
+
+    int16_t pwm_get_set = 0;
+
     int16_t pwm_get = 0;
 
     while (1)
@@ -115,9 +121,22 @@ void task_servo(void *pvParameters)
         {
         case 'a':
         {
-            get_set((int16_t)pc->x);
-            shiftv_set((int16_t)pc->y);
-            pitch_set((int16_t)pc->z);
+            pwm_get_set = (int16_t)pc->x;
+            pitch_set((int16_t)pc->y);
+            shiftv_set((int16_t)pc->z);
+
+            int16_t delta = pwm_get + pwm_get_set;
+            if (delta < 0)
+            {
+                pwm_get++;
+                get_set(pwm_get);
+            }
+            else if (delta > 0)
+            {
+                pwm_get--;
+                get_set(pwm_get);
+            }
+            os_printf("%i\r\n", pwm_get);
 
             break;
         }
@@ -129,36 +148,68 @@ void task_servo(void *pvParameters)
         if (switch_is_down(rc->rc.s[RC_SW_L]) &&
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
-            if (rc->rc.ch[RC_CH_S] < -440)
+            if (rc->rc.ch[RC_CH_LV] < -650)
             {
-                shiftv_set(2300U);
+                if (rc->rc.ch[RC_CH_S] < -550)
+                {
+                    gpio_pin_reset(POWER3_GPIO_Port, POWER3_Pin);
+                }
+                else if (rc->rc.ch[RC_CH_S] < -110)
+                {
+                    shiftv_set(2300);
+                }
+
+                if (rc->rc.ch[RC_CH_S] > 110 ||
+                    rc->rc.ch[RC_CH_RV] > 220)
+                {
+                    shiftv_set(1000);
+                }
+
+                if (rc->rc.ch[RC_CH_RV] > 10)
+                {
+                    pitch_set(1280 - rc->rc.ch[RC_CH_RV]);
+                }
+                else if (rc->rc.ch[RC_CH_RV] < -440)
+                {
+                    pwm_get_set = 750;
+                }
+                else if (rc->rc.ch[RC_CH_RV] < -10)
+                {
+                    gpio_pin_set(POWER3_GPIO_Port, POWER3_Pin);
+                }
+            }
+            else if (rc->rc.ch[RC_CH_LV] > 650)
+            {
+                pwm_get_set = 0;
             }
             else
             {
-                shiftv_set(1000U);
-            }
-
-            if (rc->rc.ch[RC_CH_RV] > 0 && rc->rc.ch[RC_CH_LV] < -650)
-            {
-                pitch_set(1300 - rc->rc.ch[RC_CH_RV]);
-            }
-            else if (rc->rc.ch[RC_CH_RV] < 0 && rc->rc.ch[RC_CH_LV] < -650)
-            {
-                int16_t delta = pwm_get + rc->rc.ch[RC_CH_RV] * 5 / 4;
-                if (delta < 0)
+                /* relay control */
+                if (rc->rc.ch[RC_CH_S] < -440)
                 {
-                    pwm_get++;
-                    get_set(pwm_get);
+                    gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
+                    gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
                 }
-                else if (delta > 0)
+                else
                 {
-                    pwm_get--;
-                    get_set(pwm_get);
+                    gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
+                    gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
                 }
             }
         }
 
-        osDelay(2U);
+        int16_t delta = pwm_get - pwm_get_set;
+        if (delta < 0)
+        {
+            pwm_get++;
+            get_set(pwm_get);
+        }
+        else if (delta > 0)
+        {
+            pwm_get--;
+            get_set(pwm_get);
+        }
+        osDelay(4);
     }
 }
 
