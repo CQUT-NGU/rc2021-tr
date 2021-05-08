@@ -41,13 +41,19 @@ extern TIM_HandleTypeDef htim4;
 #define FLAG_RUN_SHIFTV (1U << 2U)
 #define FLAG_RUN_PITCH  (1U << 3U)
 
+#define PWM_INIT_GET 0
+#define PWM_LIFT_GET 100
+#define PWM_LAST_GET 750
+
+#define PWM_INIT_PITCH 1288
+
+#define PWM_INIT_SHIFTV 1000
+#define PWM_LAST_SHIFTV 2300
+
 /* Private macro -------------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-
-//static uint8_t flag_servo_run = 0x00U;
-
 /* Private function prototypes -----------------------------------------------*/
 /* Private user code ---------------------------------------------------------*/
 
@@ -98,18 +104,14 @@ void task_servo(void *pvParameters)
 
     ctrl_pc_t *pc = ctrl_pc_point();
 
-    ca_lpf_f32_t lpf;
-
-    ca_lpf_f32_init(&lpf, 0.7F, 0.002F);
-
-    osDelay(999);
-
     servo_init();
     servo_start();
 
-    get_set(0);
-    pitch_set(1280);
-    shiftv_set(1000);
+    get_set(PWM_INIT_GET);
+    pitch_set(PWM_INIT_PITCH);
+    shiftv_set(PWM_INIT_SHIFTV);
+
+    osDelay(500);
 
     int16_t pwm_get_set = 0;
 
@@ -125,19 +127,6 @@ void task_servo(void *pvParameters)
             pitch_set((int16_t)pc->y);
             shiftv_set((int16_t)pc->z);
 
-            int16_t delta = pwm_get + pwm_get_set;
-            if (delta < 0)
-            {
-                pwm_get++;
-                get_set(pwm_get);
-            }
-            else if (delta > 0)
-            {
-                pwm_get--;
-                get_set(pwm_get);
-            }
-            os_printf("%i\r\n", pwm_get);
-
             break;
         }
 
@@ -145,70 +134,102 @@ void task_servo(void *pvParameters)
             break;
         }
 
+        /* down, down */
         if (switch_is_down(rc->rc.s[RC_SW_L]) &&
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
+            /* Pull the lever to the lowest level */
             if (rc->rc.ch[RC_CH_LV] < -650)
             {
+                /* Unclip the arrow */
                 if (rc->rc.ch[RC_CH_S] < -550)
                 {
                     gpio_pin_reset(POWER3_GPIO_Port, POWER3_Pin);
                 }
+                /**
+                 * -550 ~ -110
+                 * The steering gear is moved vertically forward and
+                 * inserted into the tail of the arrow
+                */
                 else if (rc->rc.ch[RC_CH_S] < -110)
                 {
-                    shiftv_set(2300);
+                    shiftv_set(PWM_LAST_SHIFTV);
                 }
 
+                /* The steering gear moves backwards vertically */
                 if (rc->rc.ch[RC_CH_S] > 110 ||
                     rc->rc.ch[RC_CH_RV] > 220)
                 {
-                    shiftv_set(1000);
+                    shiftv_set(PWM_INIT_SHIFTV);
                 }
 
-                if (rc->rc.ch[RC_CH_RV] > 10)
+                /* Set the Angle of the arrow */
+                if (rc->rc.ch[RC_CH_RV] > 0)
                 {
-                    pitch_set(1280 - rc->rc.ch[RC_CH_RV]);
+                    pitch_set(PWM_INIT_PITCH - rc->rc.ch[RC_CH_RV]);
                 }
-                else if (rc->rc.ch[RC_CH_RV] < -440)
+                /* Lift the arrow horizontally */
+                else if (rc->rc.ch[RC_CH_RV] < -550)
                 {
-                    pwm_get_set = 750;
+                    pwm_get_set = PWM_LAST_GET;
                 }
-                else if (rc->rc.ch[RC_CH_RV] < -10)
+                /* -440 ~ -10, Clip the arrow and lift it */
+                else if (rc->rc.ch[RC_CH_RV] < -110)
                 {
+                    /* Clamp the arrow */
                     gpio_pin_set(POWER3_GPIO_Port, POWER3_Pin);
+                    /* Lift it */
+                    if (pwm_get_set == PWM_INIT_GET)
+                    {
+                        pwm_get_set = PWM_LIFT_GET;
+                    }
                 }
             }
+            /* Pull lever up to maximum */
             else if (rc->rc.ch[RC_CH_LV] > 650)
             {
-                pwm_get_set = 0;
+                /* Return to initial position */
+                pwm_get_set = PWM_INIT_GET;
             }
+            /* The tie rod is in the normal position */
             else
             {
-                /* relay control */
+                /* relay control, shoot an arrow */
                 if (rc->rc.ch[RC_CH_S] < -440)
                 {
+                    /* It starts to spew out gas */
                     gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
-                    gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
+                    //gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
                 }
                 else
                 {
+                    /* Stop ejecting gas */
                     gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
-                    gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
+                    //gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
                 }
             }
         }
 
+        /**
+         * Updated arrow steering gear Angle,
+         * prevent the PWM from changing too much to
+         * cause the steering gear to jam
+        */
         int16_t delta = pwm_get - pwm_get_set;
         if (delta < 0)
         {
             pwm_get++;
-            get_set(pwm_get);
         }
         else if (delta > 0)
         {
             pwm_get--;
+        }
+        if (delta)
+        {
             get_set(pwm_get);
         }
+
+        /* Task delay */
         osDelay(4);
     }
 }
