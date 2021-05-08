@@ -3,7 +3,7 @@
  * @file         task_step.c/h
  * @brief        stepping motor control task
  * @author       ngu
- * @date         20210502
+ * @date         20210509
  * @version      1
  * @copyright    Copyright (C) 2021
  * @code         utf-8                                                  @endcode
@@ -79,10 +79,9 @@ static void shifth_update(const ctrl_rc_t *rc)
             fr = -fr;
         }
 
-        if (fr > 100 && rc->rc.ch[RC_CH_LV] < -650)
+        if (rc->rc.ch[RC_CH_LV] < -650)
         {
-            fr = ca_lpf_f32(&lpf, fr * 3);
-            shifth_set(fr);
+            shifth_set((int16_t)ca_lpf_f32(&lpf, fr * 3));
 
             if (!(step_flag_run & FLAG_RUN_SHIFTH))
             {
@@ -92,7 +91,7 @@ static void shifth_update(const ctrl_rc_t *rc)
         }
         else
         {
-            lpf.out = 0;
+            ca_lpf_reset(&lpf);
             if (step_flag_run & FLAG_RUN_SHIFTH)
             {
                 CLEAR_BIT(step_flag_run, FLAG_RUN_SHIFTH);
@@ -106,8 +105,9 @@ void task_step(void *pvParameters)
 {
     const ctrl_rc_t *rc = ctrl_rc_point();
 
-    step_init();
     ca_lpf_f32_init(&lpf, 0.1F, 0.002F);
+
+    step_init();
 
     osDelay(1000);
 
