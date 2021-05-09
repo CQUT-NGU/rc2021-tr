@@ -45,10 +45,15 @@ extern TIM_HandleTypeDef htim4;
 #define PWM_LIFT_GET 100
 #define PWM_LAST_GET 750
 
-#define PWM_INIT_PITCH 1288
+#define PWM_INIT_PITCH 1275
 
 #define PWM_INIT_SHIFTV 1000
 #define PWM_LAST_SHIFTV 2300
+
+#define SHOOT_COUNT      50U
+#define FLAG_SHOOT_START (1U << 0U)
+#define FLAG_SHOOT_COUNT (1U << 1U)
+#define FLAG_SHOOT_STOP  (1U << 2U)
 
 /* Private macro -------------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
@@ -117,6 +122,9 @@ void task_servo(void *pvParameters)
 
     int16_t pwm_get = 0;
 
+    uint8_t shoot_flag  = 0x00U;
+    uint8_t shoot_count = 0x00U;
+
     while (1)
     {
         switch (pc->c)
@@ -142,7 +150,7 @@ void task_servo(void *pvParameters)
             if (rc->rc.ch[RC_CH_LV] < -650)
             {
                 /* Unclip the arrow */
-                if (rc->rc.ch[RC_CH_S] < -550)
+                if (rc->rc.ch[RC_CH_S] < -650)
                 {
                     gpio_pin_reset(POWER3_GPIO_Port, POWER3_Pin);
                 }
@@ -195,17 +203,27 @@ void task_servo(void *pvParameters)
             else
             {
                 /* relay control, shoot an arrow */
-                if (rc->rc.ch[RC_CH_S] < -440)
+                if (rc->rc.ch[RC_CH_S] < -650)
                 {
                     /* It starts to spew out gas */
-                    gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
-                    //gpio_pin_set(RELAY_GPIO_Port, RELAY_Pin);
+                    if (!READ_BIT(shoot_flag, FLAG_SHOOT_START))
+                    {
+                        SET_BIT(shoot_flag, FLAG_SHOOT_START);
+                        SET_BIT(shoot_flag, FLAG_SHOOT_COUNT);
+
+                        gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
+                    }
                 }
                 else
                 {
                     /* Stop ejecting gas */
+                    if (READ_BIT(shoot_flag, FLAG_SHOOT_STOP))
+                    {
+                        CLEAR_BIT(shoot_flag, FLAG_SHOOT_STOP);
+                        CLEAR_BIT(shoot_flag, FLAG_SHOOT_START);
+                    }
+
                     gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
-                    //gpio_pin_reset(RELAY_GPIO_Port, RELAY_Pin);
                 }
             }
         }
@@ -227,6 +245,19 @@ void task_servo(void *pvParameters)
         if (delta)
         {
             get_set(pwm_get);
+        }
+
+        /* Control injection time */
+        if (READ_BIT(shoot_flag, FLAG_SHOOT_COUNT))
+        {
+            if (shoot_count++ == SHOOT_COUNT)
+            {
+                shoot_count = 0U;
+                CLEAR_BIT(shoot_flag, FLAG_SHOOT_COUNT);
+
+                gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
+                SET_BIT(shoot_flag, FLAG_SHOOT_STOP);
+            }
         }
 
         /* Task delay */

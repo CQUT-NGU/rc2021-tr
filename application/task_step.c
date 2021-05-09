@@ -79,7 +79,8 @@ static void shifth_update(const ctrl_rc_t *rc)
             fr = -fr;
         }
 
-        if (rc->rc.ch[RC_CH_LV] < -650)
+        if (-100 < rc->rc.ch[RC_CH_LV] &&
+            rc->rc.ch[RC_CH_LV] < 100)
         {
             shifth_set((int16_t)ca_lpf_f32(&lpf, fr * 3));
 
@@ -105,7 +106,7 @@ void task_step(void *pvParameters)
 {
     const ctrl_rc_t *rc = ctrl_rc_point();
 
-    ca_lpf_f32_init(&lpf, 0.1F, 0.002F);
+    ca_lpf_f32_init(&lpf, 0.2F, 0.002F);
 
     step_init();
 
