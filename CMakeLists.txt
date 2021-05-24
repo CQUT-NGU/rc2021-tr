@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.10)
 project (rc2021_stm32_tr)
 
 if (NOT CMAKE_BUILD_TYPE)
-set (CMAKE_BUILD_TYPE "Release")
+  set (CMAKE_BUILD_TYPE "Debug")
 endif (NOT CMAKE_BUILD_TYPE)
 
 include (cmake-flags.cmake)
