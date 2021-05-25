@@ -93,7 +93,7 @@ static void shifth_update(const ctrl_rc_t *rc)
         }
         else
         {
-            ca_lpf_reset(&lpf);
+            ca_lpf_f32_reset(&lpf);
             if (step_flag_run & FLAG_RUN_SHIFTH)
             {
                 CLEAR_BIT(step_flag_run, FLAG_RUN_SHIFTH);
@@ -105,6 +105,8 @@ static void shifth_update(const ctrl_rc_t *rc)
 
 void task_step(void *pvParameters)
 {
+    (void)pvParameters;
+
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     ca_lpf_f32_init(&lpf, 0.1F, 0.002F);

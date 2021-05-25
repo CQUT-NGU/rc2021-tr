@@ -70,6 +70,8 @@ static void ctrl_temp_init(void)
 
 void task_imu(void *pvParameters)
 {
+    (void)pvParameters;
+
     ctrl_temp_init();
     imu_pwm_start();
 

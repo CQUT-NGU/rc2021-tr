@@ -20,7 +20,10 @@ C_SOURCES += application/task_servo.c
 C_SOURCES += application/task_step.c
 C_SOURCES += application/task_imu.c
 
-C_SOURCES += ca/ca.c
+C_SOURCES += ca/ca-pid.c
+C_SOURCES += ca/ca-math.c
+C_SOURCES += ca/ahrs.c
+C_SOURCES += ca/zyx.c
 
 C_SOURCES += bsp/devices/mpu6500.c
 C_SOURCES += bsp/devices/imu_ahrs.c

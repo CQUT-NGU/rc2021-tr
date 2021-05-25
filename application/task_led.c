@@ -28,6 +28,8 @@
 
 void task_led(void *pvParameters)
 {
+    (void)pvParameters;
+
     delay_init();
 
     buzzer_start();

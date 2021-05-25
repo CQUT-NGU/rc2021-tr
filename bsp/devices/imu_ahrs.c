@@ -82,9 +82,9 @@ static float t_get(void)
  * @param[in]    hx:   x axis direction of Earth's magnetic field
  * @param[in]    hy:   y axis direction of Earth's magnetic field
 */
-void quat_init(float   q[4],
-               int16_t hx,
-               int16_t hy)
+void quat_init(float q[4],
+               float hx,
+               float hy)
 {
 #ifdef BOARD_IS_DOWN
     if (hx < 0 && hy < 0)
@@ -247,9 +247,9 @@ void imu_quat_init(void)
 */
 void imu_update_ahrs(void)
 {
-    volatile float g[3] = {imu.wx, imu.wy, imu.wz};
-    volatile float a[3] = {imu.ax, imu.ay, imu.az};
-    volatile float m[3] = {imu.mx, imu.my, imu.mz};
+    float g[3] = {imu.wx, imu.wy, imu.wz};
+    float a[3] = {imu.ax, imu.ay, imu.az};
+    float m[3] = {imu.mx, imu.my, imu.mz};
 
     //ahrs_madgwick(quat, g, a, m, 2 * ht_get());
     ahrs_mahony(quat, g, a, m, ht_get());

@@ -105,6 +105,8 @@ static inline void pitch_set(uint16_t pwm)
 
 void task_servo(void *pvParameters)
 {
+    (void)pvParameters;
+
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     ctrl_pc_t *pc = ctrl_pc_point();

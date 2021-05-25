@@ -63,6 +63,8 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 
 void task_test(void *pvParameters)
 {
+    (void)pvParameters;
+
     TIM_SET_CAPTUREPOLARITY(&htim8, TIM_CHANNEL_4, TIM_ICPOLARITY_RISING);
 
     ctrl_pc_t *ctrl = ctrl_pc_point();
