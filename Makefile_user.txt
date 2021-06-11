@@ -37,3 +37,5 @@ C_INCLUDES += -I bsp/boards
 C_INCLUDES += -I bsp/devices
 C_INCLUDES += -I application
 C_INCLUDES += -I DSP/Include
+
+LDFLAGS += -u _printf_float
