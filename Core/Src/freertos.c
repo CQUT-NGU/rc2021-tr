@@ -109,6 +109,13 @@ const osThreadAttr_t step_attributes = {
   .cb_size = sizeof(stepControlBlock),
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for location */
+osThreadId_t locationHandle;
+const osThreadAttr_t location_attributes = {
+  .name = "location",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -120,6 +127,7 @@ extern void task_chassis(void *argument);
 extern void task_imu(void *argument);
 extern void task_servo(void *argument);
 extern void task_step(void *argument);
+void task_location(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -165,6 +173,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of step */
   stepHandle = osThreadNew(task_step, NULL, &step_attributes);
 
+  /* creation of location */
+  locationHandle = osThreadNew(task_location, NULL, &location_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -191,6 +202,24 @@ __weak void task_led(void *argument)
     osDelay(1);
   }
   /* USER CODE END task_led */
+}
+
+/* USER CODE BEGIN Header_task_location */
+/**
+* @brief Function implementing the location thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_task_location */
+__weak void task_location(void *argument)
+{
+  /* USER CODE BEGIN task_location */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END task_location */
 }
 
 /* Private application code --------------------------------------------------*/
