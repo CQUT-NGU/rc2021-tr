@@ -3,12 +3,10 @@
 
 //set real position
 typedef struct
-	{
-	float x;
-	float y;
-	float alpha;
-}real_position_t;
+{
+    float x;
+    float y;
+    float alpha;
+} real_position_t;
 
-
-#endif
-
+#endif /* __TASK_LOCATION_H */

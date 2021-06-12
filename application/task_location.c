@@ -1,22 +1,25 @@
+#include "task_location.h"
+
+#include "cmsis_os.h"
 #include "main.h"
 #include "mpu6500.h"
-#include "task_location.h"
-#include "cmsis_os.h"
-real_position_t real_position;//get the yaw (x ,y) position
+
 extern imu_t imu;
+
+real_position_t real_position;  //get the yaw (x ,y) position
+
 void task_location(void *argument)
 {
-	float vx,vy;
-	while(1)
-	{
-	real_position.alpha = imu.yaw ; //get xoy yaw
-	//»ñÈ¡xoyÆ½ÃæµÄx£¬yËÙ¶È
-	vx = imu.vx;
-	vy = imu.vy;
-	//Ö´ĞĞ»»Ëã,Ö´ĞĞÊ±¼äÎª10ms
-	real_position.x = vx*10;
-	real_position.y = vy*10;
-	}
-	 osDelay(4);
-
+    float vx, vy;
+    while (1)
+    {
+        real_position.alpha = imu.yaw;  //get xoy yaw
+        //è·å–xoyå¹³é¢çš„xï¼Œyé€Ÿåº¦
+        vx = imu.vx;
+        vy = imu.vy;
+        //æ‰§è¡Œæ¢ç®—,æ‰§è¡Œæ—¶é—´ä¸º10ms
+        real_position.x = vx * 10;
+        real_position.y = vy * 10;
+        osDelay(4);
+    }
 }
