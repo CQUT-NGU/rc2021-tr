@@ -34,7 +34,7 @@ extern SPI_HandleTypeDef hspi;
 
 /* Private macro -------------------------------------------------------------*/
 
-#if 0
+#if USED_OS
 #define MPU_DELAY osDelay
 #else
 #define MPU_DELAY delay_ms
