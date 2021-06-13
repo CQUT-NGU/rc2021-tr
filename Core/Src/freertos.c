@@ -55,10 +55,10 @@ uint32_t ledBuffer[ 128 ];
 osStaticThreadDef_t ledControlBlock;
 const osThreadAttr_t led_attributes = {
   .name = "led",
-  .stack_mem = &ledBuffer[0],
-  .stack_size = sizeof(ledBuffer),
   .cb_mem = &ledControlBlock,
   .cb_size = sizeof(ledControlBlock),
+  .stack_mem = &ledBuffer[0],
+  .stack_size = sizeof(ledBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for chassis */
@@ -67,10 +67,10 @@ uint32_t chassisBuffer[ 512 ];
 osStaticThreadDef_t chassisControlBlock;
 const osThreadAttr_t chassis_attributes = {
   .name = "chassis",
-  .stack_mem = &chassisBuffer[0],
-  .stack_size = sizeof(chassisBuffer),
   .cb_mem = &chassisControlBlock,
   .cb_size = sizeof(chassisControlBlock),
+  .stack_mem = &chassisBuffer[0],
+  .stack_size = sizeof(chassisBuffer),
   .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for imu */
@@ -79,10 +79,10 @@ uint32_t imuBuffer[ 512 ];
 osStaticThreadDef_t imuControlBlock;
 const osThreadAttr_t imu_attributes = {
   .name = "imu",
-  .stack_mem = &imuBuffer[0],
-  .stack_size = sizeof(imuBuffer),
   .cb_mem = &imuControlBlock,
   .cb_size = sizeof(imuControlBlock),
+  .stack_mem = &imuBuffer[0],
+  .stack_size = sizeof(imuBuffer),
   .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for servo */
@@ -91,10 +91,10 @@ uint32_t servoBuffer[ 128 ];
 osStaticThreadDef_t servoControlBlock;
 const osThreadAttr_t servo_attributes = {
   .name = "servo",
-  .stack_mem = &servoBuffer[0],
-  .stack_size = sizeof(servoBuffer),
   .cb_mem = &servoControlBlock,
   .cb_size = sizeof(servoControlBlock),
+  .stack_mem = &servoBuffer[0],
+  .stack_size = sizeof(servoBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for step */
@@ -103,18 +103,18 @@ uint32_t stepBuffer[ 128 ];
 osStaticThreadDef_t stepControlBlock;
 const osThreadAttr_t step_attributes = {
   .name = "step",
-  .stack_mem = &stepBuffer[0],
-  .stack_size = sizeof(stepBuffer),
   .cb_mem = &stepControlBlock,
   .cb_size = sizeof(stepControlBlock),
+  .stack_mem = &stepBuffer[0],
+  .stack_size = sizeof(stepBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for location */
 osThreadId_t locationHandle;
 const osThreadAttr_t location_attributes = {
   .name = "location",
+  .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
 };
 
 /* Private function prototypes -----------------------------------------------*/
