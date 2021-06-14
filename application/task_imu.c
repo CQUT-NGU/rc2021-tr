@@ -143,7 +143,7 @@ void task_imu(void *pvParameters)
                   mpu.my,
                   mpu.mz,
                   mpu.temp);
-#elif 1
+#elif 0
         if (index == 10)
         {
             for (index = 0; index < 10; index++)

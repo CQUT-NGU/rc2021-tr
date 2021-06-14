@@ -83,10 +83,10 @@ extern imu_t imu;
 
 /* single chassis motor max speed */
 #define MAX_WHEEL_SPEED 4.0F
-/* chassis forward or back max speed */
-#define NORMAL_MAX_CHASSIS_SPEED_Y 2.0F
 /* chassis left or right max speed */
 #define NORMAL_MAX_CHASSIS_SPEED_X 2.0F
+/* chassis forward or back max speed */
+#define NORMAL_MAX_CHASSIS_SPEED_Y 2.0F
 
 #define CHASSIS_WZ_SET_SCALE 0.1F
 
@@ -172,6 +172,12 @@ static void chassis_init(chassis_move_t *move)
         CHASSIS_FOLLOW_GIMBAL_PID_KD,
     };
 
+    const float kpid_p[3] = {
+        5.0F,
+        0.0F,
+        0.0F,
+    };
+
     const float lpf_x = {CHASSIS_ACCEL_X_NUM};
     const float lpf_y = {CHASSIS_ACCEL_Y_NUM};
     const float lpf_z = {CHASSIS_ACCEL_Z_NUM};
@@ -208,6 +214,17 @@ static void chassis_init(chassis_move_t *move)
                         CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
                         CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
 
+    ca_pid_f32_position(move->pid_offset,
+                        kpid_p,
+                        -NORMAL_MAX_CHASSIS_SPEED_X,
+                        NORMAL_MAX_CHASSIS_SPEED_X,
+                        0);
+    ca_pid_f32_position(move->pid_offset + 1,
+                        kpid_p,
+                        -NORMAL_MAX_CHASSIS_SPEED_Y,
+                        NORMAL_MAX_CHASSIS_SPEED_Y,
+                        0);
+
     /* first order low-pass filter  replace ramp function */
     ca_lpf_f32_init(&move->vx_slow, lpf_x, CHASSIS_CONTROL_TIME);
     ca_lpf_f32_init(&move->vy_slow, lpf_y, CHASSIS_CONTROL_TIME);
@@ -237,13 +254,13 @@ static void chassis_update(chassis_move_t *move)
         move->motor[i].v = move->motor[i].measure->v_rpm *
                            CHASSIS_MOTOR_RPM_TO_VECTOR_SEN;
 
-        move->motor[i].accel = (move->pid_speed[i].x[0] - move->pid_speed[i].x[1]) *
+        move->motor[i].accel = (move->pid_speed[i].x[1] - move->pid_speed[i].x[0]) *
                                CHASSIS_CONTROL_FREQUENCE;
     }
 
     /**
      * calculate horizontal speed, vertical speed, rotation speed,
-     * left hand rule
+     * right hand rule
     */
     move->vx = (move->motor[0].v +
                 move->motor[1].v -
@@ -263,6 +280,12 @@ static void chassis_update(chassis_move_t *move)
                 move->motor[3].v) *
                MOTOR_SPEED_TO_CHASSIS_SPEED_WZ /
                MOTOR_DISTANCE_TO_CENTER;
+
+    /**
+     * calculate horizontal offset, vertical offset
+    */
+    move->x += move->vx * CHASSIS_CONTROL_TIME;
+    move->y += move->vy * CHASSIS_CONTROL_TIME;
 
     /**
      * calculate chassis euler angle,
@@ -418,6 +441,29 @@ static void chassis_mode_ctrl(float *         vx_set,
             *vx_set = move->data_pc->x;
             *vy_set = move->data_pc->y;
             *wz_set = move->data_pc->z;
+
+            break;
+        }
+
+        case 'p':
+        {
+            float tmp     = move->data_pc->x - move->x;
+            float tmp_abs = ABS(tmp);
+            if (tmp_abs > 0.001F)
+            {
+                *vx_set = ca_pid_f32(move->pid_offset,
+                                     move->x,
+                                     move->data_pc->x);
+            }
+
+            tmp     = move->data_pc->y - move->y;
+            tmp_abs = ABS(tmp);
+            if (tmp_abs > 0.001F)
+            {
+                *vy_set = ca_pid_f32(move->pid_offset + 1,
+                                     move->y,
+                                     move->data_pc->y);
+            }
 
             break;
         }
@@ -591,6 +637,8 @@ void task_chassis(void *pvParameters)
                      move.motor[1].v,
                      move.motor[2].v,
                      move.motor[3].v);
+#elif 0
+        os_printf("p:%g,%g\n", move.x, move.y);
 #endif
 
         osDelay(CHASSIS_CONTROL_TIME_MS);
