@@ -1,21 +1,18 @@
 /**
  * *****************************************************************************
- * @file         ctrl_can.c/h
+ * @file         ctrl_can.c
  * @brief        can control
- * @author       ngu
- * @date         20210427
+ * @author       NGU
+ * @date         20210619
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (c) 2021 NGU
  * @details      there is CAN interrupt function to receive motor data, and CAN 
  *               send function to send motor current to control motor.
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "ctrl_can.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
 #include "main.h"
 
@@ -23,9 +20,6 @@ extern CAN_HandleTypeDef hcan1;
 #if CAN2_IS_ENABLE
 extern CAN_HandleTypeDef hcan2;
 #endif /* CAN2_IS_ENABLE */
-
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
 
 /**
  * @brief motor data read 
@@ -41,18 +35,11 @@ extern CAN_HandleTypeDef hcan2;
         (ptr)->temperate = (data)[6];                               \
     } while (0)
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-
 static motor_t motor_chassis[4];
 
 static CAN_TxHeaderTypeDef chassis_tx_message;
 
 static uint8_t chassis_tx_can_data[8];
-
-/* Private function prototypes -----------------------------------------------*/
-/* Private user code ---------------------------------------------------------*/
 
 /**
  * @brief        hal CAN fifo call back, receive motor data
@@ -72,8 +59,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     case CAN_ID_3508_M3:
     case CAN_ID_3508_M4:
     {
-        MOTOR_MEASURE(&motor_chassis[(header_rx.StdId - CAN_ID_3508_M1)],
-                      data_rx); /*!< Get motor id */
+        MOTOR_MEASURE(&motor_chassis[(header_rx.StdId - CAN_ID_3508_M1)], data_rx);
         break;
     }
 
@@ -100,14 +86,14 @@ void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4
     /*!< Specifies the length of the frame that will be transmitted */
     chassis_tx_message.DLC = 0x08U;
 
-    chassis_tx_can_data[0] = (motor1 >> 8);
-    chassis_tx_can_data[1] = (motor1 & 0xFFU);
-    chassis_tx_can_data[2] = (motor2 >> 8);
-    chassis_tx_can_data[3] = (motor2 & 0xFFU);
-    chassis_tx_can_data[4] = (motor3 >> 8);
-    chassis_tx_can_data[5] = (motor3 & 0xFFU);
-    chassis_tx_can_data[6] = (motor4 >> 8);
-    chassis_tx_can_data[7] = (motor4 & 0xFFU);
+    chassis_tx_can_data[0] = (uint8_t)(motor1 >> 8);
+    chassis_tx_can_data[1] = (uint8_t)(motor1);
+    chassis_tx_can_data[2] = (uint8_t)(motor2 >> 8);
+    chassis_tx_can_data[3] = (uint8_t)(motor2);
+    chassis_tx_can_data[4] = (uint8_t)(motor3 >> 8);
+    chassis_tx_can_data[5] = (uint8_t)(motor3);
+    chassis_tx_can_data[6] = (uint8_t)(motor4 >> 8);
+    chassis_tx_can_data[7] = (uint8_t)(motor4);
 
     /**
      * Add a message to the first free Tx mailbox and
@@ -151,4 +137,4 @@ void chassis_reset(void)
                                &send_mail_box);
 }
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

@@ -1,30 +1,24 @@
 /**
  * *****************************************************************************
- * @file         ctrl_can.c/h
+ * @file         ctrl_can.h
  * @brief        can control
- * @author       ngu
- * @date         20210427
+ * @author       NGU
+ * @date         20210619
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (c) 2021 NGU
  * @details      there is CAN interrupt function to receive motor data, and CAN 
  *               send function to send motor current to control motor.
  * *****************************************************************************
 */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
+/* Define to prevent recursive inclusion */
 #ifndef __CTRL_CAN_H__
 #define __CTRL_CAN_H__
 
-/* Includes ------------------------------------------------------------------*/
-/* Private includes ----------------------------------------------------------*/
 #include <stdint.h>
-
-/* Exported constants --------------------------------------------------------*/
 
 #define CHASSIS_CAN hcan1
 
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -39,10 +33,7 @@
 #define __END_DECLS
 #endif /* __cplusplus */
 
-/* Exported types ------------------------------------------------------------*/
-
 /**
- * @enum         can_msg_id_enum
  * @brief        CAN send and receive ID 
 */
 typedef enum
@@ -55,7 +46,6 @@ typedef enum
 } can_msg_id_e;
 
 /**
- * @struct       motor_t
  * @brief        motor data
 */
 typedef struct
@@ -66,8 +56,6 @@ typedef struct
     int16_t  i_current;
     uint8_t  temperate;
 } motor_t;
-
-/* Exported functions prototypes ---------------------------------------------*/
 
 __BEGIN_DECLS
 
@@ -98,9 +86,7 @@ extern void chassis_reset(void);
 
 __END_DECLS
 
-/* Private defines -----------------------------------------------------------*/
-
-/* __CTRL_CAN_H__ ------------------------------------------------------------*/
+/* Enddef to prevent recursive inclusion */
 #endif /* __CTRL_CAN_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/
