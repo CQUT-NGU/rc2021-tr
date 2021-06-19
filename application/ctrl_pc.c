@@ -1,37 +1,28 @@
 /**
  * *****************************************************************************
- * @file         ctrl_pc.c/h
+ * @file         ctrl_pc.c
  * @brief        control by usart
- * @author       ngu
- * @date         20210427
+ * @author       NGU
+ * @date         20210619
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (c) 2021 NGU
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "ctrl_pc.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "bsp_usart.h"
 #include <main.h>
 
 #include <stdlib.h>
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
 #undef hpc
 #define hpc huart_os
 
-/* Private includes ----------------------------------------------------------*/
 extern UART_HandleTypeDef hpc;
-
-/* Private macro -------------------------------------------------------------*/
 
 #undef PC_IS_FLOAT
 #define PC_IS_FLOAT(x) \
-                       \
     ((x >= '0' &&      \
       x <= '9') ||     \
      x == '+' ||       \
@@ -40,7 +31,6 @@ extern UART_HandleTypeDef hpc;
 
 #undef PC_DEAL_BUF
 #define PC_DEAL_BUF(x)                       \
-                                             \
     while (i != len && !PC_IS_FLOAT(buf[i])) \
     {                                        \
         i++;                                 \
@@ -55,22 +45,14 @@ extern UART_HandleTypeDef hpc;
         buff[j++] = buf[i++];                \
     }                                        \
     buff[j] = 0;                             \
-                                             \
-    x = atof((char *)buff);
-
-/* Private variables ---------------------------------------------------------*/
+    x       = (float)atof((char *)buff);
 
 static ctrl_pc_t pc; /* pc control data */
 
 static uint8_t pc_rx_buf[2][PC_RX_BUFSIZ];
 
-/* Private function prototypes -----------------------------------------------*/
-
 static void ctrl_pc(volatile const uint8_t *buf,
-                    uint16_t                len,
-                    ctrl_pc_t *             p);
-
-/* Private user code ---------------------------------------------------------*/
+                    uint16_t                len);
 
 void ctrl_pc_init(void)
 {
@@ -95,6 +77,7 @@ void PC_IRQHandler(void)
     else if (hpc.Instance->SR & UART_FLAG_IDLE)
     {
         static uint16_t len_rx = 0;
+        static uint8_t *buf_rx = 0;
 
         __HAL_UART_CLEAR_PEFLAG(&hpc); /* Clears the UART PE pending flag */
 
@@ -107,7 +90,8 @@ void PC_IRQHandler(void)
             __HAL_DMA_DISABLE(hpc.hdmarx);
 
             /* Receive data length, length = set_data_length - remain_length */
-            len_rx = PC_RX_BUFSIZ - hpc.hdmarx->Instance->NDTR;
+            len_rx = (uint8_t)(PC_RX_BUFSIZ - hpc.hdmarx->Instance->NDTR);
+            buf_rx = pc_rx_buf[0];
 
             /* Reset set_data_lenght */
             hpc.hdmarx->Instance->NDTR = PC_RX_BUFSIZ;
@@ -117,11 +101,6 @@ void PC_IRQHandler(void)
 
             /* Enable the specified DMA Stream */
             __HAL_DMA_ENABLE(hpc.hdmarx);
-
-            if (len_rx > 1U && pc_rx_buf[0U][1U] == ':')
-            {
-                ctrl_pc(pc_rx_buf[0], len_rx, &pc);
-            }
         }
         else
         {
@@ -131,7 +110,8 @@ void PC_IRQHandler(void)
             __HAL_DMA_DISABLE(hpc.hdmarx);
 
             /* Receive data length, length = set_data_length - remain_length */
-            len_rx = PC_RX_BUFSIZ - hpc.hdmarx->Instance->NDTR;
+            len_rx = (uint8_t)(PC_RX_BUFSIZ - hpc.hdmarx->Instance->NDTR);
+            buf_rx = pc_rx_buf[1];
 
             /* Reset set_data_lenght */
             hpc.hdmarx->Instance->NDTR = PC_RX_BUFSIZ;
@@ -141,35 +121,44 @@ void PC_IRQHandler(void)
 
             /* Enable the specified DMA Stream */
             __HAL_DMA_ENABLE(hpc.hdmarx);
+        }
 
-            if (len_rx > 1U && pc_rx_buf[1U][1U] == ':')
-            {
-                ctrl_pc(pc_rx_buf[1], len_rx, &pc);
-            }
+        if (len_rx > 1 && buf_rx[1] == ':')
+        {
+            ctrl_pc(buf_rx, len_rx);
         }
     }
 }
 
 static void ctrl_pc(volatile const uint8_t *buf,
-                    uint16_t                len,
-                    ctrl_pc_t *             pc)
+                    uint16_t                len)
 {
-    uint8_t buff[32] = {0};
-
-    uint16_t i = 2U;
-    uint8_t  j = 0U;
-
-    do
+    if ('A' <= *buf && *buf <= 'Z')
     {
-        PC_DEAL_BUF(pc->x);
-        PC_DEAL_BUF(pc->y);
-        PC_DEAL_BUF(pc->z);
-
-        pc->c = buf[0];
+        pc.c = *buf;
+        pc.x = *(float *)(buf + 2);
+        pc.y = *(float *)(buf + 2 + 4);
+        pc.z = *(float *)(buf + 2 + 4 + 4);
         return;
-    } while (0);
+    }
+    else if ('a' <= *buf && *buf <= 'z')
+    {
+        do
+        {
+            uint8_t  buff[32] = {0};
+            uint16_t i        = 2U;
+            uint8_t  j        = 0U;
 
-    pc->c = 0;
+            PC_DEAL_BUF(pc.x);
+            PC_DEAL_BUF(pc.y);
+            PC_DEAL_BUF(pc.z);
+
+            pc.c = buf[0];
+            return;
+        } while (0);
+    }
+
+    pc.c = 0;
 }
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/
