@@ -13,7 +13,10 @@
             "cStandard": "gnu11",
             "cppStandard": "gnu++11",
             "compilerPath": "arm-none-eabi-gcc",
-            "intelliSenseMode": "gcc-arm"
+            "intelliSenseMode": "gcc-arm",
+            "forcedInclude": [
+                "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+            ]
         }
     ],
     "version": 4

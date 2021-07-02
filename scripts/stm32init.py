@@ -158,12 +158,12 @@ def c_cpp(filename="c_cpp_properties.json"):
     return
 
 
-def makefile(pwd, filename="Makefile"):
+def makefile(filename="Makefile"):
     """
     Set Makefile
     """
 
-    openocd = "\topenocd -f " + pwd + "openocd.cfg -c init -c halt -c "
+    openocd = "\topenocd -f " + config + " -c init -c halt -c "
     cmd = (
         "flash:\n"
         + openocd
@@ -234,6 +234,6 @@ if __name__ == "__main__":
     c_cpp()
     launch()
     task()
-    makefile(pwd)
+    makefile()
     # Show log
-    print("config:", pwd + "openocd.cfg")
+    print("config:", config)
