@@ -1,6 +1,9 @@
 [submodule "ca"]
 	path = ca
-	url = git@github.com:tqfx/ca.git
+	url = https://github.com/cqut-ngu/ca.git
 [submodule "cmake"]
 	path = cmake
-	url = git@github.com:tqfx/cmake.git
+	url = https://github.com/tqfx/cmake.git
+[submodule "scripts"]
+	path = scripts
+	url = https://github.com/cqut-ngu/rc2021-scripts.git
