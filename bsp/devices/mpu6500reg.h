@@ -1,20 +1,17 @@
 /**
  * *****************************************************************************
- * @file         mpu6500.c/h
+ * @file         mpu6500.h
  * @brief        register of mpu6500
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MPU6500REG_H__
 #define __MPU6500REG_H__
-
-/* Exported constants --------------------------------------------------------*/
 
 /* MPU RRG -- MAP */
 #define MPU6500_SELF_TEST_XG       (0x00)
@@ -123,7 +120,7 @@
 
 #define MPU_IIC_ADDR (0x68)
 
-/* __MPU6500REG_H__ ----------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __MPU6500REG_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

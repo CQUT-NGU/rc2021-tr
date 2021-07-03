@@ -1,12 +1,11 @@
 /**
  * *****************************************************************************
- * @file         imu_ahrs.c/h
+ * @file         imu_ahrs.h
  * @brief        Automatic Heading Reference System by imu
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
@@ -14,10 +13,6 @@
 #ifndef __IMU_AHRS_H__
 #define __IMU_AHRS_H__
 
-/* Includes ------------------------------------------------------------------*/
-/* Private includes ----------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -31,9 +26,6 @@
 #define __BEGIN_DECLS
 #define __END_DECLS
 #endif /* __cplusplus */
-
-/* Exported types ------------------------------------------------------------*/
-/* Exported functions prototypes ---------------------------------------------*/
 
 __BEGIN_DECLS
 
@@ -54,9 +46,7 @@ extern void imu_update_attitude(void);
 
 __END_DECLS
 
-/* Private defines -----------------------------------------------------------*/
-
-/* __IMU_AHRS_H__ ------------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __IMU_AHRS_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

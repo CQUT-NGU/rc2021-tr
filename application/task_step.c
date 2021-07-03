@@ -1,19 +1,16 @@
 /**
  * *****************************************************************************
- * @file         task_step.c/h
+ * @file         task_step.c
  * @brief        stepping motor control task
- * @author       ngu
+ * @author       NGU
  * @date         20210509
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "task_step.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
 #include "ca.h"
 #include "ctrl.h"
@@ -26,8 +23,6 @@
 
 extern TIM_HandleTypeDef htim8;
 
-/* Private define ------------------------------------------------------------*/
-
 #define SHIFTH_TIM htim8
 
 #define SHIFTH_CHANNEL TIM_CHANNEL_4
@@ -36,17 +31,9 @@ extern TIM_HandleTypeDef htim8;
 
 #define LIMIT_LOW_SHIFTH 100
 
-/* Private macro -------------------------------------------------------------*/
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-
 static uint8_t step_flag_run = 0x00U;
 
 static ca_lpf_f32_t lpf;
-
-/* Private function prototypes -----------------------------------------------*/
-/* Private user code ---------------------------------------------------------*/
 
 static void shifth_set(uint32_t hz)
 {

@@ -1,12 +1,11 @@
 /**
  * *****************************************************************************
- * @file         mpu6500.c/h
+ * @file         mpu6500.h
  * @brief        mpu6500
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
@@ -14,15 +13,10 @@
 #ifndef __MPU6500_H__
 #define __MPU6500_H__
 
-/* Includes ------------------------------------------------------------------*/
 #include "mpu6500reg.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include <stdint.h>
 
-/* Exported constants --------------------------------------------------------*/
-
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -36,8 +30,6 @@
 #define __BEGIN_DECLS
 #define __END_DECLS
 #endif /* __cplusplus */
-
-/* Exported types ------------------------------------------------------------*/
 
 typedef struct
 {
@@ -91,8 +83,6 @@ typedef struct
 
 } imu_t;
 
-/* Exported functions prototypes ---------------------------------------------*/
-
 __BEGIN_DECLS
 
 extern void mpu_data_update(void);
@@ -101,9 +91,7 @@ extern void mpu_device_init(void);
 
 __END_DECLS
 
-/* Private defines -----------------------------------------------------------*/
-
-/* __MPU6500_H__ -------------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __MPU6500_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

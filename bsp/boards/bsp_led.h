@@ -1,12 +1,11 @@
 /**
  * *****************************************************************************
- * @file         bsp_led.c/h
+ * @file         bsp_led.h
  * @brief        led of boards
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * @details      GPIO PIN
  *               LED_NUM_0 ------> PG1
  *               LED_NUM_1 ------> PG2
@@ -25,13 +24,9 @@
 #ifndef __BSP_LED_H__
 #define __BSP_LED_H__
 
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include <stdint.h>
-
-/* Exported constants --------------------------------------------------------*/
 
 #define LED_PWM 1
 
@@ -48,7 +43,6 @@
 #define LED_PWM_MAX 0x10000U
 #endif /* LED_PWM */
 
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -63,11 +57,9 @@
 #define __END_DECLS
 #endif /* __cplusplus */
 
-/* Exported types ------------------------------------------------------------*/
-
 typedef enum
 {
-    LED_ON  = 0,       /* turn on */
+    LED_ON = 0,        /* turn on */
     LED_OFF = !LED_ON, /* turn off */
 
 } led_state_e;
@@ -85,10 +77,8 @@ typedef enum
     LED_NUM_8 = GPIO_PIN_14, /* green */
 #if !LED_PWM
     LED_NUM_9 = GPIO_PIN_11, /* red */
-#endif /* LED_PWM */
+#endif                       /* LED_PWM */
 } led_e;
-
-/* Exported functions prototypes ---------------------------------------------*/
 
 __BEGIN_DECLS
 
@@ -97,7 +87,7 @@ __BEGIN_DECLS
  * @param[in]    pin:   led_e { LED_NUM_0 ~ LED_NUM_9 }
  * @param[in]    state: led_state_e { LED_ON LED_OFF }
 */
-extern void led_write(led_e       pin,
+extern void led_write(led_e pin,
                       led_state_e state);
 
 /**
@@ -155,9 +145,7 @@ extern void led_pwm_set(uint16_t value);
 
 __END_DECLS
 
-/* Private defines -----------------------------------------------------------*/
-
-/* __BSP_LED_H__ -------------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __BSP_LED_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

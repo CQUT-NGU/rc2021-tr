@@ -1,19 +1,16 @@
 /**
  * *****************************************************************************
- * @file         mpu6500.c/h
+ * @file         mpu6500.c
  * @brief        mpu6500
- * @author       ngu
+ * @author       NGU
  * @date         20210101
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "mpu6500.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
 #include "ca.h"
 #include "ist8310reg.h"
@@ -22,17 +19,12 @@
 
 #include <string.h>
 
-/* Private define ------------------------------------------------------------*/
-
 #undef hspi
 #define hspi         hspi5
 #define MPU_NSS_PIN  GPIO_PIN_6
 #define MPU_NSS_PORT GPIOF
 
-/* Private includes ----------------------------------------------------------*/
 extern SPI_HandleTypeDef hspi;
-
-/* Private macro -------------------------------------------------------------*/
 
 #if USED_OS
 #define MPU_DELAY osDelay
@@ -43,11 +35,6 @@ extern SPI_HandleTypeDef hspi;
 #define MPU_NSS_LOW  MPU_NSS_PORT->BSRR = (uint32_t)MPU_NSS_PIN << 16U
 #define MPU_NSS_HIGH MPU_NSS_PORT->BSRR = MPU_NSS_PIN
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-
 static uint8_t buff_mpu[14]; /*!< buffer to save MPU6500 raw data */
 static uint8_t buff_ist[6];  /*!< buffer to save IST8310 raw data */
 static uint8_t tx;           /*!< Transmit */
@@ -55,8 +42,6 @@ static uint8_t rx;           /*!< Receive */
 
 mpu_t mpu;
 imu_t imu;
-
-/* Private user code ---------------------------------------------------------*/
 
 /**
  * @brief        write a byte of data to specified register
@@ -409,4 +394,4 @@ void mpu_device_init(void)
     mpu_offset_call();
 }
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

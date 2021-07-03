@@ -5,8 +5,7 @@
  * @author       tqfx
  * @date         20210427
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
@@ -14,12 +13,8 @@
 #ifndef __BSP_DMA_H__
 #define __BSP_DMA_H__
 
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -106,16 +101,11 @@
                            \
     while (!__HAL_DMA_GET_FLAG(_, __HAL_DMA_GET_TC_FLAG_INDEX(_)))
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported functions prototypes ---------------------------------------------*/
-
 __BEGIN_DECLS
 
 __END_DECLS
 
-/* Private defines -----------------------------------------------------------*/
-
-/* __BSP_DMA_H__ -------------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __BSP_DMA_H__ */
 
-/************************ (C) COPYRIGHT tqfx *******************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

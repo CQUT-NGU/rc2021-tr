@@ -5,8 +5,8 @@
  * @author       NGU
  * @date         20210619
  * @version      1
- * @copyright    Copyright (c) 2021 NGU
- * @details      there is CAN interrupt function to receive motor data, and CAN 
+ * @copyright    Copyright (C) 2021 NGU
+ * @details      there is CAN interrupt function to receive motor data, and CAN
  *               send function to send motor current to control motor.
  * *****************************************************************************
 */
@@ -22,17 +22,17 @@ extern CAN_HandleTypeDef hcan2;
 #endif /* CAN2_IS_ENABLE */
 
 /**
- * @brief motor data read 
+ * @brief motor data read
 */
-#define MOTOR_MEASURE(ptr, data)                                    \
-                                                                    \
-    do                                                              \
-    {                                                               \
-        (ptr)->ecd_last  = (ptr)->ecd;                              \
-        (ptr)->ecd       = (uint16_t)((data)[0] << 8U | (data)[1]); \
-        (ptr)->v_rpm     = (int16_t)((data)[2] << 8U | (data)[3]);  \
-        (ptr)->i_current = (int16_t)((data)[4] << 8U | (data)[5]);  \
-        (ptr)->temperate = (data)[6];                               \
+#define MOTOR_MEASURE(ptr, data)                                   \
+                                                                   \
+    do                                                             \
+    {                                                              \
+        (ptr)->ecd_last = (ptr)->ecd;                              \
+        (ptr)->ecd = (uint16_t)((data)[0] << 8U | (data)[1]);      \
+        (ptr)->v_rpm = (int16_t)((data)[2] << 8U | (data)[3]);     \
+        (ptr)->i_current = (int16_t)((data)[4] << 8U | (data)[5]); \
+        (ptr)->temperate = (data)[6];                              \
     } while (0)
 
 static motor_t motor_chassis[4];
@@ -47,8 +47,8 @@ static uint8_t chassis_tx_can_data[8];
 */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-    CAN_RxHeaderTypeDef header_rx  = {0};
-    static uint8_t      data_rx[8] = {0};
+    CAN_RxHeaderTypeDef header_rx = {0};
+    static uint8_t data_rx[8] = {0};
 
     (void)HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &header_rx, data_rx);
 
@@ -97,7 +97,7 @@ void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4
 
     /**
      * Add a message to the first free Tx mailbox and
-     * activate the corresponding transmission request 
+     * activate the corresponding transmission request
     */
     (void)HAL_CAN_AddTxMessage(&CHASSIS_CAN,
                                &chassis_tx_message,
@@ -129,7 +129,7 @@ void chassis_reset(void)
 
     /**
      * Add a message to the first free Tx mailbox and
-     * activate the corresponding transmission request 
+     * activate the corresponding transmission request
     */
     (void)HAL_CAN_AddTxMessage(&CHASSIS_CAN,
                                &chassis_tx_message,

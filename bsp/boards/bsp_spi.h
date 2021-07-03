@@ -1,13 +1,12 @@
 /**
  * *****************************************************************************
- * @file         bsp_spi.c/h
+ * @file         bsp_spi.h
  * @brief        spi of boards
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
- * @details      
+ * @copyright    Copyright (C) 2021 NGU
+ * @details
  *               SPI5_SCK  ------> PF7
  *               SPI5_NSS  ------> PF6
  *               SPI5_MOSI ------> PF9
@@ -19,17 +18,13 @@
 #ifndef __BSP_SPI_H__
 #define __BSP_SPI_H__
 
-/* Includes ------------------------------------------------------------------*/
 #include "bsp_dma.h"
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include <stdint.h>
 
 extern SPI_HandleTypeDef hspi5;
 
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -43,9 +38,6 @@ extern SPI_HandleTypeDef hspi5;
 #define __BEGIN_DECLS
 #define __END_DECLS
 #endif /* __cplusplus */
-
-/* Exported types ------------------------------------------------------------*/
-/* Exported functions prototypes ---------------------------------------------*/
 
 __BEGIN_DECLS
 
@@ -61,13 +53,11 @@ extern void spi_dma_init(SPI_HandleTypeDef *hspi);
  * @param[in]    len: the length of buffer
 */
 extern void spi_dma_start(SPI_HandleTypeDef *hspi,
-                          uint32_t           buf_tx,
-                          uint32_t           buf_rx,
-                          uint16_t           len);
+                          uint32_t buf_tx,
+                          uint32_t buf_rx,
+                          uint16_t len);
 
 __END_DECLS
-
-/* Private defines -----------------------------------------------------------*/
 
 #define spi5_dma_init() spi_dma_init(&hspi5)
 #define spi5_dma_start(tx, rx, len) \
@@ -77,7 +67,7 @@ __END_DECLS
                   (uint32_t)(rx),   \
                   (uint16_t)(len))
 
-/* __BSP_SPI_H__ -------------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __BSP_SPI_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

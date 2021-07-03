@@ -1,12 +1,11 @@
 /**
  * *****************************************************************************
- * @file         task_imu.c/h
+ * @file         task_imu.h
  * @brief        The task of imu update
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
@@ -14,10 +13,6 @@
 #ifndef __TASK_IMU_H__
 #define __TASK_IMU_H__
 
-/* Includes ------------------------------------------------------------------*/
-/* Private includes ----------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -31,18 +26,13 @@
 #define __END_DECLS
 #endif /* __cplusplus */
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported functions prototypes ---------------------------------------------*/
-
 __BEGIN_DECLS
 
 extern void task_imu(void *pvParameters);
 
 __END_DECLS
 
-/* Private defines -----------------------------------------------------------*/
-
-/* __TASK_IMU_H__ ------------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __TASK_IMU_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

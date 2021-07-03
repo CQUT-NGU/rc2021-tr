@@ -1,19 +1,16 @@
 /**
  * *****************************************************************************
- * @file         imu_ahrs.c/h
+ * @file         imu_ahrs.c
  * @brief        Automatic Heading Reference System by imu
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "imu_ahrs.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "ahrs.h"
 #include "ca.h"
 #include "main.h"
@@ -24,15 +21,7 @@
 
 extern imu_t imu;
 
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-
 static float quat[4] = {1.0f, 0.0f, 0.0f, 0.0f};
-
-/* Private function prototypes -----------------------------------------------*/
 
 /**
  * @brief        Gets half of the sampling cycle time
@@ -48,15 +37,13 @@ static float ht_get(void);
 static float t_get(void);
 #endif
 
-/* Private user code ---------------------------------------------------------*/
-
 static float ht_get(void)
 {
     static volatile uint32_t update_last;
     static volatile uint32_t update_now;
 
-    update_now  = HAL_GetTick(); /* ms */
-    float ret   = (float)(update_now - update_last) / 2000.0f;
+    update_now = HAL_GetTick(); /* ms */
+    float ret = (float)(update_now - update_last) / 2000.0f;
     update_last = update_now;
 
     return ret;
@@ -268,4 +255,4 @@ void imu_update_attitude(void)
     imu.rol = a[ZYX_ROLL];
 }
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

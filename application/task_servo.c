@@ -1,19 +1,16 @@
 /**
  * *****************************************************************************
- * @file         task_servo.c/h
+ * @file         task_servo.c
  * @brief        steering gear control
  * @author       tqfx
  * @date         20210502
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "task_servo.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
 #include "ca.h"
 #include "ctrl.h"
@@ -23,8 +20,6 @@
 #endif /* USED_OS */
 
 extern TIM_HandleTypeDef htim4;
-
-/* Private define ------------------------------------------------------------*/
 
 #define SERVO_PSC     90U
 #define SERVO_PWM_MAX 20000U
@@ -54,13 +49,6 @@ extern TIM_HandleTypeDef htim4;
 #define FLAG_SHOOT_START (1U << 0U)
 #define FLAG_SHOOT_COUNT (1U << 1U)
 #define FLAG_SHOOT_STOP  (1U << 2U)
-
-/* Private macro -------------------------------------------------------------*/
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private user code ---------------------------------------------------------*/
 
 static void servo_init(void)
 {
@@ -124,7 +112,7 @@ void task_servo(void *pvParameters)
 
     int16_t pwm_get = 0;
 
-    uint8_t shoot_flag  = 0x00U;
+    uint8_t shoot_flag = 0x00U;
     uint8_t shoot_count = 0x00U;
 
     while (1)

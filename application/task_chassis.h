@@ -5,12 +5,11 @@
  * @author       NGU
  * @date         20210509
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
-/* Define to prevent recursive inclusion */
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TASK_CHASSIS_H__
 #define __TASK_CHASSIS_H__
 
@@ -66,7 +65,7 @@ typedef struct
     /* the point to the euler angle of gyro sensor */
     imu_t *imu;
 
-    chassis_mode_e  mode;     /* state machine */
+    chassis_mode_e mode;      /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */
 
     ca_pid_f32_t pid_offset[2]; /* offset PID */
@@ -126,7 +125,7 @@ extern void task_chassis(void *pvParameters);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion */
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __TASK_CHASSIS_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

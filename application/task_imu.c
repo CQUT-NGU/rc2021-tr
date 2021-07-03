@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         task_imu.c
  * @brief        The task of imu update
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021 NGU
@@ -43,7 +43,7 @@ extern mpu_t mpu;
 typedef enum
 {
     SIGNAL_AIMING_NONE = (1 << 0),  //!< none
-    SIGNAL_AIMING_DO   = (1 << 1),  //!< aim do
+    SIGNAL_AIMING_DO = (1 << 1),    //!< aim do
     SIGNAL_AIMING_DONE = (1 << 2),  //!< aim done
 } signal_aiming_t;
 
@@ -72,7 +72,7 @@ void task_imu(void *pvParameters)
         imu_quat_init();
     }
 
-    ctrl_pc_t *      pc = ctrl_pc_point();
+    ctrl_pc_t *pc = ctrl_pc_point();
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     static int8_t signal_aiming = SIGNAL_AIMING_NONE;
@@ -148,4 +148,4 @@ void task_imu(void *pvParameters)
     }
 }
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

@@ -1,12 +1,11 @@
 /**
  * *****************************************************************************
- * @file         bsp_led.c/h
+ * @file         bsp_led.c
  * @brief        led of boards
- * @author       ngu
+ * @author       NGU
  * @date         20210427
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * @details      GPIO PIN
  *               LED_NUM_0 ------> PG1
  *               LED_NUM_1 ------> PG2
@@ -21,13 +20,9 @@
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "bsp_led.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "main.h"
-
-/* Private define ------------------------------------------------------------*/
 
 #if LED_PWM
 #undef htim
@@ -36,13 +31,9 @@
 #define LED_CHANNEL TIM_CHANNEL_2
 #endif /* LED_PWM */
 
-/* Includes ------------------------------------------------------------------*/
-
 #if LED_PWM
 extern TIM_HandleTypeDef htim;
 #endif /* LED_PWM */
-
-/* Private macro -------------------------------------------------------------*/
 
 #undef LED_W
 #define LED_W(GPIOx, PIN, STATE)                \
@@ -86,13 +77,7 @@ extern TIM_HandleTypeDef htim;
         }                                       \
     } while (0)
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private user code ---------------------------------------------------------*/
-
-void led_write(led_e       pin,
+void led_write(led_e pin,
                led_state_e state)
 {
     switch (pin)
@@ -243,4 +228,4 @@ void led_pwm_set(uint16_t value)
 
 #endif /* LED_PWM */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

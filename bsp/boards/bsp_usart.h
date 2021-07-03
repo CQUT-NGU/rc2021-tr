@@ -1,12 +1,11 @@
 /**
  * *****************************************************************************
- * @file         bsp_usart.c/h
+ * @file         bsp_usart.h
  * @brief        usart of boards
- * @author       ngu
+ * @author       NGU
  * @date         20210417
  * @version      1
- * @copyright    Copyright (c) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * @details
  *               USART1_RX ------> PB7 ------> DBUS
  *               USART3_TX ------> PD8
@@ -20,14 +19,10 @@
 #ifndef __BSP_USART_H__
 #define __BSP_USART_H__
 
-/* Includes ------------------------------------------------------------------*/
 #include "bsp_dma.h"
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include <stdint.h>
-
-/* Exported constants --------------------------------------------------------*/
 
 #define huart_rc huart1 /* dbus, connect to the remote control */
 #undef RC_IRQHandler
@@ -37,11 +32,9 @@
 #undef PC_IRQHandler
 #define PC_IRQHandler USART6_IRQHandler
 
-/* Private includes ----------------------------------------------------------*/
 extern UART_HandleTypeDef huart_rc;
 extern UART_HandleTypeDef huart_os;
 
-/* Exported macro ------------------------------------------------------------*/
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 
@@ -55,9 +48,6 @@ extern UART_HandleTypeDef huart_os;
 #define __BEGIN_DECLS
 #define __END_DECLS
 #endif /* __cplusplus */
-
-/* Exported types ------------------------------------------------------------*/
-/* Exported functions prototypes ---------------------------------------------*/
 
 __BEGIN_DECLS
 
@@ -79,7 +69,7 @@ extern void usart_enable(UART_HandleTypeDef *huart);
  * @param[in]    len:   the length of data
 */
 extern void usart_dma_rerx(UART_HandleTypeDef *huart,
-                           uint16_t            len);
+                           uint16_t len);
 
 /**
  * @brief        Restart USART DMA transmit
@@ -87,7 +77,7 @@ extern void usart_dma_rerx(UART_HandleTypeDef *huart,
  * @param[in]    len:   the length of data
 */
 extern void usart_dma_retx(UART_HandleTypeDef *huart,
-                           uint16_t            len);
+                           uint16_t len);
 
 /**
  * @brief        Initializes USART DMA receiver
@@ -115,9 +105,9 @@ extern void usart_dma_init(UART_HandleTypeDef *huart);
  * @param[in]    len:   DMA stream x number of data register
 */
 extern void usart_dma_rx(UART_HandleTypeDef *huart,
-                         uint8_t *           buf1,
-                         uint8_t *           buf2,
-                         uint16_t            len);
+                         uint8_t *buf1,
+                         uint8_t *buf2,
+                         uint16_t len);
 
 /**
  * @brief        USART transmit by DMA Stream
@@ -126,8 +116,8 @@ extern void usart_dma_rx(UART_HandleTypeDef *huart,
  * @param[in]    len:   the length of data
 */
 extern void usart_dma_tx(UART_HandleTypeDef *huart,
-                         uint8_t *           data,
-                         uint16_t            len);
+                         uint8_t *data,
+                         uint16_t len);
 
 /**
  * @brief        print string to USART
@@ -158,12 +148,10 @@ extern void os_tail(void);
  * @param[in]    x: float number
  * @param[in]    l: float number
 */
-extern void os_putf(float   x,
+extern void os_putf(float x,
                     uint8_t l);
 
 __END_DECLS
-
-/* Private defines -----------------------------------------------------------*/
 
 static inline void usart_init(void)
 {
@@ -173,7 +161,7 @@ static inline void usart_init(void)
     usart_dma_rx_init(&huart_rc);
 }
 
-/* __BSP_USART_H__ -----------------------------------------------------------*/
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __BSP_USART_H__ */
 
-/************************ (C) COPYRIGHT ngu ********************END OF FILE****/
+/************************ (C) COPYRIGHT NGU ********************END OF FILE****/

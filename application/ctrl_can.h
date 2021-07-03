@@ -5,13 +5,13 @@
  * @author       NGU
  * @date         20210619
  * @version      1
- * @copyright    Copyright (c) 2021 NGU
- * @details      there is CAN interrupt function to receive motor data, and CAN 
+ * @copyright    Copyright (C) 2021 NGU
+ * @details      there is CAN interrupt function to receive motor data, and CAN
  *               send function to send motor current to control motor.
  * *****************************************************************************
 */
 
-/* Define to prevent recursive inclusion */
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __CTRL_CAN_H__
 #define __CTRL_CAN_H__
 
@@ -34,15 +34,15 @@
 #endif /* __cplusplus */
 
 /**
- * @brief        CAN send and receive ID 
+ * @brief        CAN send and receive ID
 */
 typedef enum
 {
     CAN_ID_CHASSIS_ALL = 0x200U,
-    CAN_ID_3508_M1     = 0x201U,
-    CAN_ID_3508_M2     = 0x202U,
-    CAN_ID_3508_M3     = 0x203U,
-    CAN_ID_3508_M4     = 0x204U,
+    CAN_ID_3508_M1 = 0x201U,
+    CAN_ID_3508_M2 = 0x202U,
+    CAN_ID_3508_M3 = 0x203U,
+    CAN_ID_3508_M4 = 0x204U,
 } can_msg_id_e;
 
 /**
@@ -52,9 +52,9 @@ typedef struct
 {
     uint16_t ecd_last;
     uint16_t ecd;
-    int16_t  v_rpm;
-    int16_t  i_current;
-    uint8_t  temperate;
+    int16_t v_rpm;
+    int16_t i_current;
+    uint8_t temperate;
 } motor_t;
 
 __BEGIN_DECLS
@@ -86,7 +86,7 @@ extern void chassis_reset(void);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion */
+/* Terminate definition to prevent recursive inclusion -----------------------*/
 #endif /* __CTRL_CAN_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/
