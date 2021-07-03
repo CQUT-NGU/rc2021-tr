@@ -1,31 +1,27 @@
 /**
  * *****************************************************************************
- * @file         task_imu.c/h
+ * @file         task_imu.c
  * @brief        The task of imu update
  * @author       ngu
  * @date         20210427
  * @version      1
- * @copyright    Copyright (C) 2021
- * @code         utf-8                                                  @endcode
+ * @copyright    Copyright (C) 2021 NGU
  * *****************************************************************************
 */
 
-/* Includes ------------------------------------------------------------------*/
 #include "task_imu.h"
 
-/* Private includes ----------------------------------------------------------*/
 #include "bsp.h"
 #include "ca.h"
 #include "imu_ahrs.h"
 #include "main.h"
 #include "mpu6500.h"
+#include "ctrl.h"
 
 #include <stdint.h>
 
 extern imu_t imu;
 extern mpu_t mpu;
-
-/* Private define ------------------------------------------------------------*/
 
 #define ACC_G_CQ 9.7914F
 
@@ -41,95 +37,92 @@ extern mpu_t mpu;
 /* max iout of temperature control PID */
 #define TEMPERATURE_PID_MAX_IOUT 0xFFF
 
-/* Private macro -------------------------------------------------------------*/
-/* Private typedef -----------------------------------------------------------*/
-/* Private types -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private user code ---------------------------------------------------------*/
-
-static ca_pid_f32_t pid_temp;
-
-static void ctrl_temp_init(void)
+/**
+ * @brief        aiming signal
+*/
+typedef enum
 {
-    static const float kpid_temp[3] = {
-        TEMPERATURE_PID_KP,
-        TEMPERATURE_PID_KI,
-        TEMPERATURE_PID_KD,
-    };
-#if 1
-    ca_pid_f32_position(&pid_temp,
-                        kpid_temp,
-                        0,
-                        TEMPERATURE_PID_MAX_OUT,
-                        TEMPERATURE_PID_MAX_IOUT);
-#else
-    ca_pid_delta(&pid_temp,
-                 kpid_temp,
-                 TEMPERATURE_PID_MAX_OUT);
-#endif
-}
+    SIGNAL_AIMING_NONE = (1 << 0),  //!< none
+    SIGNAL_AIMING_DO   = (1 << 1),  //!< aim do
+    SIGNAL_AIMING_DONE = (1 << 2),  //!< aim done
+} signal_aiming_t;
 
 void task_imu(void *pvParameters)
 {
     (void)pvParameters;
 
-    mpu_device_init();
+    static ca_pid_f32_t pid_temp;
 
-    ctrl_temp_init();
-    imu_pwm_start();
-
-    mpu_data_update();
-    imu_quat_init();
-    //平均的参数数组
-    uint8_t index = 0;
-    float   ort_x_value[10];
-    float   ort_y_value[10];
-    float   scale = 0;
-    //x，y当前的坐标，板倾斜时效果更佳
-    float vx_value;
-    float vy_value;
-
-    //平均值缓解误差
-    for (uint16_t i = 0U; i != 200U; ++i)
+    /* Initialization block */
     {
-        scale += ca_sqrt_u32(SQ(imu.ax) + SQ(imu.ay) + SQ(imu.az));  //get the accel victor now
-        osDelay(1);                                                  // task switch in 2ms
+        static const float kpid_temp[3] = {
+            TEMPERATURE_PID_KP,
+            TEMPERATURE_PID_KI,
+            TEMPERATURE_PID_KD,
+        };
+        ca_pid_f32_position(&pid_temp,
+                            kpid_temp,
+                            0,
+                            TEMPERATURE_PID_MAX_OUT,
+                            TEMPERATURE_PID_MAX_IOUT);
+
+        imu_pwm_start();
+
+        mpu_data_update();
+        imu_quat_init();
     }
 
-    scale /= 200;
+    ctrl_pc_t *      pc = ctrl_pc_point();
+    const ctrl_rc_t *rc = ctrl_rc_point();
 
-    scale = 1 / scale * ACC_G_CQ * 0.001F;
-
-    //低通滤波器缓解误差
-    ca_lpf_f32_t lpf[2] = {0};
-    ca_lpf_f32_init(lpf, 0, 0.001F);
-    ca_lpf_f32_init(lpf + 1, 0, 0.001F);
-    //ca_lpf_f32_init(lpf + 2, 0, 0.002F);
-
-    //reset the velocit
-    imu.vx = 0;
-    imu.vy = 0;
-    imu.vz = 0;
+    static int8_t signal_aiming = SIGNAL_AIMING_NONE;
 
     for (;;)
     {
-        mpu_data_update();
-        imu_update_ahrs();
-        imu_update_attitude();
+        /* imu control */
+        {
+            mpu_data_update();
+            imu_update_ahrs();
+            imu_update_attitude();
 
-        imu_pwm_set((uint16_t)ca_pid_f32(&pid_temp, imu.temp, 45.0F));
+            uint16_t pwm = (uint16_t)ca_pid_f32(&pid_temp, imu.temp, 45.0F);
+            imu_pwm_set(pwm);
+        }
 
-        //imu.vx += ca_lpf_f32(lpf, imu.ax) * scale;
-        //imu.vy += ca_lpf_f32(lpf + 1, imu.ay) * scale;
-        // imu.vz += ca_lpf_f32(lpf + 2, imu.az) * scale;
+        /* Aiming signal control */
+        {
+            if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
+                switch_is_down(rc->rc.s[RC_SW_R]))
+            {
+                /* restart control */
+                if (rc->rc.ch[RC_CH_S] > 440)
+                {
+                    pc->c = 0;
+                }
 
-        imu.vx += imu.ax * scale;
-        imu.vy += imu.ay * scale;
-        //平均N=10时数据
-        ort_x_value[index] = imu.vx;
-        ort_y_value[index] = imu.vy;
-        index++;
+                /* Start sending aiming signal */
+                if (signal_aiming == SIGNAL_AIMING_NONE &&
+                    rc->rc.ch[RC_CH_S] < -440)
+                {
+                    signal_aiming = SIGNAL_AIMING_DO;
+                }
+
+                /* End sending aiming signal */
+                if (signal_aiming != SIGNAL_AIMING_NONE &&
+                    rc->rc.ch[RC_CH_S] > -440)
+                {
+                    signal_aiming = SIGNAL_AIMING_NONE;
+                }
+            }
+
+            /* Send aiming signal */
+            if (signal_aiming == SIGNAL_AIMING_DO)
+            {
+                signal_aiming = SIGNAL_AIMING_DONE;
+
+                usart_dma_tx(&huart_os, (void *)"a\n", 2);
+            }
+        }
 
 #if 0
         os_printf("%i,%i,%i,%i,%i,%i,%i,%i,%i,%g\n",
@@ -144,20 +137,11 @@ void task_imu(void *pvParameters)
                   mpu.mz,
                   mpu.temp);
 #elif 0
-        if (index == 10)
-        {
-            for (index = 0; index < 10; index++)
-            {
-                vx_value += ort_x_value[index];
-                vy_value += ort_y_value[index];
-            }
-            vx_value = ((vx_value / 10) - 0.1);
-            vy_value = ((vy_value / 10) - 0.1);
-            index    = 0;
-            os_printf("%g,%g\r\n", vx_value * 0.4, vy_value * 0.4);
-        }
-#elif 0
-        os_justfloat(4U, imu.rol, imu.pit, imu.yaw, imu.temp);
+        os_justfloat(4U,
+                     imu.rol,
+                     imu.pit,
+                     imu.yaw,
+                     imu.temp);
 #endif
 
         osDelay(2U);
