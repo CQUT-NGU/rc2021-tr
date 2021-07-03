@@ -317,7 +317,8 @@ void mpu_data_update(void)
 */
 static void mpu_set_gyro_fsr(uint8_t fsr)
 {
-    mpu_write_byte(MPU6500_GYRO_CONFIG, fsr << 3U);
+    fsr = (uint8_t)(fsr << 3);
+    mpu_write_byte(MPU6500_GYRO_CONFIG, fsr);
 }
 
 /**
@@ -326,7 +327,8 @@ static void mpu_set_gyro_fsr(uint8_t fsr)
 */
 static void mpu_set_accel_fsr(uint8_t fsr)
 {
-    mpu_write_byte(MPU6500_ACCEL_CONFIG, fsr << 3U);
+    fsr = (uint8_t)(fsr << 3);
+    mpu_write_byte(MPU6500_ACCEL_CONFIG, fsr);
 }
 
 /**
