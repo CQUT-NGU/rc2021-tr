@@ -114,7 +114,7 @@ int main(void)
     buzzer_start();
     usart_init();
     ctrl_rc_init();
-    ctrl_pc_init();
+    os_dma_init();
     os_printf("OK\r\n");
     /* USER CODE END 2 */
 

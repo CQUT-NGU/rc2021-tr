@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * @file         ctrl_pc.c
+ * @file         ctrl_pc.h
  * @brief        control by usart
  * @author       NGU
  * @date         20210619
@@ -14,8 +14,6 @@
 #define __CTRL_PC_H__
 
 #include <stdint.h>
-
-#define PC_RX_BUFSIZ 128U
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -44,11 +42,6 @@ typedef struct
 } ctrl_pc_t;
 
 __BEGIN_DECLS
-
-/**
- * @brief          Initializes the PC control function
-*/
-extern void ctrl_pc_init(void);
 
 /**
  * @brief        Get pc control data point
