@@ -281,14 +281,14 @@ static void chassis_update(void)
 #if 1
     move.yaw = restrict_rad_f32(move.imu->yaw);
 
-    move.pitch = move.imu->pit;
+    // move.pitch = move.imu->pit;
 
-    move.roll = restrict_rad_f32(move.imu->rol);
+    // move.roll = restrict_rad_f32(move.imu->rol);
 #endif
 }
 
 /**
- * @brief        accroding to the channel value of remote control, 
+ * @brief        accroding to the channel value of remote control,
  *               calculate chassis horizontal and vertical speed set-point
  * @param[out]   vx_set: horizontal speed set-point
  * @param[out]   vy_set: vertical speed set-point
@@ -299,7 +299,7 @@ static void chassis_rc(float *vx_set,
 {
     /**
      * deadline, because some remote control need be calibrated,
-     * the value of rocker is not zero in middle place 
+     * the value of rocker is not zero in middle place
     */
     int16_t vx_channel = LIMIT_RC(move.data_rc->rc.ch[CHASSIS_X_CHANNEL],
                                   CHASSIS_RC_DEADLINE);
@@ -548,7 +548,7 @@ static void chassis_loop_set(void)
 }
 
 /**
- * @brief        four omni4 wheels speed is calculated by three param. 
+ * @brief        four omni4 wheels speed is calculated by three param.
  * @param[in]    vx_set: horizontal speed
  * @param[in]    vy_set: vertial speed
  * @param[in]    wz_set: rotation speed
