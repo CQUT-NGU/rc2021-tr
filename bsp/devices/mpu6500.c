@@ -286,29 +286,29 @@ void ist_data_update(void *buff)
 */
 void mpu_data_update(void)
 {
-    mpu_read_bytes(MPU6500_ACCEL_XOUT_H, buff_mpu, 14U);
+    mpu_read_bytes(MPU6500_ACCEL_XOUT_H, buff_mpu, 14);
 
-    mpu.ax = buff_mpu[0] << 8 | buff_mpu[1];
-    mpu.ay = buff_mpu[2] << 8 | buff_mpu[3];
-    mpu.az = buff_mpu[4] << 8 | buff_mpu[5];
+    mpu.ax = (int16_t)(buff_mpu[0] << 8 | buff_mpu[1]);
+    mpu.ay = (int16_t)(buff_mpu[2] << 8 | buff_mpu[3]);
+    mpu.az = (int16_t)(buff_mpu[4] << 8 | buff_mpu[5]);
 
-    mpu.temp = buff_mpu[6] << 8 | buff_mpu[7];
+    mpu.temp = (int16_t)(buff_mpu[6] << 8 | buff_mpu[7]);
 
-    mpu.gx = ((buff_mpu[8] << 8 | buff_mpu[9]) - mpu.gx_offset);
-    mpu.gy = ((buff_mpu[10] << 8 | buff_mpu[11]) - mpu.gy_offset);
-    mpu.gz = ((buff_mpu[12] << 8 | buff_mpu[13]) - mpu.gz_offset);
+    mpu.gx = (int16_t)((buff_mpu[8] << 8 | buff_mpu[9]) - mpu.gx_offset);
+    mpu.gy = (int16_t)((buff_mpu[10] << 8 | buff_mpu[11]) - mpu.gy_offset);
+    mpu.gz = (int16_t)((buff_mpu[12] << 8 | buff_mpu[13]) - mpu.gz_offset);
 
     ist_data_update(buff_ist);
 
-    memcpy(&mpu.mx, buff_ist, 6U);
+    memcpy(&mpu.mx, buff_ist, 6);
 
-    memcpy(&imu.ax, &mpu.ax, 6U * sizeof(int16_t));
+    memcpy(&imu.ax, &mpu.ax, 6 * sizeof(int16_t));
 
-    imu.temp = 21 + mpu.temp / 333.87f;
+    imu.temp = 21 + mpu.temp / 333.87F;
     /* 2000dps -> rad/s */
-    imu.wx = mpu.gx / 16.384f / 57.3f;
-    imu.wy = mpu.gy / 16.384f / 57.3f;
-    imu.wz = mpu.gz / 16.384f / 57.3f;
+    imu.wx = mpu.gx / 16.384F / 57.3F;
+    imu.wy = mpu.gy / 16.384F / 57.3F;
+    imu.wz = mpu.gz / 16.384F / 57.3F;
 }
 
 /**
