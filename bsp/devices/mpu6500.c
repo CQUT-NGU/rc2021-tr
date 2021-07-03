@@ -86,7 +86,7 @@ static uint8_t mpu_read_byte(uint8_t const reg)
  * @param[out]   buf: the buffer of receiver
  * @param[in]    len: the length of len
 */
-static void mpu_read_bytes(uint8_t const reg, uint8_t *buf, uint8_t len)
+static void mpu_read_bytes(uint8_t const reg, void *buf, uint8_t len)
 {
     MPU_NSS_LOW;
 
@@ -276,7 +276,7 @@ uint8_t ist_init(void)
  * @brief        get the data of IST8310
  * @param[out]   buff the buffer to save the data of IST8310
 */
-void ist_data_update(uint8_t *buff)
+void ist_data_update(void *buff)
 {
     mpu_read_bytes(MPU6500_EXT_SENS_DATA_00, buff, 6U);
 }
@@ -334,27 +334,34 @@ static void mpu_set_accel_fsr(uint8_t fsr)
 */
 void mpu_offset_call(void)
 {
-    for (uint16_t i = 0U; i < 300U; ++i)
+    int ax_offset = 0;
+    int ay_offset = 0;
+    int az_offset = 0;
+    int gx_offset = 0;
+    int gy_offset = 0;
+    int gz_offset = 0;
+
+    for (uint16_t i = 0; i != 300; ++i)
     {
-        mpu_read_bytes(MPU6500_ACCEL_XOUT_H, buff_mpu, 14U);
+        mpu_read_bytes(MPU6500_ACCEL_XOUT_H, buff_mpu, 14);
 
-        mpu.ax_offset += buff_mpu[0] << 8 | buff_mpu[1];
-        mpu.ay_offset += buff_mpu[2] << 8 | buff_mpu[3];
-        mpu.az_offset += buff_mpu[4] << 8 | buff_mpu[5];
+        ax_offset += buff_mpu[0] << 8 | buff_mpu[1];
+        ay_offset += buff_mpu[2] << 8 | buff_mpu[3];
+        az_offset += buff_mpu[4] << 8 | buff_mpu[5];
 
-        mpu.gx_offset += buff_mpu[8] << 8 | buff_mpu[9];
-        mpu.gy_offset += buff_mpu[10] << 8 | buff_mpu[11];
-        mpu.gz_offset += buff_mpu[12] << 8 | buff_mpu[13];
+        gx_offset += buff_mpu[8] << 8 | buff_mpu[9];
+        gy_offset += buff_mpu[10] << 8 | buff_mpu[11];
+        gz_offset += buff_mpu[12] << 8 | buff_mpu[13];
 
         MPU_DELAY(5);
     }
 
-    mpu.ax_offset = mpu.ax_offset / 300;
-    mpu.ay_offset = mpu.ay_offset / 300;
-    mpu.az_offset = mpu.az_offset / 300;
-    mpu.gx_offset = mpu.gx_offset / 300;
-    mpu.gy_offset = mpu.gx_offset / 300;
-    mpu.gz_offset = mpu.gz_offset / 300;
+    mpu.ax_offset = (int16_t)(ax_offset / 300);
+    mpu.ay_offset = (int16_t)(ay_offset / 300);
+    mpu.az_offset = (int16_t)(az_offset / 300);
+    mpu.gx_offset = (int16_t)(gx_offset / 300);
+    mpu.gy_offset = (int16_t)(gx_offset / 300);
+    mpu.gz_offset = (int16_t)(gz_offset / 300);
 }
 
 /**
