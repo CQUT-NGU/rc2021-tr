@@ -19,13 +19,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "can.h"
 #include "cmsis_os.h"
+#include "can.h"
 #include "dma.h"
-#include "gpio.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
