@@ -52,7 +52,7 @@ void ctrl_rc_init(void)
     usart_dma_rx(&hrc, sbus_rx_buf[0], sbus_rx_buf[1], SBUS_RX_BUF_NUM);
 }
 
-const ctrl_rc_t *ctrl_rc_point(void)
+ctrl_rc_t *ctrl_rc_point(void)
 {
     return &rc;
 }
