@@ -41,25 +41,10 @@
 #define LED_PWM_MAX 0x10000
 #endif /* LED_PWM */
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-
-#if defined(__cplusplus)
-#define __BEGIN_DECLS \
-    extern "C"        \
-    {
-#define __END_DECLS \
-    }
-#else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#endif /* __cplusplus */
-
 typedef enum
 {
     LED_ON = 0,        /* turn on */
     LED_OFF = !LED_ON, /* turn off */
-
 } led_state_e;
 
 typedef enum
@@ -145,7 +130,7 @@ extern void led_pwm_set(uint16_t value);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_LED_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

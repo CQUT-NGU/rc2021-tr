@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         bsp_gpio.c
  * @brief        gpio of boards
- * @author       tqfx
+ * @author       NGU
  * @date         20210101
  * @version      1
  * @copyright    Copyright (C) 2021 NGU

@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         bsp_uart.c
  * @brief        uart of boards
- * @author       tqfx
+ * @author       NGU
  * @date         20210417
  * @version      1
  * @copyright    Copyright (C) 2021 NGU

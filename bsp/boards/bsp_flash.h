@@ -297,7 +297,7 @@ extern int8_t flash_writen(uint32_t addr,
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_FLASH_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

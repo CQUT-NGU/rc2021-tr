@@ -38,7 +38,7 @@ extern void imu_pwm_set(uint16_t pwm);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_IMU_PWM_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

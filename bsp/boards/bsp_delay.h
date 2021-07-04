@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         bsp_delay.h
  * @brief        delay of boards
- * @author       tqfx
+ * @author       NGU
  * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021 NGU
@@ -36,7 +36,7 @@ extern void delay_ms(uint16_t nms);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_DELAY_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

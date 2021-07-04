@@ -11,8 +11,6 @@
 
 #include "ctrl_rc.h"
 
-#include "main.h"
-
 #undef hrc
 #define hrc huart_rc
 
@@ -45,7 +43,7 @@ ctrl_rc_t *ctrl_rc_point(void)
 */
 void RC_IRQHandler(void)
 {
-    if (hrc.Instance->SR & UART_FLAG_RXNE) /*!< USART Status register*/
+    if (hrc.Instance->SR & UART_FLAG_RXNE) /* USART Status register*/
     {
         __HAL_UART_CLEAR_PEFLAG(&hrc); /* Clears the UART PE pending flag */
     }
@@ -61,7 +59,7 @@ void RC_IRQHandler(void)
         /* Receive data length, length = set_data_length - remain_length */
         uint16_t rx_l = (uint16_t)(SBUS_RX_BUF_NUM - hrc.hdmarx->Instance->NDTR);
 
-        /*!< DMA stream x configuration register */
+        /* DMA stream x configuration register */
         if ((hrc.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
         {
             /* Current memory buffer used is Memory 0 */
@@ -95,31 +93,31 @@ static void sbus_to_rc(const void *buf)
 {
     const uint8_t *p = (const uint8_t *)buf;
 
-    /*!< Channel 0 */
+    /* Channel 0 */
     rc.rc.ch[0] = 0x7FF & (int16_t)((p[1] << 8) | p[0]);
-    /*!< Channel 1 */
+    /* Channel 1 */
     rc.rc.ch[1] = 0x7FF & (int16_t)((p[1] >> 3) | (p[2] << 5));
-    /*!< Channel 2 */
+    /* Channel 2 */
     rc.rc.ch[2] = 0x7FF & (int16_t)((p[2] >> 6) | (p[3] << 2) | (p[4] << 10));
-    /*!< Channel 3 */
+    /* Channel 3 */
     rc.rc.ch[3] = 0x7FF & (int16_t)((p[4] >> 1) | (p[5] << 7));
-    /*!< Switch left */
+    /* Switch left */
     rc.rc.s[0] = ((p[5] >> 4) & 0x3);
-    /*!< Switch right */
+    /* Switch right */
     rc.rc.s[1] = ((p[5] >> 4) & 0xC) >> 2;
-    /*!< Mouse X axis */
+    /* Mouse X axis */
     rc.mouse.x = (int16_t)(p[6] | (p[7] << 8));
-    /*!< Mouse Y axis */
+    /* Mouse Y axis */
     rc.mouse.y = (int16_t)(p[8] | (p[9] << 8));
-    /*!< Mouse Z axis */
+    /* Mouse Z axis */
     rc.mouse.z = (int16_t)(p[10] | (p[11] << 8));
-    /*!< Mouse Left Is Press ? */
+    /* Mouse Left Is Press ? */
     rc.mouse.press_l = p[12];
-    /*!< Mouse Right Is Press ? */
+    /* Mouse Right Is Press ? */
     rc.mouse.press_r = p[13];
-    /*!< KeyBoard value */
+    /* KeyBoard value */
     rc.key.v = (uint16_t)(p[14] | (p[15] << 8));
-    /*!< NULL */
+    /* NULL */
     rc.rc.ch[4] = (int16_t)(p[16] | (p[17] << 8));
 
     rc.rc.ch[0] = (int16_t)(rc.rc.ch[0] - RC_CH_VALUE_OFFSET);

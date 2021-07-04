@@ -120,7 +120,7 @@
 
 #define MPU_IIC_ADDR (0x68)
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __MPU6500REG_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

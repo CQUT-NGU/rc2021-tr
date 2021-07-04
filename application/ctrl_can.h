@@ -17,8 +17,6 @@
 
 #include "ctrl.h"
 
-#include <stdint.h>
-
 #define CHASSIS_CAN hcan1
 
 /**
@@ -74,7 +72,7 @@ extern void chassis_reset(void);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __CTRL_CAN_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

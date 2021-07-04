@@ -15,8 +15,6 @@
 
 #include "ctrl.h"
 
-#include <stdint.h>
-
 typedef struct
 {
     volatile float x;
@@ -36,7 +34,7 @@ extern ctrl_pc_t *ctrl_pc_point(void);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __CTRL_PC_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

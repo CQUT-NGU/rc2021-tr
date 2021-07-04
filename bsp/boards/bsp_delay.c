@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         bsp_delay.c
  * @brief        delay of boards
- * @author       tqfx
+ * @author       NGU
  * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021 NGU

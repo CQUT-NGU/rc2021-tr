@@ -248,7 +248,7 @@ static void dma_printf_irq(void)
 */
 void OS_IRQHandler(void)
 {
-    if (huart_os.Instance->SR & UART_FLAG_RXNE) /*!< USART Status register*/
+    if (huart_os.Instance->SR & UART_FLAG_RXNE) /* USART Status register*/
     {
         __HAL_UART_CLEAR_PEFLAG(&huart_os); /* Clears the UART PE pending flag */
     }
@@ -259,7 +259,7 @@ void OS_IRQHandler(void)
         /* Disable the specified DMA Stream */
         __HAL_DMA_DISABLE(huart_os.hdmarx);
 
-        /*!< DMA stream x configuration register */
+        /* DMA stream x configuration register */
         if ((huart_os.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
         {
             /* Current memory buffer used is Memory 0 */

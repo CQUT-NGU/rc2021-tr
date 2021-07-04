@@ -49,7 +49,7 @@ __END_DECLS
                   (uint32_t)(rx),   \
                   (uint16_t)(len))
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_SPI_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

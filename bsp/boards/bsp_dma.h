@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         bsp_dma.h
  * @brief        flash of boards
- * @author       tqfx
+ * @author       NGU
  * @date         20210427
  * @version      1
  * @copyright    Copyright (C) 2021 NGU
@@ -75,7 +75,7 @@
 #define BSP_DMA_WAIT_TC(_) \
     while (!__HAL_DMA_GET_FLAG(_, __HAL_DMA_GET_TC_FLAG_INDEX(_)))
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_DMA_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

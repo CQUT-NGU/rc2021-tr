@@ -11,8 +11,6 @@
 
 #include "ctrl_pc.h"
 
-#include "main.h"
-
 #include <stdlib.h>
 
 #undef PC_IS_FLOAT

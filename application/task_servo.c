@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         task_servo.c
  * @brief        steering gear control
- * @author       tqfx
+ * @author       NGU
  * @date         20210502
  * @version      1
  * @copyright    Copyright (C) 2021 NGU

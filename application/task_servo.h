@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         task_servo.h
  * @brief        steering gear control
- * @author       tqfx
+ * @author       NGU
  * @date         20210502
  * @version      1
  * @copyright    Copyright (C) 2021 NGU
@@ -19,7 +19,7 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __TASK_SERVO_H__ */
 
 /************************ (C) COPYRIGHT TQFX *******************END OF FILE****/

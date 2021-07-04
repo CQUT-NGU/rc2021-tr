@@ -105,7 +105,7 @@ static void mpu_read_bytes(uint8_t const reg, void *buf, uint8_t len)
 */
 static void ist_write_byte(uint8_t addr, uint8_t data)
 {
-    /*!< turn off slave 1 at first */
+    /* turn off slave 1 at first */
     mpu_write_byte(MPU6500_I2C_SLV1_CTRL, 0x00);
     MPU_DELAY(2);
 
@@ -115,10 +115,10 @@ static void ist_write_byte(uint8_t addr, uint8_t data)
     mpu_write_byte(MPU6500_I2C_SLV1_DO, data);
     MPU_DELAY(2);
 
-    /*!< turn on slave 1 with one byte transmitting */
+    /* turn on slave 1 with one byte transmitting */
     mpu_write_byte(MPU6500_I2C_SLV1_CTRL, 0x80 | 0x01);
 
-    /*!< wait longer to ensure the data is transmitted from slave 1 */
+    /* wait longer to ensure the data is transmitted from slave 1 */
     MPU_DELAY(10);
 }
 
@@ -139,7 +139,7 @@ static uint8_t ist_read_byte(uint8_t addr)
 
     ret = mpu_read_byte(MPU6500_I2C_SLV4_DI);
 
-    /*!< turn off slave4 after read */
+    /* turn off slave4 after read */
     mpu_write_byte(MPU6500_I2C_SLV4_CTRL, 0x00);
     MPU_DELAY(10);
 
@@ -167,28 +167,28 @@ static void mpu_i2c_config(uint8_t id, uint8_t reg, uint8_t len)
     mpu_write_byte(MPU6500_I2C_SLV1_DO, IST8310_ODR_MODE);
     MPU_DELAY(2);
 
-    /*!< use slave0,auto read data */
+    /* use slave0,auto read data */
     mpu_write_byte(MPU6500_I2C_SLV0_ADDR, 0x80 | id);
     MPU_DELAY(2);
 
     mpu_write_byte(MPU6500_I2C_SLV0_REG, reg);
     MPU_DELAY(2);
 
-    /*!< every eight mpu6500 internal samples one i2c master read */
+    /* every eight mpu6500 internal samples one i2c master read */
     mpu_write_byte(MPU6500_I2C_SLV4_CTRL, 0x03);
     MPU_DELAY(2);
 
-    /*!< enable slave 0 and 1 access delay */
+    /* enable slave 0 and 1 access delay */
     mpu_write_byte(MPU6500_I2C_MST_DELAY_CTRL, 0x01 | 0x02);
     MPU_DELAY(2);
 
-    /*!< enable slave 1 auto transmit */
+    /* enable slave 1 auto transmit */
     mpu_write_byte(MPU6500_I2C_SLV1_CTRL, 0x80 | 0x01);
 
-    /*!< Wait 6ms (minimum waiting time for 16 times internal average setup) */
+    /* Wait 6ms (minimum waiting time for 16 times internal average setup) */
     MPU_DELAY(6);
 
-    /*!< enable slave 0 with len bytes reading */
+    /* enable slave 0 with len bytes reading */
     mpu_write_byte(MPU6500_I2C_SLV0_CTRL, 0x80 | len);
     MPU_DELAY(2);
 }
@@ -198,15 +198,15 @@ static void mpu_i2c_config(uint8_t id, uint8_t reg, uint8_t len)
 */
 uint8_t ist_init(void)
 {
-    /*!< Enable iic master mode */
+    /* Enable iic master mode */
     mpu_write_byte(MPU6500_USER_CTRL, 0x30);
     MPU_DELAY(10);
 
-    /*!< Enable iic 400khz */
+    /* Enable iic 400khz */
     mpu_write_byte(MPU6500_I2C_MST_CTRL, 0x0D);
     MPU_DELAY(10);
 
-    /*!< Turn on slave 1 for ist write and slave 4 to ist read */
+    /* Turn on slave 1 for ist write and slave 4 to ist read */
     mpu_write_byte(MPU6500_I2C_SLV1_ADDR, IST8310_ADDRESS);
     MPU_DELAY(10);
 

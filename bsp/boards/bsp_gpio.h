@@ -2,7 +2,7 @@
  * *****************************************************************************
  * @file         bsp_gpio.h
  * @brief        gpio of boards
- * @author       tqfx
+ * @author       NGU
  * @date         20210101
  * @version      1
  * @copyright    Copyright (C) 2021 NGU
@@ -88,7 +88,7 @@ void gpio_pin_lock(GPIO_TypeDef *gpio,
     tmp = gpio->LCKR;
 }
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_GPIO_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

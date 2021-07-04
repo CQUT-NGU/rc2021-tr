@@ -33,7 +33,7 @@ void can_filter_init(void);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_CAN_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

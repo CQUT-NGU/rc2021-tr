@@ -109,6 +109,12 @@ extern void usart_dma_tx(UART_HandleTypeDef *huart,
  * @brief        print string to USART
  * @param[in]    format: printf format
 */
+extern void dma_printf(const char *fmt, ...);
+
+/**
+ * @brief        print string to USART
+ * @param[in]    format: printf format
+*/
 extern void os_printf(const char *format, ...);
 
 /**
@@ -130,7 +136,7 @@ static inline void usart_init(void)
     usart_dma_rx_init(&huart_rc);
 }
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_USART_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

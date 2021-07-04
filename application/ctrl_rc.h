@@ -15,8 +15,6 @@
 
 #include "ctrl.h"
 
-#include <stdint.h>
-
 #define SBUS_RX_BUF_NUM 36
 #define RC_FRAME_LENGTH 18
 
@@ -102,7 +100,7 @@ extern ctrl_rc_t *ctrl_rc_point(void);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __CTRL_RC_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

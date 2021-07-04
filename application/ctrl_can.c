@@ -13,8 +13,6 @@
 
 #include "ctrl_can.h"
 
-#include "main.h"
-
 extern CAN_HandleTypeDef hcan1;
 #if CAN2_IS_ENABLE
 extern CAN_HandleTypeDef hcan2;
@@ -73,15 +71,15 @@ const motor_t *chassis_point(uint8_t i)
 
 void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
 {
-    /*!< the TxMailbox used to store the Tx message */
+    /* the TxMailbox used to store the Tx message */
     uint32_t send_mail_box;
-    /*!< Specifies the type of identifier for the message */
+    /* Specifies the type of identifier for the message */
     chassis_tx_message.IDE = CAN_ID_STD;
-    /*!< Specifies the type of frame for the message */
+    /* Specifies the type of frame for the message */
     chassis_tx_message.RTR = CAN_RTR_DATA;
-    /*!< Specifies the standard identifier */
+    /* Specifies the standard identifier */
     chassis_tx_message.StdId = CAN_ID_CHASSIS_ALL;
-    /*!< Specifies the length of the frame that will be transmitted */
+    /* Specifies the length of the frame that will be transmitted */
     chassis_tx_message.DLC = 0x08;
 
     chassis_tx_can_data[0] = (uint8_t)(motor1 >> 8);
@@ -105,15 +103,15 @@ void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4
 
 void chassis_reset(void)
 {
-    /*!< the TxMailbox used to store the Tx message */
+    /* the TxMailbox used to store the Tx message */
     uint32_t send_mail_box;
-    /*!< Specifies the type of identifier for the message */
+    /* Specifies the type of identifier for the message */
     chassis_tx_message.IDE = CAN_ID_STD;
-    /*!< Specifies the type of frame for the message */
+    /* Specifies the type of frame for the message */
     chassis_tx_message.RTR = CAN_RTR_DATA;
-    /*!< Specifies the standard identifier */
+    /* Specifies the standard identifier */
     chassis_tx_message.StdId = 0x700;
-    /*!< Specifies the length of the frame that will be transmitted */
+    /* Specifies the length of the frame that will be transmitted */
     chassis_tx_message.DLC = 0x08;
 
     chassis_tx_can_data[0] = 0;

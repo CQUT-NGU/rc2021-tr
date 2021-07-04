@@ -36,7 +36,7 @@
 /* sigle measure mode */
 #define IST8310_ODR_MODE 0x01
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __IST8310REG_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

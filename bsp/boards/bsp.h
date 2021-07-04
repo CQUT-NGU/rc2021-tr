@@ -51,7 +51,7 @@
 #include "bsp_buzzer.h"
 #include "bsp_imu_pwm.h"
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

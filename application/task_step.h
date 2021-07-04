@@ -19,7 +19,7 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __TASK_STEP_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

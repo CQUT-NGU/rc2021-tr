@@ -91,7 +91,7 @@ extern void mpu_device_init(void);
 
 __END_DECLS
 
-/* Enddef to prevent recursive inclusion ------------------------------------ */
+/* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __MPU6500_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/
