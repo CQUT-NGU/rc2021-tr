@@ -31,7 +31,7 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __TASK_SERVO_H__ */
 
 /************************ (C) COPYRIGHT TQFX *******************END OF FILE****/

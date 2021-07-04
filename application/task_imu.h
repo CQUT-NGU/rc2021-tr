@@ -32,7 +32,7 @@ extern void task_imu(void *pvParameters);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __TASK_IMU_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

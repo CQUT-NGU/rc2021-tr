@@ -125,7 +125,7 @@ extern void task_chassis(void *pvParameters);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __TASK_CHASSIS_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

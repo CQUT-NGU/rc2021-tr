@@ -34,7 +34,7 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __CTRL_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

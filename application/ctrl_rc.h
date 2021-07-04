@@ -117,7 +117,7 @@ extern ctrl_rc_t *ctrl_rc_point(void);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __CTRL_RC_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

@@ -145,7 +145,7 @@ extern void led_pwm_set(uint16_t value);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __BSP_LED_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

@@ -60,7 +60,7 @@ extern void buzzer_set(uint16_t psc,
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __BSP_BUZZER_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

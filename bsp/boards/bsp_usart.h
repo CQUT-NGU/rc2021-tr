@@ -147,7 +147,7 @@ static inline void usart_init(void)
     usart_dma_rx_init(&huart_rc);
 }
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __BSP_USART_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

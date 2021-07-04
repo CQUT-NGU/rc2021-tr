@@ -46,7 +46,7 @@ extern void imu_update_attitude(void);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __IMU_AHRS_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

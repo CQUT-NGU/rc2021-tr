@@ -49,7 +49,7 @@ extern void delay_ms(uint16_t nms);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __BSP_DELAY_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

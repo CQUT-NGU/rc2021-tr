@@ -34,7 +34,7 @@ extern void task_led(void *pvParameters);
 
 __END_DECLS
 
-/* Terminate definition to prevent recursive inclusion -----------------------*/
+/* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __TASK_LED_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/
