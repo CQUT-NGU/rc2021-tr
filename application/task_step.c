@@ -27,21 +27,21 @@ extern TIM_HandleTypeDef htim8;
 
 #define SHIFTH_CHANNEL TIM_CHANNEL_4
 
-#define FLAG_RUN_SHIFTH (1U << 0U)
+#define FLAG_RUN_SHIFTH (1 << 0)
 
 #define LIMIT_LOW_SHIFTH 100
 
-static uint8_t step_flag_run = 0x00U;
+static int8_t step_flag_run = 0;
 
 static ca_lpf_f32_t lpf;
 
 static void shifth_set(uint32_t hz)
 {
-    uint16_t x = (uint16_t)ca_sqrt_u32(SystemCoreClock / hz);
+    uint32_t x = (uint32_t)ca_sqrt_u32(SystemCoreClock / hz);
 
-    __HAL_TIM_SET_PRESCALER(&SHIFTH_TIM, x - 1U);
-    __HAL_TIM_SetAutoreload(&SHIFTH_TIM, x - 1U);
-    __HAL_TIM_SetCompare(&SHIFTH_TIM, SHIFTH_CHANNEL, (x >> 1U));
+    __HAL_TIM_SET_PRESCALER(&SHIFTH_TIM, x - 1);
+    __HAL_TIM_SetAutoreload(&SHIFTH_TIM, x - 1);
+    __HAL_TIM_SetCompare(&SHIFTH_TIM, SHIFTH_CHANNEL, (x >> 1));
 }
 
 static void step_init(void)
@@ -63,14 +63,14 @@ static void shifth_update(const ctrl_rc_t *rc)
         else if (fr < -10)
         {
             gpio_pin_reset(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
-            fr = -fr;
+            fr = (int16_t)-fr;
         }
 
         if (-100 < rc->rc.ch[RC_CH_LV] &&
             rc->rc.ch[RC_CH_LV] < 100 &&
             fr > 100)
         {
-            shifth_set((int16_t)ca_lpf_f32(&lpf, fr * 3));
+            shifth_set((uint16_t)ca_lpf_f32(&lpf, fr * 3.0F));
 
             if (!(step_flag_run & FLAG_RUN_SHIFTH))
             {
@@ -106,7 +106,7 @@ void task_step(void *pvParameters)
     {
         shifth_update(rc);
 
-        osDelay(2U);
+        osDelay(2);
     }
 }
 

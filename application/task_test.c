@@ -36,14 +36,14 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
                 if (HAL_TIM_PWM_Stop_IT(&htim8, TIM_CHANNEL_4) == HAL_OK)
                 {
                     HAL_TIM_OC_Stop_IT(&htim5, TIM_CHANNEL_4);
-                    flagStop[3] = 1U;
+                    flagStop[3] = 1;
                 }
             }
         }
 
         if (flagStop[3])
         {
-            flagStop[3] = 0U;
+            flagStop[3] = 0;
 
             __HAL_TIM_SET_COUNTER(&htim5, 0);
         }
@@ -62,7 +62,7 @@ void task_test(void *pvParameters)
     {
         if (ctrl->c == 't')
         {
-            ctrl->c = '\0';
+            ctrl->c = 0;
 
             uint16_t count = 0;
             if (ctrl->y < 0)

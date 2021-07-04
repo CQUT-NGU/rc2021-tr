@@ -21,9 +21,9 @@
 
 extern TIM_HandleTypeDef htim4;
 
-#define SERVO_PSC     90U
-#define SERVO_PWM_MAX 20000U
-#define SERVO_PWM_MID 1500U
+#define SERVO_PSC     90
+#define SERVO_PWM_MAX 20000
+#define SERVO_PWM_MID 1500
 
 #define SERVO_TIM      htim4
 #define GETL_CHANNEL   TIM_CHANNEL_1
@@ -31,10 +31,10 @@ extern TIM_HandleTypeDef htim4;
 #define SHIFTV_CHANNEL TIM_CHANNEL_3
 #define PITCH_CHANNEL  TIM_CHANNEL_4
 
-#define FLAG_RUN_GETL   (1U << 0U)
-#define FLAG_RUN_GETR   (1U << 1U)
-#define FLAG_RUN_SHIFTV (1U << 2U)
-#define FLAG_RUN_PITCH  (1U << 3U)
+#define FLAG_RUN_GETL   (1 << 0)
+#define FLAG_RUN_GETR   (1 << 1)
+#define FLAG_RUN_SHIFTV (1 << 2)
+#define FLAG_RUN_PITCH  (1 << 3)
 
 #define PWM_INIT_GET 0
 #define PWM_LIFT_GET 100
@@ -45,15 +45,15 @@ extern TIM_HandleTypeDef htim4;
 #define PWM_INIT_SHIFTV 1000
 #define PWM_LAST_SHIFTV 2300
 
-#define SHOOT_COUNT      50U
-#define FLAG_SHOOT_START (1U << 0U)
-#define FLAG_SHOOT_COUNT (1U << 1U)
-#define FLAG_SHOOT_STOP  (1U << 2U)
+#define SHOOT_COUNT      50
+#define FLAG_SHOOT_START (1 << 0)
+#define FLAG_SHOOT_COUNT (1 << 1)
+#define FLAG_SHOOT_STOP  (1 << 2)
 
 static void servo_init(void)
 {
-    __HAL_TIM_SET_PRESCALER(&SERVO_TIM, SERVO_PSC - 1U);
-    __HAL_TIM_SetAutoreload(&SERVO_TIM, SERVO_PWM_MAX - 1U);
+    __HAL_TIM_SET_PRESCALER(&SERVO_TIM, SERVO_PSC - 1);
+    __HAL_TIM_SetAutoreload(&SERVO_TIM, SERVO_PWM_MAX - 1);
     HAL_TIM_Base_Start(&SERVO_TIM);
 }
 
@@ -77,8 +77,8 @@ static inline void getr_set(uint16_t pwm)
 
 static inline void get_set(int16_t x)
 {
-    __HAL_TIM_SetCompare(&SERVO_TIM, GETL_CHANNEL, 1500 - x);
-    __HAL_TIM_SetCompare(&SERVO_TIM, GETR_CHANNEL, 1500 + x);
+    __HAL_TIM_SetCompare(&SERVO_TIM, GETL_CHANNEL, (uint32_t)(1500 - x));
+    __HAL_TIM_SetCompare(&SERVO_TIM, GETR_CHANNEL, (uint32_t)(1500 + x));
 }
 
 static inline void shiftv_set(uint16_t pwm)
@@ -112,8 +112,8 @@ void task_servo(void *pvParameters)
 
     int16_t pwm_get = 0;
 
-    uint8_t shoot_flag = 0x00U;
-    uint8_t shoot_count = 0x00U;
+    int8_t shoot_flag = 0;
+    uint8_t shoot_count = 0;
 
     while (1)
     {
@@ -122,8 +122,8 @@ void task_servo(void *pvParameters)
         case 'a':
         {
             pwm_get_set = (int16_t)pc->x;
-            pitch_set((int16_t)pc->y);
-            shiftv_set((int16_t)pc->z);
+            pitch_set((uint16_t)pc->y);
+            shiftv_set((uint16_t)pc->z);
 
             break;
         }
@@ -164,7 +164,7 @@ void task_servo(void *pvParameters)
                 /* Set the Angle of the arrow */
                 if (rc->rc.ch[RC_CH_RV] > 0)
                 {
-                    pitch_set(PWM_INIT_PITCH - rc->rc.ch[RC_CH_RV]);
+                    pitch_set((uint8_t)(PWM_INIT_PITCH - rc->rc.ch[RC_CH_RV]));
                 }
                 /* Lift the arrow horizontally */
                 else if (rc->rc.ch[RC_CH_RV] < -550)
@@ -223,7 +223,7 @@ void task_servo(void *pvParameters)
          * prevent the PWM from changing too much to
          * cause the steering gear to jam
         */
-        int16_t delta = pwm_get - pwm_get_set;
+        int16_t delta = (int16_t)(pwm_get - pwm_get_set);
         if (delta < 0)
         {
             pwm_get++;
@@ -242,7 +242,7 @@ void task_servo(void *pvParameters)
         {
             if (shoot_count++ == SHOOT_COUNT)
             {
-                shoot_count = 0U;
+                shoot_count = 0;
                 CLEAR_BIT(shoot_flag, FLAG_SHOOT_COUNT);
 
                 gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);

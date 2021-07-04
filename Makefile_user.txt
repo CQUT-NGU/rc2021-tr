@@ -47,4 +47,4 @@ C_SOURCES += ca/zyx.c
 C_SOURCES += bsp/devices/mpu6500.c
 C_SOURCES += bsp/devices/imu_ahrs.c
 
-C_SOURCES += DSP/Source/FastMathFunctions/FastMathFunctions.c
+# C_SOURCES += DSP/Source/FastMathFunctions/FastMathFunctions.c

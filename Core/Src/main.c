@@ -238,7 +238,7 @@ void Error_Handler(void)
             buzzer_set(4, 0);
         }
 
-        led_pwm_set(i << 8U);
+        led_pwm_set((uint16_t)(i << 8U));
         delay_ms(4);
 
         if (flag)
