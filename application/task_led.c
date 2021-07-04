@@ -11,10 +11,6 @@
 
 #include "task_led.h"
 
-#include "bsp.h"
-
-#include <stdint.h>
-
 void task_led(void *pvParameters)
 {
     (void)pvParameters;
@@ -23,7 +19,7 @@ void task_led(void *pvParameters)
 
     buzzer_start();
     buzzer_set(0, BUZZER_PWM_DIV64);
-    osDelay(1000U);
+    osDelay(1000);
     buzzer_set(0, 0);
     buzzer_stop();
 
@@ -31,32 +27,32 @@ void task_led(void *pvParameters)
 
     for (;;)
     {
-        uint8_t tmp = 0xFCU;
+        uint8_t tmp = 0xFC;
 
         if (count < 0)
         {
-            for (uint8_t i = 0U; i != 8U; ++i)
+            for (uint8_t i = 0; i != 8; ++i)
             {
                 led_line(tmp);
-                osDelay(100U);
-                tmp >>= 1U;
-                if (i > 1U)
+                osDelay(100);
+                tmp >>= 1;
+                if (i > 1)
                 {
-                    tmp |= 0x80U;
+                    tmp |= 0x80;
                 }
                 count++;
             }
         }
         else
         {
-            for (uint8_t i = 0U; i != 8U; ++i)
+            for (uint8_t i = 0; i != 8; ++i)
             {
                 led_line(tmp);
-                osDelay(100U);
-                tmp <<= 1U;
-                if (i < 6U)
+                osDelay(100);
+                tmp = (uint8_t)(tmp << 1);
+                if (i < 6)
                 {
-                    tmp |= 0x01U;
+                    tmp |= 0x01;
                 }
                 count++;
             }

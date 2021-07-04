@@ -11,8 +11,6 @@
 
 #include "bsp_spi.h"
 
-#include "main.h"
-
 void spi_dma_init(SPI_HandleTypeDef *hspi)
 {
     SET_BIT(hspi->Instance->CR2, SPI_CR2_RXDMAEN); /* Rx Buffer DMA Enable */

@@ -19,10 +19,7 @@
 #ifndef __BSP_USART_H__
 #define __BSP_USART_H__
 
-#include "bsp_dma.h"
-#include "main.h"
-
-#include <stdint.h>
+#include "bsp.h"
 
 #define huart_rc huart1 /* dbus, connect to the remote control */
 #undef RC_IRQHandler
@@ -35,22 +32,8 @@
 extern UART_HandleTypeDef huart_rc;
 extern UART_HandleTypeDef huart_os;
 
-#define BUFSIZ_OS 256U
+#define BUFSIZ_OS 256
 extern uint8_t *os_buf;
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-
-#if defined(__cplusplus)
-#define __BEGIN_DECLS \
-    extern "C"        \
-    {
-#define __END_DECLS \
-    }
-#else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#endif /* __cplusplus */
 
 __BEGIN_DECLS
 

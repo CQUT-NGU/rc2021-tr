@@ -24,9 +24,7 @@
 #ifndef __BSP_LED_H__
 #define __BSP_LED_H__
 
-#include "main.h"
-
-#include <stdint.h>
+#include "bsp.h"
 
 #define LED_PWM 1
 
@@ -39,8 +37,8 @@
 #if !LED_PWM
 #define LED_PORT2 GPIOE /* red */
 #else
-#define LED_PWM_PSC 1U
-#define LED_PWM_MAX 0x10000U
+#define LED_PWM_PSC 1
+#define LED_PWM_MAX 0x10000
 #endif /* LED_PWM */
 
 #undef __BEGIN_DECLS
@@ -76,8 +74,10 @@ typedef enum
     LED_NUM_7 = GPIO_PIN_8,  /* green 7 */
     LED_NUM_8 = GPIO_PIN_14, /* green */
 #if !LED_PWM
+
     LED_NUM_9 = GPIO_PIN_11, /* red */
-#endif                       /* LED_PWM */
+
+#endif /* LED_PWM */
 } led_e;
 
 __BEGIN_DECLS

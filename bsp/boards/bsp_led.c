@@ -22,8 +22,6 @@
 
 #include "bsp_led.h"
 
-#include "main.h"
-
 #if LED_PWM
 #undef htim
 #define htim htim1
@@ -36,17 +34,17 @@ extern TIM_HandleTypeDef htim;
 #endif /* LED_PWM */
 
 #undef LED_W
-#define LED_W(GPIOx, PIN, STATE)                \
-    do                                          \
-    {                                           \
-        if (STATE == LED_OFF)                   \
-        {                                       \
-            GPIOx->BSRR = (uint32_t)PIN;        \
-        }                                       \
-        else                                    \
-        {                                       \
-            GPIOx->BSRR = (uint32_t)PIN << 16U; \
-        }                                       \
+#define LED_W(GPIOx, PIN, STATE)               \
+    do                                         \
+    {                                          \
+        if (STATE == LED_OFF)                  \
+        {                                      \
+            GPIOx->BSRR = (uint32_t)PIN;       \
+        }                                      \
+        else                                   \
+        {                                      \
+            GPIOx->BSRR = (uint32_t)PIN << 16; \
+        }                                      \
     } while (0)
 
 #undef LED_R
@@ -64,17 +62,17 @@ extern TIM_HandleTypeDef htim;
     } while (0)
 
 #undef LED_T
-#define LED_T(GPIOx, PIN)                       \
-    do                                          \
-    {                                           \
-        if ((GPIOx->ODR & PIN) == PIN)          \
-        {                                       \
-            GPIOx->BSRR = (uint32_t)PIN << 16U; \
-        }                                       \
-        else                                    \
-        {                                       \
-            GPIOx->BSRR = (uint32_t)PIN;        \
-        }                                       \
+#define LED_T(GPIOx, PIN)                      \
+    do                                         \
+    {                                          \
+        if ((GPIOx->ODR & PIN) == PIN)         \
+        {                                      \
+            GPIOx->BSRR = (uint32_t)PIN << 16; \
+        }                                      \
+        else                                   \
+        {                                      \
+            GPIOx->BSRR = (uint32_t)PIN;       \
+        }                                      \
     } while (0)
 
 void led_write(led_e pin,
@@ -184,8 +182,8 @@ void led_toggle(led_e pin)
 void led_line(uint8_t state)
 {
     /* GPIO port bit set/reset register */
-    LED_PORT0->BSRR = ((uint32_t)state << 1U) |
-                      (~((uint32_t)state << 1U) << 16U);
+    LED_PORT0->BSRR = ((uint32_t)state << 1) |
+                      (~((uint32_t)state << 1) << 16);
 }
 
 void led_green(led_state_e state)
@@ -205,9 +203,9 @@ void led_red(led_state_e state)
 void led_pwm_start(void)
 {
     /* Set the TIM Prescaler on runtime */
-    __HAL_TIM_SET_PRESCALER(&htim, LED_PWM_PSC - 1U);
+    __HAL_TIM_SET_PRESCALER(&htim, LED_PWM_PSC - 1);
     /* Set the TIM Autoreload Register value on runtime */
-    __HAL_TIM_SetAutoreload(&htim, LED_PWM_MAX - 1U);
+    __HAL_TIM_SetAutoreload(&htim, LED_PWM_MAX - 1);
     /* Set the TIM Clock Division value on runtime */
     __HAL_TIM_SetClockDivision(&htim, TIM_CLOCKDIVISION_DIV1);
     /* Starts the PWM signal generation */

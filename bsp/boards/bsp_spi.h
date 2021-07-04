@@ -18,26 +18,9 @@
 #ifndef __BSP_SPI_H__
 #define __BSP_SPI_H__
 
-#include "bsp_dma.h"
-#include "main.h"
-
-#include <stdint.h>
+#include "bsp.h"
 
 extern SPI_HandleTypeDef hspi5;
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-
-#if defined(__cplusplus)
-#define __BEGIN_DECLS \
-    extern "C"        \
-    {
-#define __END_DECLS \
-    }
-#else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#endif /* __cplusplus */
 
 __BEGIN_DECLS
 
@@ -61,7 +44,6 @@ __END_DECLS
 
 #define spi5_dma_init() spi_dma_init(&hspi5)
 #define spi5_dma_start(tx, rx, len) \
-                                    \
     spi_dma_start(&hspi5,           \
                   (uint32_t)(tx),   \
                   (uint32_t)(rx),   \

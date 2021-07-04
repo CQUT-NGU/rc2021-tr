@@ -11,8 +11,6 @@
 
 #include "bsp_can.h"
 
-#include "main.h"
-
 extern CAN_HandleTypeDef hcan1;
 #if CAN2_IS_ENABLE
 extern CAN_HandleTypeDef hcan2;

@@ -11,8 +11,6 @@
 
 #include "bsp_imu_pwm.h"
 
-#include "main.h"
-
 #undef htim
 #define htim htim3
 #undef IMU_CHANNEL
@@ -23,9 +21,9 @@ extern TIM_HandleTypeDef htim;
 void imu_pwm_start(void)
 {
     /* Set the TIM Prescaler on runtime */
-    __HAL_TIM_SET_PRESCALER(&htim, IMU_PWM_PSC - 1U);
+    __HAL_TIM_SET_PRESCALER(&htim, IMU_PWM_PSC - 1);
     /* Set the TIM Autoreload Register value on runtime */
-    __HAL_TIM_SetAutoreload(&htim, IMU_PWM_MAX - 1U);
+    __HAL_TIM_SetAutoreload(&htim, IMU_PWM_MAX - 1);
     /* Set the TIM Clock Division value on runtime */
     __HAL_TIM_SetClockDivision(&htim, TIM_CLOCKDIVISION_DIV1);
     /* Starts the PWM signal generation */

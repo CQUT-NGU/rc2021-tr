@@ -13,24 +13,10 @@
 #ifndef __BSP_IMU_PWM_H__
 #define __BSP_IMU_PWM_H__
 
-#include <stdint.h>
+#include "bsp.h"
 
-#define IMU_PWM_PSC 180U
-#define IMU_PWM_MAX 0x3FFFU
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-
-#if defined(__cplusplus)
-#define __BEGIN_DECLS \
-    extern "C"        \
-    {
-#define __END_DECLS \
-    }
-#else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#endif /* __cplusplus */
+#define IMU_PWM_PSC 180
+#define IMU_PWM_MAX 0x3FFF
 
 __BEGIN_DECLS
 
@@ -46,7 +32,7 @@ extern void imu_pwm_stop(void);
 
 /**
  * @brief        Set pwm of the imu
- * @param[in]    pwm: 0x0000U ~ IMU_PWM_MAX
+ * @param[in]    pwm: 0x0000 ~ IMU_PWM_MAX
 */
 extern void imu_pwm_set(uint16_t pwm);
 

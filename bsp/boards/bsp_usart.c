@@ -11,8 +11,6 @@
 
 #include "bsp_usart.h"
 
-#include "main.h"
-
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -346,7 +344,7 @@ void os_justfloat(uint8_t n, ...)
     va_end(ap);
 
     /* USART transmit by DMA Stream */
-    usart_dma_tx(&huart_os, (uint8_t *)buf32, (uint16_t)(sizeof(float) * (n + 1U)));
+    usart_dma_tx(&huart_os, (void *)buf32, (uint16_t)(sizeof(float) * (n + 1U)));
 
     /* Wait Complete Transmit flag to be set */
     BSP_DMA_WAIT_TC(huart_os.hdmatx);

@@ -11,13 +11,11 @@
 
 #include "bsp_flash.h"
 
-#include "main.h"
-
 #include <string.h>
 
 uint32_t flash_sector(uint32_t addr)
 {
-    uint32_t sector = 0U;
+    uint32_t sector = 0;
 
 #if FLASH_SECTOR_TOTAL > 1U
     if ((addr < ADDR_FLASH_SECTOR_1) && (addr >= ADDR_FLASH_SECTOR_0))
@@ -169,7 +167,7 @@ uint32_t flash_sector(uint32_t addr)
 
 uint32_t flash_addr_next(uint32_t addr)
 {
-    uint32_t sector = 0U;
+    uint32_t sector = 0;
 
 #if FLASH_SECTOR_TOTAL > 1U
     if ((addr < ADDR_FLASH_SECTOR_1) && (addr >= ADDR_FLASH_SECTOR_0))
@@ -394,7 +392,7 @@ int8_t flash_writen(uint32_t addr,
 {
     int8_t ret = 0;
 
-    uint32_t n = 0U;
+    uint32_t n = 0;
 
     HAL_FLASH_Unlock();
 
