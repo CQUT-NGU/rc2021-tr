@@ -13,7 +13,6 @@
 
 #include "ctrl_can.h"
 
-#include "bsp.h"
 #include "main.h"
 
 extern CAN_HandleTypeDef hcan1;
@@ -24,15 +23,14 @@ extern CAN_HandleTypeDef hcan2;
 /**
  * @brief motor data read
 */
-#define MOTOR_MEASURE(ptr, data)                                   \
-                                                                   \
-    do                                                             \
-    {                                                              \
-        (ptr)->ecd_last = (ptr)->ecd;                              \
-        (ptr)->ecd = (uint16_t)((data)[0] << 8U | (data)[1]);      \
-        (ptr)->v_rpm = (int16_t)((data)[2] << 8U | (data)[3]);     \
-        (ptr)->i_current = (int16_t)((data)[4] << 8U | (data)[5]); \
-        (ptr)->temperate = (data)[6];                              \
+#define MOTOR_MEASURE(ptr, data)                                  \
+    do                                                            \
+    {                                                             \
+        (ptr)->ecd_last = (ptr)->ecd;                             \
+        (ptr)->ecd = (uint16_t)((data)[0] << 8 | (data)[1]);      \
+        (ptr)->v_rpm = (int16_t)((data)[2] << 8 | (data)[3]);     \
+        (ptr)->i_current = (int16_t)((data)[4] << 8 | (data)[5]); \
+        (ptr)->temperate = (data)[6];                             \
     } while (0)
 
 static motor_t motor_chassis[4];
@@ -70,7 +68,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
 const motor_t *chassis_point(uint8_t i)
 {
-    return &motor_chassis[(i & 0x07U)];
+    return &motor_chassis[(i & 0x07)];
 }
 
 void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
@@ -84,7 +82,7 @@ void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4
     /*!< Specifies the standard identifier */
     chassis_tx_message.StdId = CAN_ID_CHASSIS_ALL;
     /*!< Specifies the length of the frame that will be transmitted */
-    chassis_tx_message.DLC = 0x08U;
+    chassis_tx_message.DLC = 0x08;
 
     chassis_tx_can_data[0] = (uint8_t)(motor1 >> 8);
     chassis_tx_can_data[1] = (uint8_t)(motor1);
@@ -116,7 +114,7 @@ void chassis_reset(void)
     /*!< Specifies the standard identifier */
     chassis_tx_message.StdId = 0x700;
     /*!< Specifies the length of the frame that will be transmitted */
-    chassis_tx_message.DLC = 0x08U;
+    chassis_tx_message.DLC = 0x08;
 
     chassis_tx_can_data[0] = 0;
     chassis_tx_can_data[1] = 0;

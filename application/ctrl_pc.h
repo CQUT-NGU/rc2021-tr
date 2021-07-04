@@ -13,24 +13,9 @@
 #ifndef __CTRL_PC_H__
 #define __CTRL_PC_H__
 
+#include "ctrl.h"
+
 #include <stdint.h>
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-
-#if defined(__cplusplus)
-#define __BEGIN_DECLS \
-    extern "C"        \
-    {
-#define __END_DECLS \
-    }
-#else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#endif /* __cplusplus */
-
-#undef __packed
-#define __packed __attribute__((__packed__))
 
 typedef struct
 {
@@ -49,7 +34,7 @@ __BEGIN_DECLS
 */
 extern ctrl_pc_t *ctrl_pc_point(void);
 
-__BEGIN_DECLS
+__END_DECLS
 
 /* Enddef to prevent recursive inclusion ------------------------------------ */
 #endif /* __CTRL_PC_H__ */

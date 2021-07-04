@@ -11,7 +11,6 @@
 
 #include "ctrl_pc.h"
 
-#include "bsp_usart.h"
 #include "main.h"
 
 #include <stdlib.h>

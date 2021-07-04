@@ -13,6 +13,23 @@
 #ifndef __BSP_H__
 #define __BSP_H__
 
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+
+#if defined(__cplusplus)
+#define __BEGIN_DECLS \
+    extern "C"        \
+    {
+#define __END_DECLS \
+    }
+#else
+#define __BEGIN_DECLS
+#define __END_DECLS
+#endif /* __cplusplus */
+
+#undef __packed
+#define __packed __attribute__((__packed__))
+
 #include "bsp_buzzer.h"
 #include "bsp_can.h"
 #include "bsp_delay.h"

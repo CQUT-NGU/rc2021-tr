@@ -15,34 +15,22 @@
 #ifndef __CTRL_CAN_H__
 #define __CTRL_CAN_H__
 
+#include "ctrl.h"
+
 #include <stdint.h>
 
 #define CHASSIS_CAN hcan1
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-
-#if defined(__cplusplus)
-#define __BEGIN_DECLS \
-    extern "C"        \
-    {
-#define __END_DECLS \
-    }
-#else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#endif /* __cplusplus */
 
 /**
  * @brief        CAN send and receive ID
 */
 typedef enum
 {
-    CAN_ID_CHASSIS_ALL = 0x200U,
-    CAN_ID_3508_M1 = 0x201U,
-    CAN_ID_3508_M2 = 0x202U,
-    CAN_ID_3508_M3 = 0x203U,
-    CAN_ID_3508_M4 = 0x204U,
+    CAN_ID_CHASSIS_ALL = 0x200,
+    CAN_ID_3508_M1 = 0x201,
+    CAN_ID_3508_M2 = 0x202,
+    CAN_ID_3508_M3 = 0x203,
+    CAN_ID_3508_M4 = 0x204,
 } can_msg_id_e;
 
 /**
