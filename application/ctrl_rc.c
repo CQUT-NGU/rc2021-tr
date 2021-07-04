@@ -122,11 +122,11 @@ static void sbus_to_rc(const void *buf)
     /*!< NULL */
     rc.rc.ch[4] = (int16_t)(p[16] | (p[17] << 8));
 
-    rc.rc.ch[0] = (int16_t)(rc.rc.ch[0] + RC_CH_VALUE_OFFSET);
-    rc.rc.ch[1] = (int16_t)(rc.rc.ch[1] + RC_CH_VALUE_OFFSET);
-    rc.rc.ch[2] = (int16_t)(rc.rc.ch[2] + RC_CH_VALUE_OFFSET);
-    rc.rc.ch[3] = (int16_t)(rc.rc.ch[3] + RC_CH_VALUE_OFFSET);
-    rc.rc.ch[4] = (int16_t)(rc.rc.ch[4] + RC_CH_VALUE_OFFSET);
+    rc.rc.ch[0] = (int16_t)(rc.rc.ch[0] - RC_CH_VALUE_OFFSET);
+    rc.rc.ch[1] = (int16_t)(rc.rc.ch[1] - RC_CH_VALUE_OFFSET);
+    rc.rc.ch[2] = (int16_t)(rc.rc.ch[2] - RC_CH_VALUE_OFFSET);
+    rc.rc.ch[3] = (int16_t)(rc.rc.ch[3] - RC_CH_VALUE_OFFSET);
+    rc.rc.ch[4] = (int16_t)(rc.rc.ch[4] - RC_CH_VALUE_OFFSET);
 }
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/
