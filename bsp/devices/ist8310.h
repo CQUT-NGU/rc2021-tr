@@ -13,6 +13,10 @@
 #ifndef __IST8310_H__
 #define __IST8310_H__
 
+#include "ist8310reg.h"
+
+#include <stdint.h>
+
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 

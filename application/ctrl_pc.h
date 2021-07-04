@@ -19,11 +19,11 @@
 
 typedef struct
 {
-    float x;
-    float y;
-    float z;
+    volatile float x;
+    volatile float y;
+    volatile float z;
 
-    uint8_t c;
+    volatile uint8_t c;
 } ctrl_pc_t;
 
 __BEGIN_DECLS

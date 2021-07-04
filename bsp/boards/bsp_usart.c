@@ -173,7 +173,7 @@ void usart_dma_rx(UART_HandleTypeDef *huart,
 }
 
 void usart_dma_tx(UART_HandleTypeDef *huart,
-                  void *data,
+                  const void *data,
                   uint16_t len)
 {
     do

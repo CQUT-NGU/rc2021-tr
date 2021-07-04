@@ -120,7 +120,7 @@ void task_imu(void *pvParameters)
             {
                 signal_aiming = SIGNAL_AIMING_DONE;
 
-                usart_dma_tx(&huart_os, (void *)"a\n", 2);
+                usart_dma_tx(&huart_os, (const void *)"a\n", 2);
             }
         }
 

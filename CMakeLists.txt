@@ -48,8 +48,8 @@ include_directories("Core/Inc")
 aux_source_directory("Core/Src" SOURCE_Core)
 list(APPEND SOURCE ${SOURCE_Core})
 
-include_directories("DSP/Include")
-list(APPEND SOURCE "DSP/Source/FastMathFunctions/FastMathFunctions.c")
+# include_directories("DSP/Include")
+# list(APPEND SOURCE "DSP/Source/FastMathFunctions/FastMathFunctions.c")
 
 include_directories("bsp/boards")
 include_directories("bsp/devices")
@@ -66,11 +66,11 @@ add_subdirectory(ca)
 file(GLOB STARTUP *.s)
 add_executable(${CMAKE_PROJECT_NAME}.elf ${STARTUP} ${SOURCE})
 
-target_link_libraries(${CMAKE_PROJECT_NAME}.elf c m nosys
-    ca
+target_link_libraries(${CMAKE_PROJECT_NAME}.elf ca
+    c m nosys
 )
 
-file(GLOB LINKER_SCRIPT  *.ld)
+file(GLOB LINKER_SCRIPT *.ld)
 target_link_options(${CMAKE_PROJECT_NAME}.elf PUBLIC
     -Wl,--gc-sections
     --specs=nano.specs

@@ -27,7 +27,7 @@ static uint8_t sbus_rx_buf[2][SBUS_RX_BUF_NUM];
  * @brief        Remote control protocol resolution
  * @param[in]    buf: raw data point
 */
-static void sbus_to_rc(volatile const void *buf);
+static void sbus_to_rc(const void *buf);
 
 void ctrl_rc_init(void)
 {
@@ -91,9 +91,9 @@ void RC_IRQHandler(void)
     }
 }
 
-static void sbus_to_rc(volatile const void *buf)
+static void sbus_to_rc(const void *buf)
 {
-    uint8_t *p = (uint8_t *)buf;
+    const uint8_t *p = (const uint8_t *)buf;
 
     /*!< Channel 0 */
     rc.rc.ch[0] = 0x7FF & (int16_t)((p[1] << 8) | p[0]);
