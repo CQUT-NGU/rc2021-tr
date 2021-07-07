@@ -400,6 +400,7 @@ void mpu_device_init(void)
         led_pwm_start();
         led_pwm_set(0x3FFF);
     }
+
     mpu_offset_call();
 }
 

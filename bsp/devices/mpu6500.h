@@ -80,7 +80,6 @@ typedef struct
     float rol; /* roll */
     float pit; /* pitch */
     float yaw; /* yaw */
-
 } imu_t;
 
 __BEGIN_DECLS

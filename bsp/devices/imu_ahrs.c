@@ -21,7 +21,7 @@
 
 extern imu_t imu;
 
-static float quat[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+static float quat[4] = {1.0F, 0.0F, 0.0F, 0.0F};
 
 /**
  * @brief        Gets half of the sampling cycle time
@@ -43,7 +43,7 @@ static float ht_get(void)
     static volatile uint32_t update_now;
 
     update_now = HAL_GetTick(); /* ms */
-    float ret = (float)(update_now - update_last) / 2000.0f;
+    float ret = (float)(update_now - update_last) / 2000.0F;
     update_last = update_now;
 
     return ret;
@@ -56,7 +56,7 @@ static float t_get(void)
     static volatile uint32_t update_now;
 
     update_now  = HAL_GetTick(); /* ms */
-    float ret   = (float)(update_now - update_last) / 1000.0f;
+    float ret   = (float)(update_now - update_last) / 1000.0F;
     update_last = update_now;
 
     return ret;
@@ -78,68 +78,68 @@ void quat_init(float q[4],
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = -0.005f;
-            q[1] = -0.199f;
-            q[2] = 0.979f;
-            q[3] = -0.0089f;
+            q[0] = -0.005F;
+            q[1] = -0.199F;
+            q[2] = 0.979F;
+            q[3] = -0.0089F;
         }
         else
         {
-            q[0] = -0.008f;
-            q[1] = -0.555f;
-            q[2] = 0.83f;
-            q[3] = -0.002f;
+            q[0] = -0.008F;
+            q[1] = -0.555F;
+            q[2] = 0.83F;
+            q[3] = -0.002F;
         }
     }
     else if (hx < 0 && hy > 0)
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = 0.005f;
-            q[1] = -0.199f;
-            q[2] = -0.978f;
-            q[3] = 0.012f;
+            q[0] = 0.005F;
+            q[1] = -0.199F;
+            q[2] = -0.978F;
+            q[3] = 0.012F;
         }
         else
         {
-            q[0] = 0.005f;
-            q[1] = -0.553f;
-            q[2] = -0.83f;
-            q[3] = -0.0023f;
+            q[0] = 0.005F;
+            q[1] = -0.553F;
+            q[2] = -0.83F;
+            q[3] = -0.0023F;
         }
     }
     else if (hx > 0 && hy > 0)
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = 0.0012f;
-            q[1] = -0.978f;
-            q[2] = -0.199f;
-            q[3] = -0.005f;
+            q[0] = 0.0012F;
+            q[1] = -0.978F;
+            q[2] = -0.199F;
+            q[3] = -0.005F;
         }
         else
         {
-            q[0] = 0.0023f;
-            q[1] = -0.83f;
-            q[2] = -0.553f;
-            q[3] = 0.0023f;
+            q[0] = 0.0023F;
+            q[1] = -0.83F;
+            q[2] = -0.553F;
+            q[3] = 0.0023F;
         }
     }
     else if (hx > 0 && hy < 0)
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = 0.0025f;
-            q[1] = 0.978f;
-            q[2] = -0.199f;
-            q[3] = 0.008f;
+            q[0] = 0.0025F;
+            q[1] = 0.978F;
+            q[2] = -0.199F;
+            q[3] = 0.008F;
         }
         else
         {
-            q[0] = 0.0025f;
-            q[1] = 0.83f;
-            q[2] = -0.56f;
-            q[3] = 0.0045f;
+            q[0] = 0.0025F;
+            q[1] = 0.83F;
+            q[2] = -0.56F;
+            q[3] = 0.0045F;
         }
     }
 #else
@@ -147,68 +147,68 @@ void quat_init(float q[4],
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = 0.195f;
-            q[1] = -0.015f;
-            q[2] = 0.0043f;
-            q[3] = 0.979f;
+            q[0] = 0.195F;
+            q[1] = -0.015F;
+            q[2] = 0.0043F;
+            q[3] = 0.979F;
         }
         else
         {
-            q[0] = 0.555f;
-            q[1] = -0.015f;
-            q[2] = 0.006f;
-            q[3] = 0.829f;
+            q[0] = 0.555F;
+            q[1] = -0.015F;
+            q[2] = 0.006F;
+            q[3] = 0.829F;
         }
     }
     else if (hx < 0 && hy > 0)
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = -0.193f;
-            q[1] = -0.009f;
-            q[2] = -0.006f;
-            q[3] = 0.979f;
+            q[0] = -0.193F;
+            q[1] = -0.009F;
+            q[2] = -0.006F;
+            q[3] = 0.979F;
         }
         else
         {
-            q[0] = -0.552f;
-            q[1] = -0.0048f;
-            q[2] = -0.0115f;
-            q[3] = 0.8313f;
+            q[0] = -0.552F;
+            q[1] = -0.0048F;
+            q[2] = -0.0115F;
+            q[3] = 0.8313F;
         }
     }
     else if (hx > 0 && hy > 0)
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = -0.9785f;
-            q[1] = 0.008f;
-            q[2] = -0.02f;
-            q[3] = 0.195f;
+            q[0] = -0.9785F;
+            q[1] = 0.008F;
+            q[2] = -0.02F;
+            q[3] = 0.195F;
         }
         else
         {
-            q[0] = -0.9828f;
-            q[1] = 0.002f;
-            q[2] = -0.0167f;
-            q[3] = 0.5557f;
+            q[0] = -0.9828F;
+            q[1] = 0.002F;
+            q[2] = -0.0167F;
+            q[3] = 0.5557F;
         }
     }
     else if (hx > 0 && hy < 0)
     {
         if (fabsf(hx / hy) >= 1)
         {
-            q[0] = -0.979f;
-            q[1] = 0.0116f;
-            q[2] = -0.0167f;
-            q[3] = -0.195f;
+            q[0] = -0.979F;
+            q[1] = 0.0116F;
+            q[2] = -0.0167F;
+            q[3] = -0.195F;
         }
         else
         {
-            q[0] = -0.83f;
-            q[1] = 0.014f;
-            q[2] = -0.012f;
-            q[3] = -0.556f;
+            q[0] = -0.83F;
+            q[1] = 0.014F;
+            q[2] = -0.012F;
+            q[3] = -0.556F;
         }
     }
 #endif /* BOARD_IS_DOWN */
@@ -234,13 +234,13 @@ void imu_quat_init(void)
 */
 void imu_update_ahrs(void)
 {
-    float g[3] = {imu.wx, imu.wy, imu.wz};
-    float a[3] = {imu.ax, imu.ay, imu.az};
-    float m[3] = {imu.mx, imu.my, imu.mz};
+    volatile float g[3] = {imu.wx, imu.wy, imu.wz};
+    volatile float a[3] = {imu.ax, imu.ay, imu.az};
+    volatile float m[3] = {imu.mx, imu.my, imu.mz};
 
-    //ahrs_madgwick(quat, g, a, m, 2 * ht_get());
     ahrs_mahony(quat, g, a, m, ht_get());
     //ahrs_mahony_imu(quat, g, a, ht_get());
+    //ahrs_madgwick(quat, g, a, m, 2 * ht_get());
 }
 
 /**
