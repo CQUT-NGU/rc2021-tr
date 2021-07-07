@@ -216,6 +216,6 @@ clean:
 
 # *** EOF ***
 flash:
-	openocd -f /home/u/rc2021-tr-rm-a/openocd.cfg -c init -c halt -c "program $(BUILD_DIR)/$(TARGET).elf verify reset exit"
+	openocd -f openocd.cfg -c init -c halt -c "program $(BUILD_DIR)/$(TARGET).elf verify reset exit"
 reset:
-	openocd -f /home/u/rc2021-tr-rm-a/openocd.cfg -c init -c halt -c reset -c shutdown
+	openocd -f openocd.cfg -c init -c halt -c reset -c shutdown
