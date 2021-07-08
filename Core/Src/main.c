@@ -32,7 +32,7 @@
 #include "bsp.h"
 #include "ctrl.h"
 #include "mpu6500.h"
-
+#include "l1s.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,6 +105,8 @@ int main(void)
     MX_TIM3_Init();
     MX_TIM4_Init();
     MX_TIM8_Init();
+    MX_UART8_Init(); 
+    MX_UART7_Init();
     /* USER CODE BEGIN 2 */
     gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
     gpio_pin_reset(POWER2_GPIO_Port, POWER2_Pin);
@@ -114,6 +116,7 @@ int main(void)
     buzzer_start();
     usart_init();
     ctrl_rc_init();
+    l1s_init();
     os_dma_init();
     os_printf("OK\r\n");
     /* USER CODE END 2 */
