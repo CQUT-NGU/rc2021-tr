@@ -142,7 +142,7 @@ void task_servo(void *pvParameters)
                 /* Unclip the arrow */
                 if (rc->rc.ch[RC_CH_S] < -650)
                 {
-                    gpio_pin_reset(POWER3_GPIO_Port, POWER3_Pin);
+                    gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
                 }
                 /**
                  * -550 ~ -110
@@ -175,7 +175,7 @@ void task_servo(void *pvParameters)
                 else if (rc->rc.ch[RC_CH_RV] < -110)
                 {
                     /* Clamp the arrow */
-                    gpio_pin_set(POWER3_GPIO_Port, POWER3_Pin);
+                    gpio_pin_set(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
                     /* Lift it */
                     if (pwm_get_set == PWM_INIT_GET)
                     {
@@ -201,7 +201,7 @@ void task_servo(void *pvParameters)
                         SET_BIT(shoot_flag, FLAG_SHOOT_START);
                         SET_BIT(shoot_flag, FLAG_SHOOT_COUNT);
 
-                        gpio_pin_set(POWER1_GPIO_Port, POWER1_Pin);
+                        gpio_pin_set(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
                     }
                 }
                 else
@@ -213,7 +213,7 @@ void task_servo(void *pvParameters)
                         CLEAR_BIT(shoot_flag, FLAG_SHOOT_START);
                     }
 
-                    gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
+                    gpio_pin_reset(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
                 }
             }
         }
@@ -245,7 +245,7 @@ void task_servo(void *pvParameters)
                 shoot_count = 0;
                 CLEAR_BIT(shoot_flag, FLAG_SHOOT_COUNT);
 
-                gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
+                gpio_pin_reset(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
                 SET_BIT(shoot_flag, FLAG_SHOOT_STOP);
             }
         }

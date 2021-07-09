@@ -137,14 +137,14 @@ void task_imu(void *pvParameters)
                   mpu.mz,
                   mpu.temp);
 #elif 0
-        os_justfloat(4U,
+        os_justfloat(4,
                      imu.rol,
                      imu.pit,
                      imu.yaw,
                      imu.temp);
 #endif
 
-        osDelay(2U);
+        osDelay(2);
     }
 }
 

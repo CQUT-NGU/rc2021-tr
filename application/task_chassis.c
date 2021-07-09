@@ -49,7 +49,8 @@ extern imu_t imu;
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_VY 0.25F
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_WZ 0.25F
 
-#define MOTOR_DISTANCE_TO_CENTER 0.68F
+/* a = 0.7 / 2, b = 0.7 / 2, a + b */
+#define MOTOR_DISTANCE_TO_CENTER 0.7F
 
 /* chassis task control time 2ms */
 #define CHASSIS_CONTROL_TIME_MS 2
@@ -101,7 +102,7 @@ extern imu_t imu;
 #define M3505_MOTOR_SPEED_PID_MAX_IOUT 2000.0F
 
 /* chassis follow angle PID */
-#define CHASSIS_FOLLOW_GIMBAL_PID_KP       10.0F
+#define CHASSIS_FOLLOW_GIMBAL_PID_KP       5.0F
 #define CHASSIS_FOLLOW_GIMBAL_PID_KI       0.0F
 #define CHASSIS_FOLLOW_GIMBAL_PID_KD       0.0F
 #define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT  (float)M_PI
@@ -178,7 +179,7 @@ static void chassis_init(void)
     /* get gimbal motor data point */
 
     /* get chassis motor data point, initialize motor speed PID */
-    for (uint8_t i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0; i != 4; ++i)
     {
         move.motor[i].measure = chassis_point(i);
         ca_pid_f32_position(&move.pid_speed[i],
@@ -229,7 +230,7 @@ static void chassis_init(void)
 */
 static void chassis_update(void)
 {
-    for (uint8_t i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0; i != 4; ++i)
     {
         /* update motor speed, accel is differential of speed PID */
         move.motor[i].v = move.motor[i].measure->v_rpm *
@@ -576,7 +577,7 @@ static void chassis_loop(void)
 
     /* calculate the max speed in four wheels, limit the max speed */
     float vector_max = 0;
-    for (uint8_t i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0; i != 4; ++i)
     {
         move.motor[i].v_set = wheel_speed[i];
 
@@ -592,14 +593,14 @@ static void chassis_loop(void)
     {
         float vector = MAX_WHEEL_SPEED / vector_max;
 
-        for (uint8_t i = 0U; i != 4U; ++i)
+        for (uint8_t i = 0; i != 4; ++i)
         {
             move.motor[i].v_set *= vector;
         }
     }
 
     /* calculate pid */
-    for (uint8_t i = 0U; i != 4U; ++i)
+    for (uint8_t i = 0; i != 4; ++i)
     {
         move.motor[i].i_current = (int16_t)ca_pid_f32(&move.pid_speed[i],
                                                       move.motor[i].v,
@@ -633,7 +634,7 @@ void task_chassis(void *pvParameters)
                      move.motor[3].i_current);
 
 #if 0
-        os_justfloat(4U,
+        os_justfloat(4,
                      move.motor[0].v,
                      move.motor[1].v,
                      move.motor[2].v,

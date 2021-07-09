@@ -108,10 +108,6 @@ int main(void)
     MX_UART8_Init();
     MX_UART7_Init();
     /* USER CODE BEGIN 2 */
-    gpio_pin_reset(POWER1_GPIO_Port, POWER1_Pin);
-    gpio_pin_reset(POWER2_GPIO_Port, POWER2_Pin);
-    gpio_pin_reset(POWER3_GPIO_Port, POWER3_Pin);
-    gpio_pin_reset(POWER4_GPIO_Port, POWER4_Pin);
     delay_init();
     buzzer_start();
     usart_init();
