@@ -17,8 +17,8 @@ uint8_t l1s0_buf8[2][BUFSIZ_L1S0];
 uint8_t *l1s0_buf = *l1s0_buf8;
 uint8_t l1s1_buf8[2][BUFSIZ_L1S1];
 uint8_t *l1s1_buf = *l1s1_buf8;
-// uint8_t l1s2_buf8[2][BUFSIZ_L1S2];
-// uint8_t *l1s2_buf = *l1s2_buf8;
+uint8_t l1s2_buf8[2][BUFSIZ_L1S2];
+uint8_t *l1s2_buf = *l1s2_buf8;
 // uint8_t l1s3_buf8[2][BUFSIZ_L1S3];
 // uint8_t *l1s3_buf = *l1s3_buf8;
 
@@ -74,10 +74,15 @@ void l1s_dma_init(UART_HandleTypeDef *huart)
 void l1s_config(UART_HandleTypeDef *huart)
 {
     HAL_UART_Transmit(huart, (void *)"iSET:1,0", sizeof("iSET:1,0") - 1, 0xFFFF);
+    HAL_Delay(2);
     HAL_UART_Transmit(huart, (void *)"iSET:2,40", sizeof("iSET:2,40") - 1, 0xFFFF);
+    HAL_Delay(2);
     HAL_UART_Transmit(huart, (void *)"iSET:4,115200", sizeof("iSET:4,115200") - 1, 0xFFFF);
+    HAL_Delay(2);
     HAL_UART_Transmit(huart, (void *)"iSET:7,20", sizeof("iSET:7,20") - 1, 0xFFFF);
+    HAL_Delay(2);
     HAL_UART_Transmit(huart, (void *)"iSET:8,0", sizeof("iSET:8,0") - 1, 0xFFFF);
+    HAL_Delay(2);
 }
 
 void l1s_start(UART_HandleTypeDef *huart)
@@ -94,22 +99,22 @@ void l1s_init(void)
 {
     l1s_config(&huart_l1s0);
     l1s_config(&huart_l1s1);
-    // l1s_config(&huart_l1s2);
+    l1s_config(&huart_l1s2);
     // l1s_config(&huart_l1s3);
 
     l1s_dma_init(&huart_l1s0);
     l1s_dma_init(&huart_l1s1);
-    // l1s_dma_init(&huart_l1s2);
+    l1s_dma_init(&huart_l1s2);
     // l1s_dma_init(&huart_l1s3);
 
     usart_dma_rx(&huart_l1s0, l1s0_buf8[0] + 1, l1s0_buf8[1] + 1, BUFSIZ_L1S0 - 1);
     usart_dma_rx(&huart_l1s1, l1s1_buf8[0] + 1, l1s1_buf8[1] + 1, BUFSIZ_L1S1 - 1);
-    // usart_dma_rx(&huart_l1s2, l1s2_buf8[0] + 1, l1s2_buf8[1] + 1, BUFSIZ_L1S2 - 1);
+    usart_dma_rx(&huart_l1s2, l1s2_buf8[0] + 1, l1s2_buf8[1] + 1, BUFSIZ_L1S2 - 1);
     // usart_dma_rx(&huart_l1s3, l1s3_buf8[0] + 1, l1s3_buf8[1] + 1, BUFSIZ_L1S3 - 1);
 
     l1s_start(&huart_l1s0);
     l1s_start(&huart_l1s1);
-    // l1s_start(&huart_l1s2);
+    l1s_start(&huart_l1s2);
     // l1s_start(&huart_l1s3);
 }
 
@@ -262,6 +267,66 @@ void L1S1_IRQHandler(void)
     else if (huart_l1s1.Instance->SR & UART_FLAG_TC)
     {
         __HAL_UART_CLEAR_FLAG(&huart_l1s1, UART_FLAG_TC);
+    }
+}
+
+/**
+ * @brief This function handles USART global interrupt.
+*/
+void L1S2_IRQHandler(void)
+{
+    if (huart_l1s2.Instance->SR & UART_FLAG_RXNE) /*!< USART Status register*/
+    {
+        __HAL_UART_CLEAR_PEFLAG(&huart_l1s2); /* Clears the UART PE pending l1s2_flag */
+    }
+    else if (huart_l1s2.Instance->SR & UART_FLAG_IDLE)
+    {
+        __HAL_UART_CLEAR_PEFLAG(&huart_l1s2); /* Clears the UART PE pending l1s2_flag */
+
+        /* Disable the specified DMA Stream */
+        __HAL_DMA_DISABLE(huart_l1s2.hdmarx);
+
+        /* DMA stream x configuration register */
+        if ((huart_l1s2.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
+        {
+            /* Current memory buffer used is Memory 0 */
+
+            /* Receive data length, length = set_data_length - remain_length */
+            l1s2_buf = l1s2_buf8[0];
+            l1s2_buf[0] = (uint8_t)(BUFSIZ_L1S2 - 1 - huart_l1s2.hdmarx->Instance->NDTR);
+
+            /* Reset set_data_lenght */
+            huart_l1s2.hdmarx->Instance->NDTR = BUFSIZ_L1S2 - 1;
+
+            /* Set memory buffer 1 */
+            huart_l1s2.hdmarx->Instance->CR |= DMA_SxCR_CT;
+
+            /* Enable the specified DMA Stream */
+            __HAL_DMA_ENABLE(huart_l1s2.hdmarx);
+        }
+        else
+        {
+            /* Current memory buffer used is Memory 1 */
+
+            /* Receive data length, length = set_data_length - remain_length */
+            l1s2_buf = l1s2_buf8[1];
+            l1s2_buf[0] = (uint8_t)(BUFSIZ_L1S2 - 1 - huart_l1s2.hdmarx->Instance->NDTR);
+
+            /* Reset set_data_lenght */
+            huart_l1s2.hdmarx->Instance->NDTR = BUFSIZ_L1S2 - 1;
+
+            /* Set memory buffer 0 */
+            huart_l1s2.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+        }
+
+        /* Enable the specified DMA Stream */
+        __HAL_DMA_ENABLE(huart_l1s2.hdmarx);
+
+        l1s_irq(&l1s.dis2, FLAG_L1S2, l1s2_buf + 1, *l1s2_buf);
+    }
+    else if (huart_l1s2.Instance->SR & UART_FLAG_TC)
+    {
+        __HAL_UART_CLEAR_FLAG(&huart_l1s2, UART_FLAG_TC);
     }
 }
 

@@ -53,7 +53,7 @@ typedef struct l1s_t
 {
     l1s_dis_t dis0;
     l1s_dis_t dis1;
-    // l1s_dis_t dis2;
+    l1s_dis_t dis2;
     // l1s_dis_t dis3;
     int8_t flag;
 } l1s_t;
@@ -66,9 +66,9 @@ typedef struct l1s_t
 #undef L1S1_IRQHandler
 #define L1S1_IRQHandler UART8_IRQHandler
 
-// #define huart_l1s2 huart4 /* usart, connect to l1s 2 */
-// #undef L1S2_IRQHandler
-// #define L1S2_IRQHandler USART4_IRQHandler
+#define huart_l1s2 huart3 /* usart, connect to l1s 2 */
+#undef L1S2_IRQHandler
+#define L1S2_IRQHandler USART3_IRQHandler
 
 // #define huart_l1s3 huart5 /* usart, connect to l1s 3 */
 // #undef L1S3_IRQHandler
@@ -76,7 +76,7 @@ typedef struct l1s_t
 
 extern UART_HandleTypeDef huart_l1s0;
 extern UART_HandleTypeDef huart_l1s1;
-// extern UART_HandleTypeDef huart_l1s2;
+extern UART_HandleTypeDef huart_l1s2;
 // extern UART_HandleTypeDef huart_l1s3;
 
 #define BUFSIZ_L1S  0x10
