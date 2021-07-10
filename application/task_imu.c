@@ -37,6 +37,11 @@ extern mpu_t mpu;
 /* max iout of temperature control PID */
 #define TEMPERATURE_PID_MAX_IOUT 0xFFF
 
+#define SHOOT_COUNT      100
+#define FLAG_SHOOT_START (1 << 0)
+#define FLAG_SHOOT_COUNT (1 << 1)
+#define FLAG_SHOOT_STOP  (1 << 2)
+
 /**
  * @brief        aiming signal
 */
@@ -76,6 +81,8 @@ void task_imu(void *pvParameters)
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     static int8_t signal_aiming = SIGNAL_AIMING_NONE;
+    static int8_t shoot_flag = 0;
+    static uint16_t shoot_count = 0;
 
     for (;;)
     {
@@ -89,38 +96,73 @@ void task_imu(void *pvParameters)
             imu_pwm_set(pwm);
         }
 
-        /* Aiming signal control */
+        /* remote control */
+        if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
+            switch_is_down(rc->rc.s[RC_SW_R]))
         {
-            if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
-                switch_is_down(rc->rc.s[RC_SW_R]))
+            /* restart control */
+            if (rc->rc.ch[RC_CH_LH] < -220)
             {
-                /* restart control */
-                if (rc->rc.ch[RC_CH_S] > 440)
-                {
-                    pc->c = 0;
-                }
-
-                /* Start sending aiming signal */
-                if (signal_aiming == SIGNAL_AIMING_NONE &&
-                    rc->rc.ch[RC_CH_S] < -440)
-                {
-                    signal_aiming = SIGNAL_AIMING_DO;
-                }
-
-                /* End sending aiming signal */
-                if (signal_aiming != SIGNAL_AIMING_NONE &&
-                    rc->rc.ch[RC_CH_S] > -440)
-                {
-                    signal_aiming = SIGNAL_AIMING_NONE;
-                }
+                pc->c = 0;
             }
 
-            /* Send aiming signal */
-            if (signal_aiming == SIGNAL_AIMING_DO)
+            /* Start sending aiming signal */
+            if (signal_aiming == SIGNAL_AIMING_NONE &&
+                rc->rc.ch[RC_CH_LH] > 220)
             {
-                signal_aiming = SIGNAL_AIMING_DONE;
+                signal_aiming = SIGNAL_AIMING_DO;
+            }
 
-                usart_dma_tx(&huart_os, (const void *)"a\n", 2);
+            /* End sending aiming signal */
+            if (signal_aiming != SIGNAL_AIMING_NONE &&
+                rc->rc.ch[RC_CH_LH] < 220)
+            {
+                signal_aiming = SIGNAL_AIMING_NONE;
+            }
+
+            /* relay control, shoot an arrow */
+            if (rc->rc.ch[RC_CH_S] < -650)
+            {
+                /* It starts to spew out gas */
+                if (!READ_BIT(shoot_flag, FLAG_SHOOT_START))
+                {
+                    SET_BIT(shoot_flag, FLAG_SHOOT_START);
+                    SET_BIT(shoot_flag, FLAG_SHOOT_COUNT);
+
+                    gpio_pin_set(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+                }
+            }
+            else
+            {
+                /* Stop ejecting gas */
+                if (READ_BIT(shoot_flag, FLAG_SHOOT_STOP))
+                {
+                    CLEAR_BIT(shoot_flag, FLAG_SHOOT_STOP);
+                    CLEAR_BIT(shoot_flag, FLAG_SHOOT_START);
+                }
+
+                gpio_pin_reset(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+            }
+        }
+
+        /* Send aiming signal */
+        if (signal_aiming == SIGNAL_AIMING_DO)
+        {
+            signal_aiming = SIGNAL_AIMING_DONE;
+
+            usart_dma_tx(&huart_os, (const void *)"a\n", 2);
+        }
+
+        /* Control injection time */
+        if (READ_BIT(shoot_flag, FLAG_SHOOT_COUNT))
+        {
+            if (shoot_count++ == SHOOT_COUNT)
+            {
+                shoot_count = 0;
+                CLEAR_BIT(shoot_flag, FLAG_SHOOT_COUNT);
+
+                gpio_pin_reset(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+                SET_BIT(shoot_flag, FLAG_SHOOT_STOP);
             }
         }
 
