@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
- * @file         task_led.c
- * @brief        led task
+ * @file         app_led.h
+ * @brief        led application
  * @author       NGU
  * @date         20210427
  * @version      1
@@ -9,18 +9,26 @@
  * *****************************************************************************
 */
 
-#include "task_led.h"
+#include "app_led.h"
 
 void task_led(void *pvParameters)
 {
     (void)pvParameters;
 
-    delay_init();
-
     buzzer_start();
-    buzzer_set(0, BUZZER_PWM_DIV64);
-    osDelay(1000);
-    buzzer_set(0, 0);
+    {
+        uint32_t i = 0;
+        while (i != 8)
+        {
+            buzzer_set(i++, BUZZER_PWM_DIV2);
+            osDelay(0x80);
+        }
+        while (i)
+        {
+            buzzer_set(--i, BUZZER_PWM_DIV2);
+            osDelay(0x80);
+        }
+    }
     buzzer_stop();
 
     int8_t count = 0;
@@ -34,7 +42,7 @@ void task_led(void *pvParameters)
             for (uint8_t i = 0; i != 8; ++i)
             {
                 led_line(tmp);
-                osDelay(100);
+                osDelay(0x40);
                 tmp >>= 1;
                 if (i > 1)
                 {
@@ -48,7 +56,7 @@ void task_led(void *pvParameters)
             for (uint8_t i = 0; i != 8; ++i)
             {
                 led_line(tmp);
-                osDelay(100);
+                osDelay(0x40);
                 tmp = (uint8_t)(tmp << 1);
                 if (i < 6)
                 {

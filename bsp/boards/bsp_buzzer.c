@@ -34,13 +34,13 @@ void buzzer_stop(void)
     HAL_TIM_PWM_Stop(&htim, BUZZER_CHANNEL);
 }
 
-void buzzer_set(uint16_t psc,
-                uint16_t pwm)
+void buzzer_set(uint32_t psc,
+                uint32_t pwm)
 {
     /* Set the TIM Prescaler on runtime */
     __HAL_TIM_SET_PRESCALER(&htim, psc & 0xFFF);
     /* Set the TIM Capture Compare Register value on runtime */
-    __HAL_TIM_SetCompare(&htim, BUZZER_CHANNEL, pwm);
+    __HAL_TIM_SET_COMPARE(&htim, BUZZER_CHANNEL, pwm);
 }
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

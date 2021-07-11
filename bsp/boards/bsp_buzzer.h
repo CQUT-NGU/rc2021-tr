@@ -42,8 +42,8 @@ extern void buzzer_stop(void);
  * @param[in]    psc: 0x0000 ~ 0xFFF
  * @param[in]    pwm: 0x0000 ~ 0x3FFF
 */
-extern void buzzer_set(uint16_t psc,
-                       uint16_t pwm);
+extern void buzzer_set(uint32_t psc,
+                       uint32_t pwm);
 
 __END_DECLS
 

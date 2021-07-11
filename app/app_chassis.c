@@ -358,6 +358,8 @@ void task_chassis(void *pvParameters)
 
         chassis_update();
 
+        move.yaw_set = move.yaw;
+
         switch (move.mode)
         {
         case CHASSIS_VECTOR_STOP:
@@ -413,7 +415,9 @@ void task_chassis(void *pvParameters)
 
             float delta_angle = move.rc->rc.ch[CHASSIS_WZ_CHANNEL] *
                               -CHASSIS_ANGLE_Z_RC_SEN;
-            delta_angle = restrict_rad_f32(delta_angle);
+            /* set chassis yaw angle set-point */
+            move.yaw_set = restrict_rad_f32(move.yaw_set + delta_angle);
+            delta_angle = restrict_rad_f32(move.yaw_set - move.yaw);
             /* calculate rotation speed */
             move.wz_set = ca_pid_f32(&move.pid_angle, 0, delta_angle);
 
