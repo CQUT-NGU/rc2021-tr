@@ -80,6 +80,7 @@ typedef struct
     /* chassis set rotation speed,positive means counterclockwise,unit rad/s */
     float wz_set;
 
+    ca_pid_f32_t pid_l1s;
     float yaw_set;
 } chassis_move_t;
 

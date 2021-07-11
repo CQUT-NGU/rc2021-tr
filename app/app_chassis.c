@@ -32,9 +32,9 @@
 /* vertial speed slowly (dm/s) */
 #define CHASSIS_RC_SLOW_SEN 0.1F
 
-#define CHASSIS_ACCEL_X_NUM 0.2F
-#define CHASSIS_ACCEL_Y_NUM 0.2F
-#define CHASSIS_ACCEL_Z_NUM 0.2F
+#define CHASSIS_ACCEL_X_NUM 0.1F
+#define CHASSIS_ACCEL_Y_NUM 0.1F
+#define CHASSIS_ACCEL_Z_NUM 0.1F
 
 /* rocker value deadline */
 #define CHASSIS_RC_DEADLINE 10
@@ -44,7 +44,7 @@
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_WZ 0.25F
 
 /* a = 0.7 / 2, b = 0.7 / 2, a + b */
-#define MOTOR_DISTANCE_TO_CENTER 0.7F
+#define MOTOR_DISTANCE_TO_CENTER 0.4949747468305833F
 
 /* chassis task control time 2ms */
 #define CHASSIS_CONTROL_TIME_MS 2
@@ -62,7 +62,8 @@
 #define CHASSIS_RIGHT_KEY KEY_PRESSED_OFFSET_D
 
 /* M3508 rmp change to chassis speed */
-#define M3508_MOTOR_RPM_TO_VECTOR       0.000415809748903494517209F
+// #define M3508_MOTOR_RPM_TO_VECTOR       0.000415809748903494517209F
+#define M3508_MOTOR_RPM_TO_VECTOR       0.00027998755579361663F
 #define CHASSIS_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
 
 /* single chassis motor max speed */
@@ -238,6 +239,12 @@ void task_chassis(void *pvParameters)
             0.0F,
         };
 
+        const float kpid_l1s[3] = {
+            4.0F,
+            0.01F,
+            0.0F,
+        };
+
         const float lpf_x = CHASSIS_ACCEL_X_NUM;
         const float lpf_y = CHASSIS_ACCEL_Y_NUM;
         const float lpf_z = CHASSIS_ACCEL_Z_NUM;
@@ -272,6 +279,12 @@ void task_chassis(void *pvParameters)
                             -NORMAL_MAX_CHASSIS_SPEED_Y,
                             NORMAL_MAX_CHASSIS_SPEED_Y,
                             0);
+
+        ca_pid_f32_position(&move.pid_l1s,
+                            kpid_l1s,
+                            -2,
+                            2,
+                            1);
 
         /* first order low-pass filter  replace ramp function */
         ca_lpf_f32_init(&move.vx_slow, lpf_x, CHASSIS_CONTROL_TIME);
@@ -361,6 +374,21 @@ void task_chassis(void *pvParameters)
 
         case CHASSIS_VECTOR_YAW:
         {
+            chassis_rc(&move.vx_set, &move.vy_set);
+
+            int32_t delta = (int32_t)l1s.dis1.data - (int32_t)l1s.dis0.data;
+
+            if (l1s.dis0.data > 0 &&
+                l1s.dis1.data > 0 &&
+                l1s.dis0.error + l1s.dis1.error == 0)
+            {
+                move.wz_set = ca_pid_f32(&move.pid_l1s, 0, delta * 0.001F);
+            }
+            else
+            {
+                move.wz_set = 0;
+            }
+
             if (move.serial->c == 'P' || move.serial->c == 'p')
             {
                 float tmp = move.serial->x - move.x;
@@ -460,6 +488,16 @@ void task_chassis(void *pvParameters)
                      move.motor[1].i_current,
                      move.motor[2].i_current,
                      move.motor[3].i_current);
+
+        // os_printf("%u,%X,%u,%X\n", l1s.dis0.data, l1s.dis0.error, l1s.dis1.data, l1s.dis1.error);
+        // os_printf("%g,%g,%g,%g,%g,%g,%g\n",
+        //           move.x,
+        //           move.y,
+        //           move.z,
+        //           move.motor[0].measure->angle / 8191.0F / 19,
+        //           move.motor[1].measure->angle / 8191.0F / 19,
+        //           move.motor[2].measure->angle / 8191.0F / 19,
+        //           move.motor[3].measure->angle / 8191.0F / 19);
 
         osDelay(CHASSIS_CONTROL_TIME_MS);
     }

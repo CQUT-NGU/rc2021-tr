@@ -37,6 +37,19 @@ static CAN_TxHeaderTypeDef chassis_tx_message;
 
 static uint8_t chassis_tx_can_data[8];
 
+void angle_update(motor_t *mo)
+{
+    int delta = (int)(mo->ecd_last - mo->ecd);
+    if (delta > ECD_RANGE_HALF)
+    {
+        delta = (int)(delta - ECD_RANGE);
+    }
+    else if (delta < -ECD_RANGE_HALF)
+    {
+        delta = (int)(delta + ECD_RANGE);
+    }
+}
+
 /**
  * @brief        hal CAN fifo call back, receive motor data
  * @param[in]    hcan: the point to CAN handle
@@ -55,7 +68,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     case CAN_ID_3508_M3:
     case CAN_ID_3508_M4:
     {
-        MOTOR_MEASURE(&motor_chassis[(header_rx.StdId - CAN_ID_3508_M1)], data_rx);
+        uint32_t id = (header_rx.StdId - CAN_ID_3508_M1);
+        MOTOR_MEASURE(&motor_chassis[id], data_rx);
         break;
     }
 

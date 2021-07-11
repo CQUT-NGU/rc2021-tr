@@ -57,15 +57,15 @@ static uint8_t BCC(uint8_t *dat, uint16_t len)
 void l1s_config(UART_HandleTypeDef *huart)
 {
     HAL_UART_Transmit(huart, (void *)"iSET:1,0", sizeof("iSET:1,0") - 1, 0xFFFF);
-    HAL_Delay(2);
+    HAL_Delay(10);
     HAL_UART_Transmit(huart, (void *)"iSET:2,40", sizeof("iSET:2,40") - 1, 0xFFFF);
-    HAL_Delay(2);
+    HAL_Delay(10);
     HAL_UART_Transmit(huart, (void *)"iSET:4,115200", sizeof("iSET:4,115200") - 1, 0xFFFF);
-    HAL_Delay(2);
+    HAL_Delay(10);
     HAL_UART_Transmit(huart, (void *)"iSET:7,20", sizeof("iSET:7,20") - 1, 0xFFFF);
-    HAL_Delay(2);
+    HAL_Delay(10);
     HAL_UART_Transmit(huart, (void *)"iSET:8,0", sizeof("iSET:8,0") - 1, 0xFFFF);
-    HAL_Delay(2);
+    HAL_Delay(10);
 }
 
 void l1s_start(UART_HandleTypeDef *huart)
@@ -80,9 +80,9 @@ void l1s_stop(UART_HandleTypeDef *huart)
 
 void l1s_init(void)
 {
-    l1s_config(&huart_l1s0);
-    l1s_config(&huart_l1s1);
-    l1s_config(&huart_l1s2);
+    // l1s_config(&huart_l1s0);
+    // l1s_config(&huart_l1s1);
+    // l1s_config(&huart_l1s2);
     // l1s_config(&huart_l1s3);
 
     usart_dma_rx_init(&huart_l1s0);

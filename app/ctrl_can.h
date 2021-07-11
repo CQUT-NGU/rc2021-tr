@@ -19,6 +19,9 @@
 
 #define CHASSIS_CAN hcan1
 
+#define ECD_RANGE_HALF 4096
+#define ECD_RANGE      8192
+
 /**
  * @brief        CAN send and receive ID
 */
