@@ -15,9 +15,10 @@
 
 #include "bsp.h"
 
-#include "ctrl_can.h"
-#include "ctrl_pc.h"
 #include "ctrl_rc.h"
+#include "ctrl_can.h"
+#include "ctrl_serial.h"
+#include "ctrl_l1s.h"
 
 #include <stdint.h>
 

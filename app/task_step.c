@@ -50,7 +50,7 @@ void task_step(void *pvParameters)
 
     const ctrl_rc_t *rc = ctrl_rc_point();
 
-    ctrl_pc_t *ctrl = ctrl_pc_point();
+    ctrl_serial_t *serial = ctrl_serial_point();
 
     osDelay(1000);
 
@@ -63,20 +63,20 @@ void task_step(void *pvParameters)
 
     for (;;)
     {
-        if (ctrl->c == 'h')
+        if (serial->c == 'h')
         {
-            ctrl->c = 0;
+            serial->c = 0;
 
             uint32_t count = 0;
-            if (ctrl->x < 0)
+            if (serial->x < 0)
             {
                 gpio_pin_set(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
-                count = (uint32_t)(-ctrl->x);
+                count = (uint32_t)(-serial->x);
             }
             else
             {
                 gpio_pin_reset(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
-                count = (uint32_t)ctrl->x;
+                count = (uint32_t)serial->x;
             }
 
             __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, count);

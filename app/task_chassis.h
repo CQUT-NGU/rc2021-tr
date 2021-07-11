@@ -46,8 +46,8 @@ typedef struct
     /* the point to remote control */
     const ctrl_rc_t *data_rc;
 
-    /* the point to pc */
-    ctrl_pc_t *data_pc;
+    /* the point to serial */
+    ctrl_serial_t *data_serial;
 
     /* the point to the euler angle of gyro sensor */
     imu_t *imu;

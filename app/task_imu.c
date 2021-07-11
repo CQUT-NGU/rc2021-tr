@@ -77,7 +77,7 @@ void task_imu(void *pvParameters)
         imu_quat_init();
     }
 
-    ctrl_pc_t *pc = ctrl_pc_point();
+    ctrl_serial_t *serial = ctrl_serial_point();
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     static int8_t signal_aiming = SIGNAL_AIMING_NONE;
@@ -103,7 +103,7 @@ void task_imu(void *pvParameters)
             /* restart control */
             if (rc->rc.ch[RC_CH_LH] < -220)
             {
-                pc->c = 0;
+                serial->c = 0;
             }
 
             /* Start sending aiming signal */

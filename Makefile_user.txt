@@ -16,7 +16,7 @@ LDFLAGS += -u _printf_float
 C_INCLUDES += -I ca
 C_INCLUDES += -I bsp/boards
 C_INCLUDES += -I bsp/devices
-C_INCLUDES += -I application
+C_INCLUDES += -I app
 C_INCLUDES += -I DSP/Include
 
 C_SOURCES += bsp/boards/bsp_delay.c
@@ -29,15 +29,16 @@ C_SOURCES += bsp/boards/bsp_spi.c
 C_SOURCES += bsp/boards/bsp_can.c
 C_SOURCES += bsp/boards/bsp_imu_pwm.c
 
-C_SOURCES += application/ctrl_can.c
-C_SOURCES += application/ctrl_rc.c
-C_SOURCES += application/ctrl_pc.c
+C_SOURCES += app/ctrl_rc.c
+C_SOURCES += app/ctrl_can.c
+C_SOURCES += app/ctrl_serial.c
+C_SOURCES += app/ctrl_l1s.c
 
-C_SOURCES += application/task_led.c
-C_SOURCES += application/task_chassis.c
-C_SOURCES += application/task_servo.c
-C_SOURCES += application/task_step.c
-C_SOURCES += application/task_imu.c
+C_SOURCES += app/task_led.c
+C_SOURCES += app/task_chassis.c
+C_SOURCES += app/task_servo.c
+C_SOURCES += app/task_step.c
+C_SOURCES += app/task_imu.c
 
 C_SOURCES += ca/ca-pid.c
 C_SOURCES += ca/ca-math.c
@@ -46,6 +47,5 @@ C_SOURCES += ca/zyx.c
 
 C_SOURCES += bsp/devices/mpu6500.c
 C_SOURCES += bsp/devices/imu_ahrs.c
-C_SOURCES += bsp/devices/l1s.c
 
 # C_SOURCES += DSP/Source/FastMathFunctions/FastMathFunctions.c

@@ -170,8 +170,8 @@ static void chassis_init(void)
     /* get remote control point */
     move.data_rc = ctrl_rc_point();
 
-    /* get pc control point */
-    move.data_pc = ctrl_pc_point();
+    /* get serial control point */
+    move.data_serial = ctrl_serial_point();
 
     /* get gyro sensor euler angle point */
     move.imu = &imu;
@@ -414,14 +414,14 @@ static void chassis_mode_ctrl(float *vx_set,
             *wz_set = ca_lpf_f32(&move.wz_slow, wz_set_channel);
         }
 
-        switch (move.data_pc->c)
+        switch (move.data_serial->c)
         {
         case 'V':
         case 'v':
         {
-            *vx_set = move.data_pc->x;
-            *vy_set = move.data_pc->y;
-            *wz_set = move.data_pc->z;
+            *vx_set = move.data_serial->x;
+            *vy_set = move.data_serial->y;
+            *wz_set = move.data_serial->z;
 
             break;
         }
@@ -437,14 +437,14 @@ static void chassis_mode_ctrl(float *vx_set,
     {
         chassis_rc(vx_set, vy_set);
 
-        if (move.data_pc->c == 'P' || move.data_pc->c == 'p')
+        if (move.data_serial->c == 'P' || move.data_serial->c == 'p')
         {
-            float tmp = move.data_pc->x - move.x;
+            float tmp = move.data_serial->x - move.x;
             if (ABS(tmp) > 0.001F)
             {
                 *vx_set = ca_pid_f32(move.pid_offset,
                                      move.x,
-                                     move.data_pc->x);
+                                     move.data_serial->x);
             }
             /* left or right accelerated speed limit */
             float delta = *vx_set - move.vx_set;
@@ -457,12 +457,12 @@ static void chassis_mode_ctrl(float *vx_set,
                 *vx_set = move.vx_set - NORMAL_MAX_CHASSIS_SPEED_DELTA_X;
             }
 
-            tmp = move.data_pc->y - move.y;
+            tmp = move.data_serial->y - move.y;
             if (ABS(tmp) > 0.001F)
             {
                 *vy_set = ca_pid_f32(move.pid_offset + 1,
                                      move.y,
-                                     move.data_pc->y);
+                                     move.data_serial->y);
             }
             /* forward accelerated speed limit */
             delta = *vy_set - move.vy_set;

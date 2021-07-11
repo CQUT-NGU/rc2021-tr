@@ -29,11 +29,7 @@
 #undef OS_IRQHandler
 #define OS_IRQHandler USART6_IRQHandler
 
-extern UART_HandleTypeDef huart_rc;
 extern UART_HandleTypeDef huart_os;
-
-#define BUFSIZ_OS 256
-extern uint8_t *os_buf;
 
 __BEGIN_DECLS
 
@@ -105,36 +101,7 @@ extern void usart_dma_tx(UART_HandleTypeDef *huart,
                          const void *data,
                          uint16_t len);
 
-/**
- * @brief        print string to USART
- * @param[in]    format: printf format
-*/
-extern void dma_printf(const char *fmt, ...);
-
-/**
- * @brief        print string to USART
- * @param[in]    format: printf format
-*/
-extern void os_printf(const char *format, ...);
-
-/**
- * @brief        print float data to USART by little-endian mode
- * @param[in]    n: number of float data
- * @param[in]    ...: float data
-*/
-extern void os_justfloat(uint8_t n, ...);
-
-extern void os_dma_init(void);
-
 __END_DECLS
-
-static inline void usart_init(void)
-{
-    /* Enable the usart that connect to the upper computer */
-    usart_dma_init(&huart_os);
-    /* Enable the usart that connect to the remote control */
-    usart_dma_rx_init(&huart_rc);
-}
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __BSP_USART_H__ */

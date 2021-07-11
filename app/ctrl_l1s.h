@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
- * @file         bsp_l1s.c
- * @brief        l1s of boards
+ * @file         ctrl_l1s.c
+ * @brief        contrl l1s
  * @author       NGU
  * @date         20210707
  * @version      1
@@ -10,22 +10,14 @@
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __L1S_H__
-#define __L1S_H__
+#ifndef __CTRL_L1S_H__
+#define __CTRL_L1S_H__
 
 #include "bsp.h"
 
 #include "main.h"
 
 #include <stdint.h>
-
-typedef enum l1s_e
-{
-    FLAG_L1S0 = (1 << 0),
-    FLAG_L1S1 = (1 << 1),
-    FLAG_L1S2 = (1 << 2),
-    FLAG_L1S3 = (1 << 3),
-} l1s_e;
 
 typedef enum l1s_error_t
 {
@@ -45,8 +37,8 @@ typedef enum l1s_error_t
 
 typedef struct l1s_dis_t
 {
-    uint32_t data;
-    l1s_error_t error;
+    uint32_t data;      //!< distance
+    l1s_error_t error;  //!< error stats
 } l1s_dis_t;
 
 typedef struct l1s_t
@@ -72,7 +64,7 @@ typedef struct l1s_t
 
 // #define huart_l1s3 huart5 /* usart, connect to l1s 3 */
 // #undef L1S3_IRQHandler
-// #define L1S3_IRQHandler USART5_IRQHandler
+// #define L1S3_IRQHandler UART5_IRQHandler
 
 extern UART_HandleTypeDef huart_l1s0;
 extern UART_HandleTypeDef huart_l1s1;
@@ -85,19 +77,23 @@ extern UART_HandleTypeDef huart_l1s2;
 #define BUFSIZ_L1S2 BUFSIZ_L1S
 #define BUFSIZ_L1S3 BUFSIZ_L1S
 
+#define FLAG_L1S0 (1 << 0)
+#define FLAG_L1S1 (1 << 1)
+#define FLAG_L1S2 (1 << 2)
+#define FLAG_L1S3 (1 << 3)
+
 extern l1s_t l1s;
 
 __BEGIN_DECLS
 
-extern void l1s_init(void);
-extern void l1s_dma_init(UART_HandleTypeDef *huart);
 extern void l1s_config(UART_HandleTypeDef *huart);
 extern void l1s_start(UART_HandleTypeDef *huart);
 extern void l1s_stop(UART_HandleTypeDef *huart);
+extern void l1s_init(void);
 
 __END_DECLS
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
-#endif /* __L1S_H__ */
+#endif /* __CTRL_L1S_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

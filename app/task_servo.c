@@ -96,7 +96,7 @@ void task_servo(void *pvParameters)
 
     const ctrl_rc_t *rc = ctrl_rc_point();
 
-    ctrl_pc_t *pc = ctrl_pc_point();
+    ctrl_serial_t *serial = ctrl_serial_point();
 
     {
         __HAL_TIM_SET_PRESCALER(&MIDDLE_TIM, SERVO_PSC - 1);
@@ -130,13 +130,13 @@ void task_servo(void *pvParameters)
 
     while (1)
     {
-        switch (pc->c)
+        switch (serial->c)
         {
         case 'a':
         {
-            pwm_fetch_set = (uint16_t)pc->x;
-            pitch_set((uint16_t)pc->y);
-            shiftv_set((uint16_t)pc->z);
+            pwm_fetch_set = (uint16_t)serial->x;
+            pitch_set((uint16_t)serial->y);
+            shiftv_set((uint16_t)serial->z);
 
             break;
         }

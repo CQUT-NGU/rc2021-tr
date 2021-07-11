@@ -57,9 +57,9 @@ aux_source_directory("bsp/boards" SOURCE_boards)
 aux_source_directory("bsp/devices" SOURCE_devices)
 list(APPEND SOURCE ${SOURCE_boards} ${SOURCE_devices})
 
-include_directories("application")
-aux_source_directory("application" SOURCE_application)
-list(APPEND SOURCE ${SOURCE_application})
+include_directories("app")
+aux_source_directory("app" SOURCE_app)
+list(APPEND SOURCE ${SOURCE_app})
 
 add_subdirectory(ca)
 

@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
- * @file         bsp_l1s.c
- * @brief        l1s of boards
+ * @file         ctrl_l1s.c
+ * @brief        contrl l1s
  * @author       NGU
  * @date         20210707
  * @version      1
@@ -9,7 +9,12 @@
  * *****************************************************************************
 */
 
-#include "l1s.h"
+#include "ctrl_l1s.h"
+
+extern UART_HandleTypeDef huart_l1s0;
+extern UART_HandleTypeDef huart_l1s1;
+extern UART_HandleTypeDef huart_l1s2;
+// extern UART_HandleTypeDef huart_l1s3;
 
 l1s_t l1s;
 
@@ -49,28 +54,6 @@ static uint8_t BCC(uint8_t *dat, uint16_t len)
     return bcc;
 }
 
-void l1s_dma_init(UART_HandleTypeDef *huart)
-{
-    /* DMA Enable Receiver */
-    SET_BIT(huart->Instance->CR3, USART_CR3_DMAR);
-
-    /* Enable UART */
-    __HAL_UART_ENABLE(huart);
-    /* Enalbe idle interrupt */
-    __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
-
-    do
-    {
-        /* Disable the specified DMA Stream */
-        __HAL_DMA_DISABLE(huart->hdmarx);
-    } while (huart->hdmarx->Instance->CR & DMA_SxCR_EN);
-    /* Clear all flag */
-    BSP_DMA_CLEAR_FLAG(huart->hdmarx);
-
-    /* DMA stream x peripheral address register */
-    huart->hdmarx->Instance->PAR = (uint32_t) & (huart->Instance->DR);
-}
-
 void l1s_config(UART_HandleTypeDef *huart)
 {
     HAL_UART_Transmit(huart, (void *)"iSET:1,0", sizeof("iSET:1,0") - 1, 0xFFFF);
@@ -102,10 +85,10 @@ void l1s_init(void)
     l1s_config(&huart_l1s2);
     // l1s_config(&huart_l1s3);
 
-    l1s_dma_init(&huart_l1s0);
-    l1s_dma_init(&huart_l1s1);
-    l1s_dma_init(&huart_l1s2);
-    // l1s_dma_init(&huart_l1s3);
+    usart_dma_rx_init(&huart_l1s0);
+    usart_dma_rx_init(&huart_l1s1);
+    usart_dma_rx_init(&huart_l1s2);
+    // usart_dma_rx_init(&huart_l1s3);
 
     usart_dma_rx(&huart_l1s0, l1s0_buf8[0] + 1, l1s0_buf8[1] + 1, BUFSIZ_L1S0 - 1);
     usart_dma_rx(&huart_l1s1, l1s1_buf8[0] + 1, l1s1_buf8[1] + 1, BUFSIZ_L1S1 - 1);
@@ -118,7 +101,7 @@ void l1s_init(void)
     // l1s_start(&huart_l1s3);
 }
 
-static void l1s_irq(l1s_dis_t *dis, l1s_e flag, uint8_t *buf, uint8_t len)
+static void l1s_irq(l1s_dis_t *dis, int8_t flag, uint8_t *buf, uint8_t len)
 {
     if (len < 8)
     {
