@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
- * @file         task_imu.c
- * @brief        The task of imu update
+ * @file         app_archery.c
+ * @brief        archery application
  * @author       NGU
  * @date         20210427
  * @version      1
@@ -9,7 +9,7 @@
  * *****************************************************************************
 */
 
-#include "task_imu.h"
+#include "app_archery.h"
 
 #include "bsp.h"
 #include "ca.h"
@@ -52,7 +52,7 @@ typedef enum
     SIGNAL_AIMING_DONE = (1 << 2),  //!< aim done
 } signal_aiming_t;
 
-void task_imu(void *pvParameters)
+void task_archery(void *pvParameters)
 {
     (void)pvParameters;
 
@@ -101,21 +101,21 @@ void task_imu(void *pvParameters)
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
             /* restart control */
-            if (rc->rc.ch[RC_CH_LH] < -220)
+            if (rc->rc.ch[RC_CH_LV] < -220)
             {
                 serial->c = 0;
             }
 
             /* Start sending aiming signal */
             if (signal_aiming == SIGNAL_AIMING_NONE &&
-                rc->rc.ch[RC_CH_LH] > 220)
+                rc->rc.ch[RC_CH_LV] > 220)
             {
                 signal_aiming = SIGNAL_AIMING_DO;
             }
 
             /* End sending aiming signal */
             if (signal_aiming != SIGNAL_AIMING_NONE &&
-                rc->rc.ch[RC_CH_LH] < 220)
+                rc->rc.ch[RC_CH_LV] < 220)
             {
                 signal_aiming = SIGNAL_AIMING_NONE;
             }
@@ -130,6 +130,7 @@ void task_imu(void *pvParameters)
                     SET_BIT(shoot_flag, FLAG_SHOOT_COUNT);
 
                     gpio_pin_set(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+                    usart_dma_tx(&huart_os, (const void *)"b\n", 2);
                 }
             }
             else

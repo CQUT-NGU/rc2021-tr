@@ -11,32 +11,13 @@
 
 #include "task_servo.h"
 
-#include "bsp.h"
 #include "ca.h"
+#include "bsp.h"
 #include "ctrl.h"
 
 #if USED_OS
 #include "cmsis_os.h"
 #endif /* USED_OS */
-
-#define MIDDLE_TIM htim2
-#define BESIDE_TIM htim4
-
-extern TIM_HandleTypeDef MIDDLE_TIM;
-extern TIM_HandleTypeDef BESIDE_TIM;
-
-#define SERVO_PSC     90
-#define SERVO_PWM_MAX 20000
-#define SERVO_PWM_MID 1500
-
-#define FETCH_CHANNEL  TIM_CHANNEL_2
-#define PITCH_CHANNEL  TIM_CHANNEL_3
-#define SHIFTV_CHANNEL TIM_CHANNEL_4
-
-#define PITCH_L_CHANNEL  TIM_CHANNEL_1
-#define SHIFTV_L_CHANNEL TIM_CHANNEL_2
-#define PITCH_R_CHANNEL  TIM_CHANNEL_3
-#define SHIFTV_R_CHANNEL TIM_CHANNEL_4
 
 #define FLAG_RUN_GETL   (1 << 0)
 #define FLAG_RUN_GETR   (1 << 1)
@@ -48,85 +29,20 @@ extern TIM_HandleTypeDef BESIDE_TIM;
 #define PWM_INIT_SHIFTV 1000
 #define PWM_LAST_SHIFTV 2300
 
-__STATIC_INLINE
-void fetch_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, FETCH_CHANNEL, pwm);
-}
-
-__STATIC_INLINE
-void pitch_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, PITCH_CHANNEL, pwm);
-}
-
-__STATIC_INLINE
-void pitchl_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCH_L_CHANNEL, pwm);
-}
-
-__STATIC_INLINE
-void pitchr_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCH_R_CHANNEL, pwm);
-}
-
-__STATIC_INLINE
-void shiftv_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, SHIFTV_CHANNEL, pwm);
-}
-
-__STATIC_INLINE
-void shiftvl_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTV_L_CHANNEL, pwm);
-}
-
-__STATIC_INLINE
-void shiftvr_set(uint16_t pwm)
-{
-    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, SHIFTV_R_CHANNEL, pwm);
-}
-
 void task_servo(void *pvParameters)
 {
     (void)pvParameters;
+
+    osDelay(500);
 
     const ctrl_rc_t *rc = ctrl_rc_point();
 
     ctrl_serial_t *serial = ctrl_serial_point();
 
-    {
-        __HAL_TIM_SET_PRESCALER(&MIDDLE_TIM, SERVO_PSC - 1);
-        __HAL_TIM_SetAutoreload(&MIDDLE_TIM, SERVO_PWM_MAX - 1);
-        HAL_TIM_Base_Start(&MIDDLE_TIM);
-
-        __HAL_TIM_SET_PRESCALER(&BESIDE_TIM, SERVO_PSC - 1);
-        __HAL_TIM_SetAutoreload(&BESIDE_TIM, SERVO_PWM_MAX - 1);
-        HAL_TIM_Base_Start(&BESIDE_TIM);
-    }
-
-    {
-        HAL_TIM_PWM_Start(&MIDDLE_TIM, FETCH_CHANNEL);
-        HAL_TIM_PWM_Start(&MIDDLE_TIM, SHIFTV_CHANNEL);
-        HAL_TIM_PWM_Start(&MIDDLE_TIM, PITCH_CHANNEL);
-
-        HAL_TIM_PWM_Start(&BESIDE_TIM, PITCH_L_CHANNEL);
-        HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTV_L_CHANNEL);
-        HAL_TIM_PWM_Start(&BESIDE_TIM, PITCH_R_CHANNEL);
-        HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTV_R_CHANNEL);
-    }
-
-    // get_set(PWM_INIT_GET);
-    // pitch_set(PWM_INIT_PITCH);
-    // shiftv_set(PWM_INIT_SHIFTV);
-
-    osDelay(500);
-
-    uint16_t pwm_fetch_set = 1500;
-    uint16_t pwm_fetch = 0;
+    servo_init();
+    servo_start();
+    pitch_init(1700);
+    fetch_init(1100);
 
     while (1)
     {
@@ -134,11 +50,51 @@ void task_servo(void *pvParameters)
         {
         case 'a':
         {
-            pwm_fetch_set = (uint16_t)serial->x;
-            pitch_set((uint16_t)serial->y);
-            shiftv_set((uint16_t)serial->z);
-
+            uint32_t tmp;
+            tmp = (uint32_t)serial->x;
+            if (tmp > 400)
+            {
+                fetch_set(tmp);
+            }
+            tmp = (uint32_t)serial->y;
+            if (tmp > 400)
+            {
+                pitch_set(tmp);
+            }
+            tmp = (uint32_t)serial->z;
+            if (tmp > 400)
+            {
+                shiftv_set(tmp);
+            }
             break;
+        }
+
+        case 'r':
+        {
+            if (serial->x > 0)
+            {
+                gpio_pin_set(RELAY1_GPIO_Port, RELAY1_Pin);
+            }
+            else
+            {
+                gpio_pin_reset(RELAY1_GPIO_Port, RELAY1_Pin);
+            }
+            if (serial->y > 0)
+            {
+                gpio_pin_set(RELAY2_GPIO_Port, RELAY2_Pin);
+            }
+            else
+            {
+                gpio_pin_reset(RELAY2_GPIO_Port, RELAY2_Pin);
+            }
+            if (serial->z > 0)
+            {
+                gpio_pin_set(RELAY3_GPIO_Port, RELAY3_Pin);
+            }
+            else
+            {
+                gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
+            }
         }
 
         default:
@@ -198,22 +154,11 @@ void task_servo(void *pvParameters)
          * prevent the PWM from changing too much to
          * cause the steering gear to jam
         */
-        int32_t delta = pwm_fetch - pwm_fetch_set;
-        if (delta < 0)
-        {
-            pwm_fetch++;
-        }
-        else if (delta > 0)
-        {
-            pwm_fetch--;
-        }
-        if (delta)
-        {
-            __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, FETCH_CHANNEL, pwm_fetch);
-        }
+        fetch_update();
+        pitch_update();
 
         /* Task delay */
-        osDelay(2);
+        osDelay(4);
     }
 }
 

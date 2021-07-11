@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
- * @file         task_imu.h
- * @brief        The task of imu update
+ * @file         app_archery.c
+ * @brief        archery application
  * @author       NGU
  * @date         20210427
  * @version      1
@@ -17,7 +17,7 @@
 
 __BEGIN_DECLS
 
-extern void task_imu(void *pvParameters);
+extern void task_archery(void *pvParameters);
 
 __END_DECLS
 

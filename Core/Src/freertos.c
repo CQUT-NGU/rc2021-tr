@@ -73,16 +73,16 @@ const osThreadAttr_t chassis_attributes = {
   .stack_size = sizeof(chassisBuffer),
   .priority = (osPriority_t) osPriorityRealtime,
 };
-/* Definitions for imu */
-osThreadId_t imuHandle;
-uint32_t imuBuffer[ 512 ];
-osStaticThreadDef_t imuControlBlock;
-const osThreadAttr_t imu_attributes = {
-  .name = "imu",
-  .cb_mem = &imuControlBlock,
-  .cb_size = sizeof(imuControlBlock),
-  .stack_mem = &imuBuffer[0],
-  .stack_size = sizeof(imuBuffer),
+/* Definitions for archery */
+osThreadId_t archeryHandle;
+uint32_t archeryBuffer[ 512 ];
+osStaticThreadDef_t archeryControlBlock;
+const osThreadAttr_t archery_attributes = {
+  .name = "archery",
+  .cb_mem = &archeryControlBlock,
+  .cb_size = sizeof(archeryControlBlock),
+  .stack_mem = &archeryBuffer[0],
+  .stack_size = sizeof(archeryBuffer),
   .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for servo */
@@ -117,7 +117,7 @@ const osThreadAttr_t step_attributes = {
 
 void task_led(void *argument);
 extern void task_chassis(void *argument);
-extern void task_imu(void *argument);
+extern void task_archery(void *argument);
 extern void task_servo(void *argument);
 extern void task_step(void *argument);
 
@@ -156,8 +156,8 @@ void MX_FREERTOS_Init(void) {
   /* creation of chassis */
   chassisHandle = osThreadNew(task_chassis, NULL, &chassis_attributes);
 
-  /* creation of imu */
-  imuHandle = osThreadNew(task_imu, NULL, &imu_attributes);
+  /* creation of archery */
+  archeryHandle = osThreadNew(task_archery, NULL, &archery_attributes);
 
   /* creation of servo */
   servoHandle = osThreadNew(task_servo, NULL, &servo_attributes);
