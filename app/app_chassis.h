@@ -13,9 +13,9 @@
 #ifndef __TASK_CHASSIS_H__
 #define __TASK_CHASSIS_H__
 
+#include "app.h"
+
 #include "ca.h"
-#include "bsp.h"
-#include "ctrl.h"
 #include "mpu6500.h"
 
 typedef enum
@@ -34,9 +34,9 @@ typedef struct
 {
     const motor_t *measure;
 
-    float accel; /* accelerated speed */
     float v;     /* velocity */
     float v_set; /* velocity set-point */
+    float accel; /* accelerated speed */
 
     int16_t i_current; /* current value */
 } chassis_motor_t;
@@ -44,10 +44,10 @@ typedef struct
 typedef struct
 {
     /* the point to remote control */
-    const ctrl_rc_t *data_rc;
+    const ctrl_rc_t *rc;
 
     /* the point to serial */
-    ctrl_serial_t *data_serial;
+    ctrl_serial_t *serial;
 
     /* the point to the euler angle of gyro sensor */
     imu_t *imu;
@@ -55,14 +55,16 @@ typedef struct
     chassis_mode_e mode;      /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */
 
-    ca_pid_f32_t pid_offset[2]; /* offset PID */
+    ca_pid_f32_t pid_offset[3]; /* offset PID */
     ca_pid_f32_t pid_speed[4];  /* motor speed PID */
     ca_pid_f32_t pid_angle;     /* follow angle PID */
 
-    /* chassis horizontal offset, positive means letf,unit m/s */
+    /* chassis horizontal offset, positive means letf,unit m */
     float x;
-    /* chassis vertical offset, positive means forward,unit m/s */
+    /* chassis vertical offset, positive means forward,unit m */
     float y;
+    /* chassis rotation offset, positive means counterclockwise,unit rad */
+    float z;
 
     /* use first order filter to slow set-point */
     ca_lpf_f32_t vx_slow;
@@ -103,14 +105,7 @@ typedef struct
     float pitch;
     /* the roll angle calculated by gyro sensor and gimbal motor */
     float roll;
-
 } chassis_move_t;
-
-__BEGIN_DECLS
-
-extern void task_chassis(void *pvParameters);
-
-__END_DECLS
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __TASK_CHASSIS_H__ */
