@@ -58,8 +58,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define IMU_PWM_Pin GPIO_PIN_5
-#define IMU_PWM_GPIO_Port GPIOB
 #define SHIFTH_DIR_Pin GPIO_PIN_7
 #define SHIFTH_DIR_GPIO_Port GPIOI
 #define SHIFTH_PWM_Pin GPIO_PIN_2
@@ -80,8 +78,8 @@ void Error_Handler(void);
 #define LED_G7_GPIO_Port GPIOG
 #define LED_G6_Pin GPIO_PIN_6
 #define LED_G6_GPIO_Port GPIOG
-#define SPI5_NSS_Pin GPIO_PIN_6
-#define SPI5_NSS_GPIO_Port GPIOF
+#define MPU_NSS_Pin GPIO_PIN_6
+#define MPU_NSS_GPIO_Port GPIOF
 #define RELAY2_Pin GPIO_PIN_12
 #define RELAY2_GPIO_Port GPIOH
 #define LED_G5_Pin GPIO_PIN_5

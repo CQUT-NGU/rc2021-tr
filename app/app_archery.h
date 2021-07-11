@@ -10,18 +10,16 @@
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TASK_IMU_H__
-#define __TASK_IMU_H__
+#ifndef __APP_ARCHERY_H__
+#define __APP_ARCHERY_H__
 
-#include "bsp.h"
+#include "app.h"
 
 __BEGIN_DECLS
-
-extern void task_archery(void *pvParameters);
 
 __END_DECLS
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
-#endif /* __TASK_IMU_H__ */
+#endif /* __APP_ARCHERY_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

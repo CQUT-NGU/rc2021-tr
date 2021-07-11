@@ -15,19 +15,16 @@
 
 #include "app.h"
 
-#include "ca.h"
-#include "mpu6500.h"
-
 typedef enum
 {
     /* chassis will stop */
     CHASSIS_VECTOR_STOP,
-    /* chassis will have yaw angle(chassis_yaw) close-looped control */
-    CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW,
     /* chassis will have rotation speed control */
-    CHASSIS_VECTOR_NO_FOLLOW_YAW,
+    CHASSIS_VECTOR_NORMAL,
     /* chassis will have rotation speed control slowly */
     CHASSIS_VECTOR_SLOW,
+    /* chassis will have yaw angle(chassis_yaw) close-looped control */
+    CHASSIS_VECTOR_YAW,
 } chassis_mode_e;
 
 typedef struct
@@ -43,21 +40,15 @@ typedef struct
 
 typedef struct
 {
-    /* the point to remote control */
-    const ctrl_rc_t *rc;
-
     /* the point to serial */
     ctrl_serial_t *serial;
-
-    /* the point to the euler angle of gyro sensor */
-    imu_t *imu;
+    /* the point to remote control */
+    const ctrl_rc_t *rc;
 
     chassis_mode_e mode;      /* state machine */
     chassis_motor_t motor[4]; /* chassis motor data */
 
     ca_pid_f32_t pid_offset[3]; /* offset PID */
-    ca_pid_f32_t pid_speed[4];  /* motor speed PID */
-    ca_pid_f32_t pid_angle;     /* follow angle PID */
 
     /* chassis horizontal offset, positive means letf,unit m */
     float x;
@@ -66,12 +57,7 @@ typedef struct
     /* chassis rotation offset, positive means counterclockwise,unit rad */
     float z;
 
-    /* use first order filter to slow set-point */
-    ca_lpf_f32_t vx_slow;
-    /* use first order filter to slow set-point */
-    ca_lpf_f32_t vy_slow;
-    /* use first order filter to slow set-point */
-    ca_lpf_f32_t wz_slow;
+    ca_pid_f32_t pid_speed[4]; /* motor speed PID */
 
     /* chassis horizontal speed, positive means letf,unit m/s */
     float vx;
@@ -80,6 +66,13 @@ typedef struct
     /* chassis rotation speed, positive means counterclockwise,unit rad/s */
     float wz;
 
+    /* use first order filter to slow set-point */
+    ca_lpf_f32_t vx_slow;
+    /* use first order filter to slow set-point */
+    ca_lpf_f32_t vy_slow;
+    /* use first order filter to slow set-point */
+    ca_lpf_f32_t wz_slow;
+
     /* chassis set horizontal speed,positive means left,unit m/s */
     float vx_set;
     /* chassis set vertical speed,positive means forward,unit m/s */
@@ -87,24 +80,7 @@ typedef struct
     /* chassis set rotation speed,positive means counterclockwise,unit rad/s */
     float wz_set;
 
-    /* the relative angle between chassis and gimbal */
-    float angle;
-    /* the set relative angle */
-    float angle_set;
-
     float yaw_set;
-
-    float vx_max; /* max forward speed, unit m/s */
-    float vx_min; /* max backward speed, unit m/s */
-    float vy_max; /* max letf speed, unit m/s */
-    float vy_min; /* max right speed, unit m/s */
-
-    /* the yaw angle calculated by gyro sensor and gimbal motor */
-    float yaw;
-    /* the pitch angle calculated by gyro sensor and gimbal motor */
-    float pitch;
-    /* the roll angle calculated by gyro sensor and gimbal motor */
-    float roll;
 } chassis_move_t;
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/

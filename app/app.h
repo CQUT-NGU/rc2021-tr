@@ -13,8 +13,13 @@
 #ifndef __APP_H__
 #define __APP_H__
 
+#include "ca.h"
 #include "bsp.h"
 #include "ctrl.h"
+
+#if USED_OS
+#include "cmsis_os.h"
+#endif /* USED_OS */
 
 #include <stdint.h>
 

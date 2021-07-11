@@ -11,12 +11,6 @@
 
 #include "app_chassis.h"
 
-#if USED_OS
-#include "cmsis_os.h"
-#endif /* USED_OS */
-
-extern imu_t imu;
-
 /* in the beginning of task ,wait a time */
 #define CHASSIS_TASK_INIT_TIME 357
 
@@ -56,7 +50,7 @@ extern imu_t imu;
 #define CHASSIS_CONTROL_TIME_MS 2
 /* chassis task control time 0.002s */
 #define CHASSIS_CONTROL_TIME 0.002F
-/* chassis control frequence, no use now */
+/* chassis control frequence */
 #define CHASSIS_CONTROL_FREQUENCE 500.0F
 /* chassis 3508 max motor control current */
 #define MAX_MOTOR_CAN_CURRENT 0x4000
@@ -100,13 +94,6 @@ extern imu_t imu;
 #define M3505_MOTOR_SPEED_PID_MAX_OUT  MAX_MOTOR_CAN_CURRENT
 #define M3505_MOTOR_SPEED_PID_MAX_IOUT 2000.0F
 
-/* chassis follow angle PID */
-#define CHASSIS_FOLLOW_GIMBAL_PID_KP       1.0F
-#define CHASSIS_FOLLOW_GIMBAL_PID_KI       0.0F
-#define CHASSIS_FOLLOW_GIMBAL_PID_KD       0.0F
-#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT  (float)M_PI
-#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT 0.1F
-
 #undef LIMIT_RC
 #define LIMIT_RC(x, max) ((x) > -(max) && ((x) < (max)) ? 0 : x)
 
@@ -117,9 +104,10 @@ static void chassis_omni4(const float vx_set,
                           const float wz_set,
                           float wheel_speed[4]);
 
-static void chassis_update(void);
 static void chassis_rc(float *vx_set,
                        float *vy_set);
+
+static void chassis_update(void);
 
 /**
  * @brief        chassis some measure data updata,
@@ -166,16 +154,6 @@ static void chassis_update(void)
     move.x += move.vx * CHASSIS_CONTROL_TIME;
     move.y += move.vy * CHASSIS_CONTROL_TIME;
     move.z += move.wz * CHASSIS_CONTROL_TIME;
-
-    /**
-     * calculate chassis euler angle,
-     * if chassis add a new gyro sensor,please change this code
-    */
-#if 1
-    move.yaw = restrict_rad_f32(move.imu->yaw);
-    // move.pitch = move.imu->pit;
-    // move.roll = restrict_rad_f32(move.imu->rol);
-#endif
 }
 
 /**
@@ -203,19 +181,19 @@ static void chassis_rc(float *vx_set,
     /* keyboard set speed set-point */
     if (move.rc->key.v & CHASSIS_RIGHT_KEY)
     {
-        *vx_set = move.vx_max;
+        *vx_set = NORMAL_MAX_CHASSIS_SPEED_X;
     }
     else if (move.rc->key.v & CHASSIS_LEFT_KEY)
     {
-        *vx_set = move.vx_min;
+        *vx_set = -NORMAL_MAX_CHASSIS_SPEED_X;
     }
     if (move.rc->key.v & CHASSIS_FRONT_KEY)
     {
-        *vy_set = move.vy_max;
+        *vy_set = NORMAL_MAX_CHASSIS_SPEED_Y;
     }
     else if (move.rc->key.v & CHASSIS_BACK_KEY)
     {
-        *vy_set = move.vy_min;
+        *vy_set = -NORMAL_MAX_CHASSIS_SPEED_Y;
     }
 }
 
@@ -254,22 +232,15 @@ void task_chassis(void *pvParameters)
             M3505_MOTOR_SPEED_PID_KD,
         };
 
-        /* chassis angle PID */
-        const float kpid_yaw[3] = {
-            CHASSIS_FOLLOW_GIMBAL_PID_KP,
-            CHASSIS_FOLLOW_GIMBAL_PID_KI,
-            CHASSIS_FOLLOW_GIMBAL_PID_KD,
-        };
-
         const float kpid_p[3] = {
             4.0F,
             0.0F,
             0.0F,
         };
 
-        const float lpf_x = {CHASSIS_ACCEL_X_NUM};
-        const float lpf_y = {CHASSIS_ACCEL_Y_NUM};
-        const float lpf_z = {CHASSIS_ACCEL_Z_NUM};
+        const float lpf_x = CHASSIS_ACCEL_X_NUM;
+        const float lpf_y = CHASSIS_ACCEL_Y_NUM;
+        const float lpf_z = CHASSIS_ACCEL_Z_NUM;
 
         /* in beginning， chassis mode is stop */
         move.mode = CHASSIS_VECTOR_STOP;
@@ -279,11 +250,6 @@ void task_chassis(void *pvParameters)
 
         /* get serial control point */
         move.serial = ctrl_serial_point();
-
-        /* get gyro sensor euler angle point */
-        move.imu = &imu;
-
-        /* get gimbal motor data point */
 
         /* get chassis motor data point, initialize motor speed PID */
         for (uint8_t i = 0; i != 4; ++i)
@@ -295,13 +261,6 @@ void task_chassis(void *pvParameters)
                                 M3505_MOTOR_SPEED_PID_MAX_OUT,
                                 M3505_MOTOR_SPEED_PID_MAX_IOUT);
         }
-
-        /* initialize angle PID */
-        ca_pid_f32_position(&move.pid_angle,
-                            kpid_yaw,
-                            -CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
-                            CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT,
-                            CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
 
         ca_pid_f32_position(move.pid_offset,
                             kpid_p,
@@ -318,13 +277,6 @@ void task_chassis(void *pvParameters)
         ca_lpf_f32_init(&move.vx_slow, lpf_x, CHASSIS_CONTROL_TIME);
         ca_lpf_f32_init(&move.vy_slow, lpf_y, CHASSIS_CONTROL_TIME);
         ca_lpf_f32_init(&move.wz_slow, lpf_z, CHASSIS_CONTROL_TIME);
-
-        /* max and min speed */
-        move.vx_max = NORMAL_MAX_CHASSIS_SPEED_X;
-        move.vx_min = -NORMAL_MAX_CHASSIS_SPEED_X;
-
-        move.vy_max = NORMAL_MAX_CHASSIS_SPEED_Y;
-        move.vy_min = -NORMAL_MAX_CHASSIS_SPEED_Y;
     }
 
     /* update data */
@@ -338,12 +290,12 @@ void task_chassis(void *pvParameters)
             /* middle, up */
             if (switch_is_up(move.rc->rc.s[RC_SW_R]))
             {
-                move.mode = CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW;
+                move.mode = CHASSIS_VECTOR_YAW;
             }
             /* middle, middle */
             else if (switch_is_mid(move.rc->rc.s[RC_SW_R]))
             {
-                move.mode = CHASSIS_VECTOR_NO_FOLLOW_YAW;
+                move.mode = CHASSIS_VECTOR_NORMAL;
             }
             /* middle, down */
             else if (switch_is_down(move.rc->rc.s[RC_SW_R]))
@@ -358,8 +310,6 @@ void task_chassis(void *pvParameters)
 
         chassis_update();
 
-        move.yaw_set = move.yaw;
-
         switch (move.mode)
         {
         case CHASSIS_VECTOR_STOP:
@@ -372,7 +322,7 @@ void task_chassis(void *pvParameters)
         }
 
         case CHASSIS_VECTOR_SLOW:
-        case CHASSIS_VECTOR_NO_FOLLOW_YAW:
+        case CHASSIS_VECTOR_NORMAL:
         {
             chassis_rc(&move.vx_set, &move.vy_set);
 
@@ -409,18 +359,8 @@ void task_chassis(void *pvParameters)
             break;
         }
 
-        case CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW:
+        case CHASSIS_VECTOR_YAW:
         {
-            chassis_rc(&move.vx_set, &move.vy_set);
-
-            float delta_angle = move.rc->rc.ch[CHASSIS_WZ_CHANNEL] *
-                              -CHASSIS_ANGLE_Z_RC_SEN;
-            /* set chassis yaw angle set-point */
-            move.yaw_set = restrict_rad_f32(move.yaw_set + delta_angle);
-            delta_angle = restrict_rad_f32(move.yaw_set - move.yaw);
-            /* calculate rotation speed */
-            move.wz_set = ca_pid_f32(&move.pid_angle, 0, delta_angle);
-
             if (move.serial->c == 'P' || move.serial->c == 'p')
             {
                 float tmp = move.serial->x - move.x;
@@ -471,8 +411,12 @@ void task_chassis(void *pvParameters)
 
         /* control loop */
         {
-            move.vx_set = LIMIT(move.vx_set, move.vx_min, move.vx_max);
-            move.vy_set = LIMIT(move.vy_set, move.vy_min, move.vy_max);
+            move.vx_set = LIMIT(move.vx_set,
+                                -NORMAL_MAX_CHASSIS_SPEED_X,
+                                NORMAL_MAX_CHASSIS_SPEED_X);
+            move.vy_set = LIMIT(move.vy_set,
+                                -NORMAL_MAX_CHASSIS_SPEED_Y,
+                                NORMAL_MAX_CHASSIS_SPEED_Y);
 
             float wheel_speed[4];
             /* omni4 wheel speed calculation */
@@ -496,10 +440,10 @@ void task_chassis(void *pvParameters)
 
             if (vector_max > MAX_WHEEL_SPEED)
             {
-                float vector = MAX_WHEEL_SPEED / vector_max;
+                float scale = MAX_WHEEL_SPEED / vector_max;
                 for (uint8_t i = 0; i != 4; ++i)
                 {
-                    move.motor[i].v_set *= vector;
+                    move.motor[i].v_set *= scale;
                 }
             }
 
@@ -516,16 +460,6 @@ void task_chassis(void *pvParameters)
                      move.motor[1].i_current,
                      move.motor[2].i_current,
                      move.motor[3].i_current);
-
-#if 0
-        os_justfloat(4,
-                     move.motor[0].v,
-                     move.motor[1].v,
-                     move.motor[2].v,
-                     move.motor[3].v);
-#elif 0
-        os_printf("p:%g,%g\n", move.x, move.y);
-#endif
 
         osDelay(CHASSIS_CONTROL_TIME_MS);
     }
