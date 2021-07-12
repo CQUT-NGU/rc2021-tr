@@ -77,9 +77,11 @@
 /* chassis forward or back max accelerated speed */
 #define NORMAL_MAX_CHASSIS_ACC_Y 3.0F
 /* chassis left or right max speed increment */
-#define NORMAL_MAX_CHASSIS_SPEED_DELTA_X (CHASSIS_CONTROL_TIME * NORMAL_MAX_CHASSIS_ACC_X)
+#define NORMAL_MAX_CHASSIS_SPEED_DELTA_X \
+    (CHASSIS_CONTROL_TIME * NORMAL_MAX_CHASSIS_ACC_X)
 /* chassis forward or back max speed increment */
-#define NORMAL_MAX_CHASSIS_SPEED_DELTA_Y (CHASSIS_CONTROL_TIME * NORMAL_MAX_CHASSIS_ACC_Y)
+#define NORMAL_MAX_CHASSIS_SPEED_DELTA_Y \
+    (CHASSIS_CONTROL_TIME * NORMAL_MAX_CHASSIS_ACC_Y)
 
 #define CHASSIS_WZ_SET_SCALE 0.1F
 
@@ -100,15 +102,16 @@
 
 static chassis_move_t move;
 
-static void chassis_omni4(const float vx_set,
+static void chassis_omni4(float wheel_speed[4],
+                          const float vx_set,
                           const float vy_set,
-                          const float wz_set,
-                          float wheel_speed[4]);
+                          const float wz_set);
 
 static void chassis_rc(float *vx_set,
                        float *vy_set);
 
 static void chassis_update(void);
+static void chassis_loop(void);
 
 /**
  * @brief        chassis some measure data updata,
@@ -119,35 +122,21 @@ static void chassis_update(void)
     for (uint8_t i = 0; i != 4; ++i)
     {
         /* update motor speed, accel is differential of speed PID */
-        move.motor[i].v = move.motor[i].measure->v_rpm *
-                          CHASSIS_MOTOR_RPM_TO_VECTOR_SEN;
-
-        move.motor[i].accel = (move.pid_speed[i].x[1] - move.pid_speed[i].x[0]) *
-                              CHASSIS_CONTROL_FREQUENCE;
+        move.mo[i].v = move.mo[i].fb->v_rpm * CHASSIS_MOTOR_RPM_TO_VECTOR_SEN;
+        move.mo[i].accel = move.pid_speed[i].x[0] - move.mo[i].v;
+        move.mo[i].accel *= CHASSIS_CONTROL_TIME;
     }
 
     /**
      * calculate horizontal speed, vertical speed, rotation speed,
      * right hand rule
     */
-    move.vx = (move.motor[0].v +
-               move.motor[1].v -
-               move.motor[2].v -
-               move.motor[3].v) *
+    move.vx = (move.mo[0].v + move.mo[1].v - move.mo[2].v - move.mo[3].v) *
               MOTOR_SPEED_TO_CHASSIS_SPEED_VX;
-
-    move.vy = (-move.motor[0].v +
-               move.motor[1].v +
-               move.motor[2].v -
-               move.motor[3].v) *
+    move.vy = (-move.mo[0].v + move.mo[1].v + move.mo[2].v - move.mo[3].v) *
               MOTOR_SPEED_TO_CHASSIS_SPEED_VY;
-
-    move.wz = (-move.motor[0].v -
-               move.motor[1].v -
-               move.motor[2].v -
-               move.motor[3].v) *
-              MOTOR_SPEED_TO_CHASSIS_SPEED_WZ /
-              MOTOR_DISTANCE_TO_CENTER;
+    move.wz = (-move.mo[0].v - move.mo[1].v - move.mo[2].v - move.mo[3].v) *
+              MOTOR_SPEED_TO_CHASSIS_SPEED_WZ / MOTOR_DISTANCE_TO_CENTER;
 
     /**
      * calculate horizontal offset, vertical offset, rotation offset
@@ -170,11 +159,10 @@ static void chassis_rc(float *vx_set,
      * deadline, because some remote control need be calibrated,
      * the value of rocker is not zero in middle place
     */
-    int16_t vx_channel = LIMIT_RC(move.rc->rc.ch[CHASSIS_X_CHANNEL],
-                                  CHASSIS_RC_DEADLINE);
-
-    int16_t vy_channel = LIMIT_RC(move.rc->rc.ch[CHASSIS_Y_CHANNEL],
-                                  CHASSIS_RC_DEADLINE);
+    int16_t vx_channel =
+        LIMIT_RC(move.rc->rc.ch[CHASSIS_X_CHANNEL], CHASSIS_RC_DEADLINE);
+    int16_t vy_channel =
+        LIMIT_RC(move.rc->rc.ch[CHASSIS_Y_CHANNEL], CHASSIS_RC_DEADLINE);
 
     *vx_set = vx_channel * CHASSIS_VX_RC_SEN;
     *vy_set = vy_channel * CHASSIS_VY_RC_SEN;
@@ -200,15 +188,15 @@ static void chassis_rc(float *vx_set,
 
 /**
  * @brief        four omni4 wheels speed is calculated by three param.
+ * @param[out]   wheel_speed: four omni4 wheels speed
  * @param[in]    vx_set: horizontal speed
  * @param[in]    vy_set: vertial speed
  * @param[in]    wz_set: rotation speed
- * @param[out]   wheel_speed: four omni4 wheels speed
 */
-static void chassis_omni4(const float vx_set,
+static void chassis_omni4(float wheel_speed[4],
+                          const float vx_set,
                           const float vy_set,
-                          const float wz_set,
-                          float wheel_speed[4])
+                          const float wz_set)
 {
     wheel_speed[0] = +vx_set - vy_set - wz_set * MOTOR_DISTANCE_TO_CENTER;
     wheel_speed[1] = +vx_set + vy_set - wz_set * MOTOR_DISTANCE_TO_CENTER;
@@ -216,13 +204,55 @@ static void chassis_omni4(const float vx_set,
     wheel_speed[3] = -vx_set - vy_set - wz_set * MOTOR_DISTANCE_TO_CENTER;
 }
 
+/**
+ * @brief        control loop, according to control set-point, calculate
+ *               motor current, motor current will be sentto motor
+*/
+static void chassis_loop(void)
+{
+    move.vx_set = LIMIT(move.vx_set, -NORMAL_MAX_CHASSIS_SPEED_X, NORMAL_MAX_CHASSIS_SPEED_X);
+    move.vy_set = LIMIT(move.vy_set, -NORMAL_MAX_CHASSIS_SPEED_Y, NORMAL_MAX_CHASSIS_SPEED_Y);
+
+    float wheel_speed[4];
+    /* omni4 wheel speed calculation */
+    chassis_omni4(wheel_speed, move.vx_set, move.vy_set, move.wz_set);
+
+    /* calculate the max speed in four wheels, limit the max speed */
+    float vector_max = 0;
+    for (uint8_t i = 0; i != 4; ++i)
+    {
+        move.mo[i].v_set = wheel_speed[i];
+        float temp = ABS(move.mo[i].v_set);
+        if (vector_max < temp)
+        {
+            vector_max = temp;
+        }
+    }
+    if (vector_max > MAX_WHEEL_SPEED)
+    {
+        float scale = MAX_WHEEL_SPEED / vector_max;
+        for (uint8_t i = 0; i != 4; ++i)
+        {
+            move.mo[i].v_set *= scale;
+        }
+    }
+
+    /* calculate pid */
+    for (uint8_t i = 0; i != 4; ++i)
+    {
+        move.mo[i].i = (int16_t)ca_pid_f32(move.pid_speed + i,
+                                           move.mo[i].v,
+                                           move.mo[i].v_set);
+    }
+}
+
 void task_chassis(void *pvParameters)
 {
     (void)pvParameters;
 
-    can_filter_init();
-
     osDelay(CHASSIS_TASK_INIT_TIME);
+
+    can_filter_init();
 
     /* initialization */
     {
@@ -240,7 +270,7 @@ void task_chassis(void *pvParameters)
         };
 
         const float kpid_l1s[3] = {
-            4.0F,
+            5.0F,
             0.01F,
             0.0F,
         };
@@ -261,7 +291,7 @@ void task_chassis(void *pvParameters)
         /* get chassis motor data point, initialize motor speed PID */
         for (uint8_t i = 0; i != 4; ++i)
         {
-            move.motor[i].measure = chassis_point(i);
+            move.mo[i].fb = chassis_point(i);
             ca_pid_f32_position(&move.pid_speed[i],
                                 kpid_v,
                                 -M3505_MOTOR_SPEED_PID_MAX_OUT,
@@ -282,9 +312,9 @@ void task_chassis(void *pvParameters)
 
         ca_pid_f32_position(&move.pid_l1s,
                             kpid_l1s,
-                            -2,
-                            2,
-                            1);
+                            -1,
+                            1,
+                            0.1F);
 
         /* first order low-pass filter  replace ramp function */
         ca_lpf_f32_init(&move.vx_slow, lpf_x, CHASSIS_CONTROL_TIME);
@@ -292,12 +322,12 @@ void task_chassis(void *pvParameters)
         ca_lpf_f32_init(&move.wz_slow, lpf_z, CHASSIS_CONTROL_TIME);
     }
 
-    /* update data */
-    chassis_update();
-
     for (;;)
     {
-        /* mode set */
+        /* update chassis measure data */
+        chassis_update();
+
+        /* chassis mode set */
         if (switch_is_mid(move.rc->rc.s[RC_SW_L]))
         {
             /* middle, up */
@@ -321,8 +351,7 @@ void task_chassis(void *pvParameters)
             move.mode = CHASSIS_VECTOR_STOP;
         }
 
-        chassis_update();
-
+        /* chassis loop set */
         switch (move.mode)
         {
         case CHASSIS_VECTOR_STOP:
@@ -331,7 +360,7 @@ void task_chassis(void *pvParameters)
             move.vy_set = 0;
             move.wz_set = 0;
 
-            break;
+            break; /* CHASSIS_VECTOR_STOP */
         }
 
         case CHASSIS_VECTOR_SLOW:
@@ -369,20 +398,19 @@ void task_chassis(void *pvParameters)
                 move.wz_set = move.serial->z;
             }
 
-            break;
+            break; /* CHASSIS_VECTOR_SLOW CHASSIS_VECTOR_NORMAL */
         }
 
         case CHASSIS_VECTOR_YAW:
         {
             chassis_rc(&move.vx_set, &move.vy_set);
 
-            int32_t delta = (int32_t)l1s.dis1.data - (int32_t)l1s.dis0.data;
-
-            if (l1s.dis0.data > 0 &&
-                l1s.dis1.data > 0 &&
-                l1s.dis0.error + l1s.dis1.error == 0)
+            float delta = 0.001F * (float)((int32_t)l1s.dis1.data - (int32_t)l1s.dis0.data);
+            if (l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
+                l1s.dis0.data > 0 &&
+                l1s.dis1.data > 0)
             {
-                move.wz_set = ca_pid_f32(&move.pid_l1s, 0, delta * 0.001F);
+                move.wz_set = ca_pid_f32(&move.pid_l1s, 0, delta);
             }
             else
             {
@@ -391,113 +419,27 @@ void task_chassis(void *pvParameters)
 
             if (move.serial->c == 'P' || move.serial->c == 'p')
             {
-                float tmp = move.serial->x - move.x;
-                if (ABS(tmp) > 0.001F)
-                {
-                    move.vx_set = ca_pid_f32(move.pid_offset,
-                                             move.x,
-                                             move.serial->x);
-                }
-                /* left or right accelerated speed limit */
-                float delta = move.vx_set - move.vx_set;
-                if (delta > NORMAL_MAX_CHASSIS_SPEED_DELTA_X)
-                {
-                    move.vx_set = move.vx_set + NORMAL_MAX_CHASSIS_SPEED_DELTA_X;
-                }
-                else if (delta < -NORMAL_MAX_CHASSIS_SPEED_DELTA_X)
-                {
-                    move.vx_set = move.vx_set - NORMAL_MAX_CHASSIS_SPEED_DELTA_X;
-                }
-
-                tmp = move.serial->y - move.y;
-                if (ABS(tmp) > 0.001F)
-                {
-                    move.vy_set = ca_pid_f32(move.pid_offset + 1,
-                                             move.y,
-                                             move.serial->y);
-                }
-                /* forward accelerated speed limit */
-                delta = move.vy_set - move.vy_set;
-                if (delta > NORMAL_MAX_CHASSIS_SPEED_DELTA_Y)
-                {
-                    move.vy_set = move.vy_set + NORMAL_MAX_CHASSIS_SPEED_DELTA_Y;
-                }
-                else if (delta < -NORMAL_MAX_CHASSIS_SPEED_DELTA_Y)
-                {
-                    move.vy_set = move.vy_set - NORMAL_MAX_CHASSIS_SPEED_DELTA_Y;
-                }
-
-                break;
             }
 
-            break;
+            break; /* CHASSIS_VECTOR_YAW */
         }
 
         default:
-            break;
+            break; /* move.mode */
         }
 
         /* control loop */
-        {
-            move.vx_set = LIMIT(move.vx_set,
-                                -NORMAL_MAX_CHASSIS_SPEED_X,
-                                NORMAL_MAX_CHASSIS_SPEED_X);
-            move.vy_set = LIMIT(move.vy_set,
-                                -NORMAL_MAX_CHASSIS_SPEED_Y,
-                                NORMAL_MAX_CHASSIS_SPEED_Y);
+        chassis_loop();
 
-            float wheel_speed[4];
-            /* omni4 wheel speed calculation */
-            chassis_omni4(move.vx_set,
-                          move.vy_set,
-                          move.wz_set,
-                          wheel_speed);
+        chassis_ctrl(move.mo[0].i, move.mo[1].i, move.mo[2].i, move.mo[3].i);
 
-            /* calculate the max speed in four wheels, limit the max speed */
-            float vector_max = 0;
-            for (uint8_t i = 0; i != 4; ++i)
-            {
-                move.motor[i].v_set = wheel_speed[i];
-
-                float temp = ABS(move.motor[i].v_set);
-                if (vector_max < temp)
-                {
-                    vector_max = temp;
-                }
-            }
-
-            if (vector_max > MAX_WHEEL_SPEED)
-            {
-                float scale = MAX_WHEEL_SPEED / vector_max;
-                for (uint8_t i = 0; i != 4; ++i)
-                {
-                    move.motor[i].v_set *= scale;
-                }
-            }
-
-            /* calculate pid */
-            for (uint8_t i = 0; i != 4; ++i)
-            {
-                move.motor[i].i_current = (int16_t)ca_pid_f32(&move.pid_speed[i],
-                                                              move.motor[i].v,
-                                                              move.motor[i].v_set);
-            }
-        }
-
-        chassis_ctrl(move.motor[0].i_current,
-                     move.motor[1].i_current,
-                     move.motor[2].i_current,
-                     move.motor[3].i_current);
+        l1s_check();
 
         // os_printf("%u,%X,%u,%X\n", l1s.dis0.data, l1s.dis0.error, l1s.dis1.data, l1s.dis1.error);
-        // os_printf("%g,%g,%g,%g,%g,%g,%g\n",
+        // os_printf("%g,%g,%g\n",
         //           move.x,
         //           move.y,
-        //           move.z,
-        //           move.motor[0].measure->angle / 8191.0F / 19,
-        //           move.motor[1].measure->angle / 8191.0F / 19,
-        //           move.motor[2].measure->angle / 8191.0F / 19,
-        //           move.motor[3].measure->angle / 8191.0F / 19);
+        //           move.z);
 
         osDelay(CHASSIS_CONTROL_TIME_MS);
     }

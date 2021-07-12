@@ -104,7 +104,7 @@ void shiftvr_set(uint32_t pwm)
 
 void fetch_update(void)
 {
-    int32_t delta = servo.fetch - servo.fetch_set;
+    int delta = (int)(servo.fetch - servo.fetch_set);
     if (delta < 0)
     {
         servo.fetch++;
@@ -121,7 +121,7 @@ void fetch_update(void)
 
 void pitch_update(void)
 {
-    int32_t delta = servo.pitch - servo.pitch_set;
+    int delta = (int)(servo.pitch - servo.pitch_set);
     if (delta < 0)
     {
         servo.pitch++;

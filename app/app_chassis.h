@@ -29,13 +29,12 @@ typedef enum
 
 typedef struct
 {
-    const motor_t *measure;
+    const motor_t *fb; /* feedback */
 
+    int16_t i;   /* current value */
     float v;     /* velocity */
     float v_set; /* velocity set-point */
     float accel; /* accelerated speed */
-
-    int16_t i_current; /* current value */
 } chassis_motor_t;
 
 typedef struct
@@ -45,8 +44,10 @@ typedef struct
     /* the point to remote control */
     const ctrl_rc_t *rc;
 
-    chassis_mode_e mode;      /* state machine */
-    chassis_motor_t motor[4]; /* chassis motor data */
+    chassis_mode_e mode;   /* state machine */
+    chassis_motor_t mo[4]; /* chassis motor data */
+
+    ca_pid_f32_t pid_speed[4]; /* motor speed PID */
 
     ca_pid_f32_t pid_offset[3]; /* offset PID */
 
@@ -56,8 +57,6 @@ typedef struct
     float y;
     /* chassis rotation offset, positive means counterclockwise,unit rad */
     float z;
-
-    ca_pid_f32_t pid_speed[4]; /* motor speed PID */
 
     /* chassis horizontal speed, positive means letf,unit m/s */
     float vx;

@@ -106,6 +106,9 @@ void task_archery(void *pvParameters)
             }
         }
 
+        {
+        }
+
         osDelay(2);
     }
 }

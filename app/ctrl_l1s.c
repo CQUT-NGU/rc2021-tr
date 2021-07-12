@@ -16,7 +16,12 @@ extern UART_HandleTypeDef huart_l1s1;
 extern UART_HandleTypeDef huart_l1s2;
 // extern UART_HandleTypeDef huart_l1s3;
 
-l1s_t l1s;
+l1s_t l1s = {
+    .dis0.error = L1S_ERROR_NORUN,
+    .dis1.error = L1S_ERROR_NORUN,
+    .dis2.error = L1S_ERROR_NORUN,
+    // .dis3.error = L1S_ERROR_NORUN,
+};
 
 uint8_t l1s0_buf8[2][BUFSIZ_L1S0];
 uint8_t *l1s0_buf = *l1s0_buf8;
@@ -66,6 +71,26 @@ void l1s_config(UART_HandleTypeDef *huart)
     HAL_Delay(10);
     HAL_UART_Transmit(huart, (void *)"iSET:8,0", sizeof("iSET:8,0") - 1, 0xFFFF);
     HAL_Delay(10);
+}
+
+void l1s_check(void)
+{
+    if (l1s.dis0.error == L1S_ERROR_NORUN)
+    {
+        l1s_start(&huart_l1s0);
+    }
+    if (l1s.dis1.error == L1S_ERROR_NORUN)
+    {
+        l1s_start(&huart_l1s1);
+    }
+    if (l1s.dis2.error == L1S_ERROR_NORUN)
+    {
+        l1s_start(&huart_l1s2);
+    }
+    // if (l1s.dis3.error == L1S_ERROR_NORUN)
+    // {
+    //     l1s_start(&huart_l1s3);
+    // }
 }
 
 void l1s_start(UART_HandleTypeDef *huart)

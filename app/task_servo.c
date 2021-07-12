@@ -71,27 +71,38 @@ void task_servo(void *pvParameters)
 
         case 'r':
         {
-            if (serial->x > 0)
+            int tmp = (int)serial->x;
+            if (tmp == 1)
+            {
+                gpio_pin_set(RELAY0_GPIO_Port, RELAY0_Pin);
+            }
+            else if (tmp == -1 || tmp == 3)
+            {
+                gpio_pin_reset(RELAY0_GPIO_Port, RELAY0_Pin);
+            }
+            if (tmp == 1)
             {
                 gpio_pin_set(RELAY1_GPIO_Port, RELAY1_Pin);
             }
-            else
+            else if (tmp == 0 || tmp == 3)
             {
                 gpio_pin_reset(RELAY1_GPIO_Port, RELAY1_Pin);
             }
-            if (serial->y > 0)
+            tmp = (int)serial->y;
+            if (tmp == 1)
             {
                 gpio_pin_set(RELAY2_GPIO_Port, RELAY2_Pin);
             }
-            else
+            else if (tmp == 0)
             {
                 gpio_pin_reset(RELAY2_GPIO_Port, RELAY2_Pin);
             }
-            if (serial->z > 0)
+            tmp = (int)serial->z;
+            if (tmp == 1)
             {
                 gpio_pin_set(RELAY3_GPIO_Port, RELAY3_Pin);
             }
-            else
+            else if (tmp == 0)
             {
                 gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
             }

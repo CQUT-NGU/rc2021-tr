@@ -19,9 +19,10 @@
 
 #include <stdint.h>
 
-typedef enum l1s_error_t
+typedef enum
 {
     L1S_ERROR_NONE = 0,
+    L1S_ERROR_NORUN = 0x01,                //!< not running
     L1S_ERROR_PROTOCOL_FUNCTION = 0x8C,    //!< protocol function code error
     L1S_ERROR_PROTOCOL_VALIDATION = 0x8E,  //!< protocol validation error
     L1S_ERROR_PROTOCOL_PARAMETER = 0x8D,   //!< protocol parameter error
@@ -90,6 +91,7 @@ extern void l1s_config(UART_HandleTypeDef *huart);
 extern void l1s_start(UART_HandleTypeDef *huart);
 extern void l1s_stop(UART_HandleTypeDef *huart);
 extern void l1s_init(void);
+extern void l1s_check(void);
 
 __END_DECLS
 
