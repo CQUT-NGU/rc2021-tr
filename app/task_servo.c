@@ -39,11 +39,6 @@ void task_servo(void *pvParameters)
 
     ctrl_serial_t *serial = ctrl_serial_point();
 
-    servo_init();
-    servo_start();
-    pitch_init(1700);
-    fetch_init(1100);
-
     while (1)
     {
         switch (serial->c)
@@ -159,14 +154,6 @@ void task_servo(void *pvParameters)
                 }
             }
         }
-
-        /**
-         * Updated arrow steering gear Angle,
-         * prevent the PWM from changing too much to
-         * cause the steering gear to jam
-        */
-        fetch_update();
-        pitch_update();
 
         /* Task delay */
         osDelay(4);

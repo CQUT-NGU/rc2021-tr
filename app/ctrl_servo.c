@@ -67,6 +67,18 @@ void pitch_init(uint32_t pwm)
     servo.pitch = servo.pitch_set - 1;
 }
 
+void pitchl_init(uint32_t pwm)
+{
+    servo.pitchl_set = pwm;
+    servo.pitchl = servo.pitchl_set - 1;
+}
+
+void pitchr_init(uint32_t pwm)
+{
+    servo.pitchr_set = pwm;
+    servo.pitchr = servo.pitchr_set - 1;
+}
+
 void fetch_set(uint32_t pwm)
 {
     servo.fetch_set = pwm;
@@ -79,12 +91,12 @@ void pitch_set(uint32_t pwm)
 
 void pitchl_set(uint32_t pwm)
 {
-    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCH_L_CHANNEL, pwm);
+    servo.pitchr_set = pwm;
 }
 
 void pitchr_set(uint32_t pwm)
 {
-    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCH_R_CHANNEL, pwm);
+    servo.pitchr_set = pwm;
 }
 
 void shiftv_set(uint32_t pwm)
@@ -133,6 +145,40 @@ void pitch_update(void)
     if (delta)
     {
         __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, PITCH_CHANNEL, servo.pitch);
+    }
+}
+
+void pitchl_update(void)
+{
+    int delta = (int)(servo.pitchl - servo.pitchl_set);
+    if (delta < 0)
+    {
+        servo.pitchl++;
+    }
+    else if (delta > 0)
+    {
+        servo.pitchl--;
+    }
+    if (delta)
+    {
+        __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCH_L_CHANNEL, servo.pitchl);
+    }
+}
+
+void pitchr_update(void)
+{
+    int delta = (int)(servo.pitchr - servo.pitchr_set);
+    if (delta < 0)
+    {
+        servo.pitchr++;
+    }
+    else if (delta > 0)
+    {
+        servo.pitchr--;
+    }
+    if (delta)
+    {
+        __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCH_R_CHANNEL, servo.pitchr);
     }
 }
 

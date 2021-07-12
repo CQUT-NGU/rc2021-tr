@@ -31,8 +31,6 @@ void task_step(void *pvParameters)
 
     ctrl_serial_t *serial = ctrl_serial_point();
 
-    shifth_init();
-
     for (;;)
     {
         if (serial->c == 'h')
@@ -40,8 +38,6 @@ void task_step(void *pvParameters)
             serial->c = 0;
             shifth_start((int32_t)serial->x);
         }
-
-        shifth_update();
 
         osDelay(2);
     }
