@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * @file         app_led.h
+ * @file         app_led.c
  * @brief        led application
  * @author       NGU
  * @date         20210427
@@ -18,7 +18,7 @@ void task_led(void *pvParameters)
     buzzer_start();
     {
         uint32_t i = 0;
-        while (i != 8)
+        while (i != 4)
         {
             buzzer_set(i++, BUZZER_PWM_DIV2);
             osDelay(0x80);

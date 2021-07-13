@@ -19,18 +19,19 @@ extern TIM_HandleTypeDef BESIDE_TIM;
 
 #define SERVO_PSC     90
 #define SERVO_PWM_MAX 20000
-#define SERVO_PWM_MID 1500
 
 #define FETCH_CHANNEL  TIM_CHANNEL_2
 #define PITCH_CHANNEL  TIM_CHANNEL_3
 #define SHIFTV_CHANNEL TIM_CHANNEL_4
 
-#define PITCH_L_CHANNEL  TIM_CHANNEL_1
-#define SHIFTV_L_CHANNEL TIM_CHANNEL_2
-#define PITCH_R_CHANNEL  TIM_CHANNEL_3
-#define SHIFTV_R_CHANNEL TIM_CHANNEL_4
+#define PITCHL_CHANNEL  TIM_CHANNEL_1
+#define SHIFTVL_CHANNEL TIM_CHANNEL_2
+#define PITCHR_CHANNEL  TIM_CHANNEL_3
+#define SHIFTVR_CHANNEL TIM_CHANNEL_4
 
-ctrl_servo_t servo;
+ctrl_servo_t servo = {
+    .match = SERVO_MATCH_FETCH | SERVO_MATCH_PITCH_ALL | SERVO_MATCH_SHIFTV_ALL,
+};
 
 #define SERVO_UPDATE(htim, ch, flag, ref, set)       \
     do                                               \
@@ -47,6 +48,7 @@ ctrl_servo_t servo;
         if (delta)                                   \
         {                                            \
             __HAL_TIM_SET_COMPARE(&htim, ch, (ref)); \
+            CLEAR_BIT(servo.match, flag);            \
         }                                            \
         else                                         \
         {                                            \
@@ -71,21 +73,24 @@ void servo_start(uint32_t pwm[7])
     HAL_TIM_PWM_Start(&MIDDLE_TIM, PITCH_CHANNEL);
     HAL_TIM_PWM_Start(&MIDDLE_TIM, SHIFTV_CHANNEL);
 
-    HAL_TIM_PWM_Start(&BESIDE_TIM, PITCH_L_CHANNEL);
-    HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTV_L_CHANNEL);
-    HAL_TIM_PWM_Start(&BESIDE_TIM, PITCH_R_CHANNEL);
-    HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTV_R_CHANNEL);
+    HAL_TIM_PWM_Start(&BESIDE_TIM, PITCHL_CHANNEL);
+    HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTVL_CHANNEL);
+    HAL_TIM_PWM_Start(&BESIDE_TIM, PITCHR_CHANNEL);
+    HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTVR_CHANNEL);
 
     servo.fetch_set = pwm[0];
     servo.fetch = servo.fetch_set - 1;
+
     servo.pitch_set = pwm[1];
     servo.pitch = servo.pitch_set - 1;
     servo.shiftv_set = pwm[2];
     servo.shiftv = servo.shiftv_set - 1;
+
     servo.pitchl_set = pwm[3];
     servo.pitchl = servo.pitchl_set - 1;
     servo.shiftvl_set = pwm[4];
-    servo.shiftvl = servo.shiftv_set - 1;
+    servo.shiftvl = servo.shiftvl_set - 1;
+
     servo.pitchr_set = pwm[5];
     servo.pitchr = servo.pitchr_set - 1;
     servo.shiftvr_set = pwm[6];
@@ -109,12 +114,12 @@ void pitch_update(void)
                  servo.pitch,
                  servo.pitch_set);
     SERVO_UPDATE(BESIDE_TIM,
-                 PITCH_L_CHANNEL,
+                 PITCHL_CHANNEL,
                  SERVO_MATCH_PITCHL,
                  servo.pitchl,
                  servo.pitchl_set);
     SERVO_UPDATE(BESIDE_TIM,
-                 PITCH_R_CHANNEL,
+                 PITCHR_CHANNEL,
                  SERVO_MATCH_PITCHR,
                  servo.pitchr,
                  servo.pitchr_set);
@@ -122,21 +127,36 @@ void pitch_update(void)
 
 void shiftv_update(void)
 {
+#if SERVO_CONFIG_SHIFTV_FAST
+    if (servo.shiftv != servo.shiftv_set)
+    {
+        __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, SHIFTV_CHANNEL, servo.shiftv_set);
+    }
+    if (servo.shiftvl != servo.shiftvl_set)
+    {
+        __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVL_CHANNEL, servo.shiftvl_set);
+    }
+    if (servo.shiftvr != servo.shiftvr_set)
+    {
+        __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVR_CHANNEL, servo.shiftvr_set);
+    }
+#else
     SERVO_UPDATE(MIDDLE_TIM,
                  SHIFTV_CHANNEL,
                  SERVO_MATCH_SHIFTV,
                  servo.shiftv,
                  servo.shiftv_set);
     SERVO_UPDATE(BESIDE_TIM,
-                 SHIFTV_L_CHANNEL,
+                 SHIFTVL_CHANNEL,
                  SERVO_MATCH_SHIFTVL,
                  servo.shiftvl,
                  servo.shiftvl_set);
     SERVO_UPDATE(BESIDE_TIM,
-                 SHIFTV_R_CHANNEL,
+                 SHIFTVR_CHANNEL,
                  SERVO_MATCH_SHIFTVR,
                  servo.shiftvr,
                  servo.shiftvr_set);
+#endif
 }
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

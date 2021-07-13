@@ -60,6 +60,8 @@ void archery_update(void)
     }
 
     shifth_update();
+    shiftv_update();
+
     if (archery.tick % 2 == 0)
     {
         /**
@@ -69,7 +71,6 @@ void archery_update(void)
         */
         fetch_update();
         pitch_update();
-        shifth_update();
     }
 
     ++archery.tick;
@@ -86,13 +87,13 @@ void task_archery(void *pvParameters)
 
     {
         uint32_t pwm[7] = {
-            1100,
-            1700,
-            1000,
-            1700,
-            1000,
-            1700,
-            1000,
+            SERVO_FETCH_PWMMIN,
+            SERVO_PITCH_PWMMAX - 200,
+            SERVO_SHIFTV_PWMMAX,
+            SERVO_PITCH_PWMMAX - 200,
+            SERVO_SHIFTV_PWMMAX,
+            SERVO_PITCH_PWMMAX - 200,
+            SERVO_SHIFTV_PWMMAX,
         };
         shifth_init();
         servo_init();
@@ -134,6 +135,22 @@ void task_archery(void *pvParameters)
                 /* Stop ejecting gas */
                 jet_off();
             }
+        }
+
+        switch (serial->c)
+        {
+        case 't':
+        {
+            serial->c = 0;
+            if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+            {
+                xTaskNotifyGive(task_arrow_handler);
+            }
+            break;
+        }
+
+        default:
+            break;
         }
 
         archery_update();

@@ -15,6 +15,38 @@
 
 #include "ctrl.h"
 
+#define SERVO_CONFIG_SHIFTV_FAST 1
+
+#define SERVO_PWMMID 1500
+
+#define SERVO_FETCH_PWMMAX 1800
+#define SERVO_FETCH_PWMMID 1660
+#define SERVO_FETCH_PWMMIN 1100
+
+#define SERVO_PITCH_PWMMAX 2200
+#define SERVO_PITCH_PWMMID 1500
+#define SERVO_PITCH_PWMMIN 1000
+
+#define SERVO_PITCHL_PWMMAX 2000
+#define SERVO_PITCHL_PWMMID 1500
+#define SERVO_PITCHL_PWMMIN 1000
+
+#define SERVO_PITCHR_PWMMAX 2000
+#define SERVO_PITCHR_PWMMID 1500
+#define SERVO_PITCHR_PWMMIN 1000
+
+#define SERVO_SHIFTV_PWMMAX 2000
+#define SERVO_SHIFTV_PWMMID 1500
+#define SERVO_SHIFTV_PWMMIN 1000
+
+#define SERVO_SHIFTVL_PWMMAX 2000
+#define SERVO_SHIFTVL_PWMMID 1500
+#define SERVO_SHIFTVL_PWMMIN 1000
+
+#define SERVO_SHIFTVR_PWMMAX 2000
+#define SERVO_SHIFTVR_PWMMID 1500
+#define SERVO_SHIFTVR_PWMMIN 1000
+
 #define SERVO_MATCH_FETCH   (1 << 0)  //!< servo match state for fetch
 #define SERVO_MATCH_PITCH   (1 << 1)  //!< servo match state for pitch in the middle
 #define SERVO_MATCH_PITCHL  (1 << 2)  //!< servo match state for pitch on the left
@@ -22,6 +54,9 @@
 #define SERVO_MATCH_SHIFTV  (1 << 4)  //!< servo match state for vertical shift in the middle
 #define SERVO_MATCH_SHIFTVL (1 << 5)  //!< servo match state for vertical shift on the left
 #define SERVO_MATCH_SHIFTVR (1 << 6)  //!< servo match state for vertical shift on the right
+
+#define SERVO_MATCH_PITCH_ALL  (SERVO_MATCH_PITCH | SERVO_MATCH_PITCHL | SERVO_MATCH_PITCHR)
+#define SERVO_MATCH_SHIFTV_ALL (SERVO_MATCH_SHIFTV | SERVO_MATCH_SHIFTVL | SERVO_MATCH_SHIFTVR)
 
 typedef struct
 {
@@ -71,49 +106,42 @@ __STATIC_INLINE
 void fetch_set(uint32_t pwm)
 {
     servo.fetch_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_FETCH);
 }
 
 __STATIC_INLINE
 void pitch_set(uint32_t pwm)
 {
     servo.pitch_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_PITCH);
 }
 
 __STATIC_INLINE
 void pitchl_set(uint32_t pwm)
 {
     servo.pitchr_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_PITCHL);
 }
 
 __STATIC_INLINE
 void pitchr_set(uint32_t pwm)
 {
     servo.pitchr_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_PITCHR);
 }
 
 __STATIC_INLINE
 void shiftv_set(uint32_t pwm)
 {
     servo.shiftv_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_SHIFTV);
 }
 
 __STATIC_INLINE
 void shiftvl_set(uint32_t pwm)
 {
     servo.shiftvl_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_SHIFTVL);
 }
 
 __STATIC_INLINE
 void shiftvr_set(uint32_t pwm)
 {
     servo.shiftvr_set = pwm;
-    CLEAR_BIT(servo.match, SERVO_MATCH_SHIFTVR);
 }
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/

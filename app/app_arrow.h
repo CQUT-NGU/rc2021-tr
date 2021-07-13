@@ -1,7 +1,7 @@
 /**
  * *****************************************************************************
- * @file         app.h
- * @brief        application
+ * @file         app_arrow.h
+ * @brief        arrow application
  * @author       NGU
  * @date         20210427
  * @version      1
@@ -10,25 +10,14 @@
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_H__
-#define __APP_H__
+#ifndef __APP_ARROW_H__
+#define __APP_ARROW_H__
 
-#include "ca.h"
-#include "bsp.h"
-#include "ctrl.h"
+#include "app.h"
 
-#if USED_OS
-#include "cmsis_os.h"
-#endif /* USED_OS */
-
-#include <stdint.h>
-
-#include "app_led.h"
-#include "app_chassis.h"
-#include "app_archery.h"
-#include "app_arrow.h"
+extern TaskHandle_t task_arrow_handler;
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
-#endif /* __APP_H__ */
+#endif /* __APP_ARROW_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

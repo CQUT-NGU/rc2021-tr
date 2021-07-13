@@ -1,6 +1,6 @@
 /**
  * *****************************************************************************
- * @file         app_archery.c
+ * @file         app_archery.h
  * @brief        archery application
  * @author       NGU
  * @date         20210427

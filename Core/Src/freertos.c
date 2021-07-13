@@ -109,6 +109,18 @@ const osThreadAttr_t step_attributes = {
   .stack_size = sizeof(stepBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for arrow */
+osThreadId_t arrowHandle;
+uint32_t arrowBuffer[ 128 ];
+osStaticThreadDef_t arrowControlBlock;
+const osThreadAttr_t arrow_attributes = {
+  .name = "arrow",
+  .cb_mem = &arrowControlBlock,
+  .cb_size = sizeof(arrowControlBlock),
+  .stack_mem = &arrowBuffer[0],
+  .stack_size = sizeof(arrowBuffer),
+  .priority = (osPriority_t) osPriorityRealtime,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -120,6 +132,7 @@ extern void task_chassis(void *argument);
 extern void task_archery(void *argument);
 extern void task_servo(void *argument);
 extern void task_step(void *argument);
+extern void task_arrow(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -164,6 +177,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of step */
   stepHandle = osThreadNew(task_step, NULL, &step_attributes);
+
+  /* creation of arrow */
+  arrowHandle = osThreadNew(task_arrow, NULL, &arrow_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
