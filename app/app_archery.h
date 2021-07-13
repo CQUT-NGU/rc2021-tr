@@ -54,9 +54,127 @@ typedef struct
     uint32_t tick;           //!< count of run
 } archery_t;
 
+extern archery_t archery;
+
 __BEGIN_DECLS
 
 __END_DECLS
+
+__STATIC_INLINE
+void clip_edge_on(void)
+{
+    gpio_pin_set(RELAY0_GPIO_Port, RELAY0_Pin);
+    SET_BIT(archery.load, ARCHERY_CLIP_F);
+}
+
+__STATIC_INLINE
+void clip_edge_off(void)
+{
+    gpio_pin_reset(RELAY0_GPIO_Port, RELAY0_Pin);
+    CLEAR_BIT(archery.load, ARCHERY_CLIP_F);
+}
+
+__STATIC_INLINE
+void clip_left_on(void)
+{
+    gpio_pin_set(RELAY1_GPIO_Port, RELAY1_Pin);
+    SET_BIT(archery.load, ARCHERY_CLIP_L);
+}
+
+__STATIC_INLINE
+void clip_left_off(void)
+{
+    gpio_pin_reset(RELAY1_GPIO_Port, RELAY1_Pin);
+    CLEAR_BIT(archery.load, ARCHERY_CLIP_L);
+}
+
+__STATIC_INLINE
+void clip_middle_on(void)
+{
+    gpio_pin_set(RELAY2_GPIO_Port, RELAY2_Pin);
+    SET_BIT(archery.load, ARCHERY_CLIP_M);
+}
+
+__STATIC_INLINE
+void clip_middle_off(void)
+{
+    gpio_pin_reset(RELAY2_GPIO_Port, RELAY2_Pin);
+    CLEAR_BIT(archery.load, ARCHERY_CLIP_M);
+}
+
+__STATIC_INLINE
+void clip_right_on(void)
+{
+    gpio_pin_set(RELAY3_GPIO_Port, RELAY3_Pin);
+    SET_BIT(archery.load, ARCHERY_CLIP_R);
+}
+
+__STATIC_INLINE
+void clip_right_off(void)
+{
+    gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
+    CLEAR_BIT(archery.load, ARCHERY_CLIP_R);
+}
+
+__STATIC_INLINE
+void jet_left_on(void)
+{
+    if (!READ_BIT(archery.jet, ARCHERY_JET_ON))
+    {
+        CLEAR_BIT(archery.load, ARCHERY_LOAD_L);
+        gpio_pin_set(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+        SET_BIT(archery.jet, ARCHERY_JET_ON | ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
+    }
+}
+
+__STATIC_INLINE
+void jet_middle_on(void)
+{
+    if (!READ_BIT(archery.jet, ARCHERY_JET_ON))
+    {
+        CLEAR_BIT(archery.load, ARCHERY_LOAD_M);
+        gpio_pin_set(POWER2_LD_GPIO_Port, POWER2_LD_Pin);
+        SET_BIT(archery.jet, ARCHERY_JET_ON | ARCHERY_JET_CNT | ARCHERY_JET_MIDDLE);
+    }
+}
+
+__STATIC_INLINE
+void jet_right_on(void)
+{
+    if (!READ_BIT(archery.jet, ARCHERY_JET_ON))
+    {
+        CLEAR_BIT(archery.load, ARCHERY_LOAD_R);
+        gpio_pin_set(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
+        SET_BIT(archery.jet, ARCHERY_JET_ON | ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
+    }
+}
+
+__STATIC_INLINE
+void jet_off(void)
+{
+    if (READ_BIT(archery.jet, ARCHERY_JET_OFF))
+    {
+        CLEAR_BIT(archery.jet, ARCHERY_JET_ON | ARCHERY_JET_OFF);
+    }
+}
+
+__STATIC_INLINE
+void aim_on(void)
+{
+    if (!READ_BIT(archery.aim, ARCHERY_AIM_DONE))
+    {
+        SET_BIT(archery.aim, ARCHERY_AIM_DO);
+    }
+}
+
+__STATIC_INLINE
+void aim_off(void)
+{
+    if (READ_BIT(archery.aim, ARCHERY_AIM_DONE))
+    {
+        CLEAR_BIT(archery.aim, ARCHERY_AIM_DONE);
+    }
+}
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __APP_ARCHERY_H__ */
