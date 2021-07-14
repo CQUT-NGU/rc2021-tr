@@ -2,7 +2,7 @@ include(cmake/cmake-arm-none-eabi.cmake)
 
 cmake_minimum_required(VERSION 3.10)
 
-project(rc2021_stm32_tr)
+project(rc2021-tr-rm-a)
 
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 

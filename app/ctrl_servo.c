@@ -60,11 +60,9 @@ void servo_init(void)
 {
     __HAL_TIM_SET_PRESCALER(&MIDDLE_TIM, SERVO_PSC - 1);
     __HAL_TIM_SetAutoreload(&MIDDLE_TIM, SERVO_PWM_MAX - 1);
-    HAL_TIM_Base_Start(&MIDDLE_TIM);
 
     __HAL_TIM_SET_PRESCALER(&BESIDE_TIM, SERVO_PSC - 1);
     __HAL_TIM_SetAutoreload(&BESIDE_TIM, SERVO_PWM_MAX - 1);
-    HAL_TIM_Base_Start(&BESIDE_TIM);
 }
 
 void servo_start(uint32_t pwm[7])

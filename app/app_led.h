@@ -10,12 +10,12 @@
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TASK_LED_H__
-#define __TASK_LED_H__
+#ifndef __APP_LED_H__
+#define __APP_LED_H__
 
 #include "app.h"
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
-#endif /* __TASK_LED_H__ */
+#endif /* __APP_LED_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

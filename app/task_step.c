@@ -27,8 +27,6 @@ void task_step(void *pvParameters)
 
     osDelay(1000);
 
-    const ctrl_rc_t *rc = ctrl_rc_point();
-
     ctrl_serial_t *serial = ctrl_serial_point();
 
     for (;;)

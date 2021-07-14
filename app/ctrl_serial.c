@@ -31,33 +31,33 @@ static uint8_t *pn = (uint8_t *)buf32;
 #define FLAG_TX     (1 << 2)
 static int8_t flag = 0;
 
-#undef PC_IS_FLOAT
-#define PC_IS_FLOAT(x) \
-    ((x >= '0' &&      \
-      x <= '9') ||     \
-     x == '+' ||       \
-     x == '-' ||       \
+#undef SERIAL_IS_FLOAT
+#define SERIAL_IS_FLOAT(x) \
+    ((x >= '0' &&          \
+      x <= '9') ||         \
+     x == '+' ||           \
+     x == '-' ||           \
      x == '.')
 
-#undef PC_BUF_DEAL
-#define PC_BUF_DEAL(x, p, pd)               \
-    {                                       \
-        while (p != pd && !PC_IS_FLOAT(*p)) \
-        {                                   \
-            ++p;                            \
-        }                                   \
-        if (p == pd)                        \
-        {                                   \
-            break;                          \
-        }                                   \
-        char tmpbuf[32];                    \
-        char *pi = tmpbuf;                  \
-        while (p != pd && PC_IS_FLOAT(*p))  \
-        {                                   \
-            *pi++ = *p++;                   \
-        }                                   \
-        *pi = 0;                            \
-        x = (float)atof((char *)tmpbuf);    \
+#undef SERIAL_BUF_DEAL
+#define SERIAL_BUF_DEAL(x, p, pd)               \
+    {                                           \
+        while (p != pd && !SERIAL_IS_FLOAT(*p)) \
+        {                                       \
+            ++p;                                \
+        }                                       \
+        if (p == pd)                            \
+        {                                       \
+            break;                              \
+        }                                       \
+        char tmpbuf[32];                        \
+        char *pi = tmpbuf;                      \
+        while (p != pd && SERIAL_IS_FLOAT(*p))  \
+        {                                       \
+            *pi++ = *p++;                       \
+        }                                       \
+        *pi = 0;                                \
+        x = (float)atof((char *)tmpbuf);        \
     }
 
 static void dma_printf_irq(void);
@@ -247,9 +247,9 @@ void os_rx_irq(void *buf,
             char *pd = p + len;
             p += 2;
 
-            PC_BUF_DEAL(serial.x, p, pd);
-            PC_BUF_DEAL(serial.y, p, pd);
-            PC_BUF_DEAL(serial.z, p, pd);
+            SERIAL_BUF_DEAL(serial.x, p, pd);
+            SERIAL_BUF_DEAL(serial.y, p, pd);
+            SERIAL_BUF_DEAL(serial.z, p, pd);
 
             serial.c = *(uint8_t *)buf;
             return;

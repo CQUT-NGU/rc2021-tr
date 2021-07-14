@@ -87,7 +87,7 @@ void task_archery(void *pvParameters)
 
     {
         uint32_t pwm[7] = {
-            SERVO_FETCH_PWMMIN,
+            SERVO_FETCH_PWMMID,
             SERVO_PITCH_PWMMAX - 200,
             SERVO_SHIFTV_PWMMAX,
             SERVO_PITCH_PWMMAX - 200,

@@ -10,8 +10,8 @@
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TASK_CHASSIS_H__
-#define __TASK_CHASSIS_H__
+#ifndef __APP_CHASSIS_H__
+#define __APP_CHASSIS_H__
 
 #include "app.h"
 
@@ -84,6 +84,6 @@ typedef struct
 } chassis_move_t;
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
-#endif /* __TASK_CHASSIS_H__ */
+#endif /* __APP_CHASSIS_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

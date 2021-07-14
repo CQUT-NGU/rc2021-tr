@@ -10,8 +10,8 @@
 */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __CTRL_PC_H__
-#define __CTRL_PC_H__
+#ifndef __CTRL_SERIAL_H__
+#define __CTRL_SERIAL_H__
 
 #include "ctrl.h"
 
@@ -59,6 +59,6 @@ extern void os_dma_init(void);
 __END_DECLS
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
-#endif /* __CTRL_PC_H__ */
+#endif /* __CTRL_SERIAL_H__ */
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/
