@@ -44,18 +44,32 @@ void shifth_set(uint32_t hz)
 
 void shifth_update(void)
 {
-    step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
-    if (step.cnt < SHIFTH_PWM_DIVIDE)
+    if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
     {
-        step.fr += SHIFTH_PWM_DELTA;
-        shifth_set(step.fr);
+        step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
+        if (step.cnt < SHIFTH_PWM_DIVIDE)
+        {
+            step.fr += SHIFTH_PWM_DELTA;
+            shifth_set(step.fr);
+        }
+    }
+}
+
+void shifth_index(uint32_t idx)
+{
+    if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
+    {
+        shifth_stop();
+    }
+    step.set = idx;
+    if (step.idx != step.set)
+    {
+        shifth_start((int32_t)(step.set - step.idx));
     }
 }
 
 void shifth_start(int32_t count)
 {
-    step.fr = 0;
-
     if (count < 0)
     {
         gpio_pin_set(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
@@ -69,13 +83,29 @@ void shifth_start(int32_t count)
         step.cnt = (uint32_t)count;
     }
 
-    __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, step.cnt);
+    CLEAR_REG(step.fr);
+    SET_BIT(step.flag, SHIFTH_FLAG_RUN);
 
+    __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, step.cnt);
     __HAL_TIM_ENABLE(&COUNT_TIM);
 
     HAL_TIM_PWM_Start(&SHIFTH_TIM, SHIFTH_CHANNEL);
-
     shifth_update();
+}
+
+void shifth_stop(void)
+{
+    step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
+    __HAL_TIM_DISABLE(&COUNT_TIM);
+    if (READ_BIT(step.flag, SHIFTH_FLAG_REVERSE))
+    {
+        step.idx -= step.cnt;
+    }
+    else
+    {
+        step.idx += step.cnt;
+    }
+    __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
 }
 
 /**
@@ -87,26 +117,15 @@ void COUNT_IRQHandler(void)
     {
         __HAL_TIM_CLEAR_FLAG(&COUNT_TIM, SHIFTH_IT_CC);
 
-        SET_BIT(step.flag, SHIFTH_FLAG_STOP);
-
         HAL_TIM_PWM_Stop_IT(&SHIFTH_TIM, SHIFTH_CHANNEL);
     }
 
-    if (READ_BIT(step.flag, SHIFTH_FLAG_STOP))
+    if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
     {
-        CLEAR_BIT(step.flag, SHIFTH_FLAG_STOP);
+        CLEAR_BIT(step.flag, SHIFTH_FLAG_RUN);
 
-        step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
-        __HAL_TIM_DISABLE(&COUNT_TIM);
-        __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
-        if (READ_BIT(step.flag, SHIFTH_FLAG_REVERSE))
-        {
-            step.idx -= step.cnt;
-        }
-        else
-        {
-            step.idx += step.cnt;
-        }
+        shifth_stop();
+
         os_printf("idx:%u\r\n", step.idx);
     }
 }

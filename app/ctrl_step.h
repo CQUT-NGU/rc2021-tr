@@ -15,14 +15,15 @@
 
 #include "ctrl.h"
 
-#define SHIFTH_FLAG_STOP    (1 << 0)
+#define SHIFTH_FLAG_RUN     (1 << 0)
 #define SHIFTH_FLAG_REVERSE (1 << 1)
 
 typedef struct
 {
     uint32_t fr;
-    uint32_t idx;
     uint32_t cnt;
+    uint32_t idx;
+    uint32_t set;
     int8_t flag;
 } ctrl_step_t;
 
@@ -32,8 +33,10 @@ __BEGIN_DECLS
 
 extern void shifth_init(void);
 extern void shifth_set(uint32_t hz);
-extern void shifth_update(void);
+extern void shifth_index(uint32_t idx);
 extern void shifth_start(int32_t count);
+extern void shifth_stop(void);
+extern void shifth_update(void);
 
 __END_DECLS
 
