@@ -16,7 +16,7 @@
 
 #include "bsp.h"
 
-#define BUZZER_PWM_MAX   ((180000000 >> 1) / 2700)
+#define BUZZER_PWM_MAX   200
 #define BUZZER_PWM_DIV1  (BUZZER_PWM_MAX >> 0)
 #define BUZZER_PWM_DIV2  (BUZZER_PWM_MAX >> 1)
 #define BUZZER_PWM_DIV4  (BUZZER_PWM_MAX >> 2)

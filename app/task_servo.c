@@ -107,54 +107,6 @@ void task_servo(void *pvParameters)
             break;
         }
 
-        /* down, down */
-        if (switch_is_down(rc->rc.s[RC_SW_L]) &&
-            switch_is_down(rc->rc.s[RC_SW_R]))
-        {
-            /* Pull the lever to the lowest level */
-            if (rc->rc.ch[RC_CH_LV] < -650)
-            {
-                /* Unclip the arrow */
-                if (rc->rc.ch[RC_CH_S] < -650)
-                {
-                    gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
-                }
-                /**
-                 * -550 ~ -110
-                 * The steering gear is moved vertically forward and
-                 * inserted into the tail of the arrow
-                */
-                else if (rc->rc.ch[RC_CH_S] < -110)
-                {
-                    //shiftv_set(PWM_LAST_SHIFTV);
-                }
-
-                /* The steering gear moves backwards vertically */
-                if (rc->rc.ch[RC_CH_S] > 110 ||
-                    rc->rc.ch[RC_CH_RV] > 220)
-                {
-                    shiftv_set(PWM_INIT_SHIFTV);
-                }
-
-                /* Set the Angle of the arrow */
-                if (rc->rc.ch[RC_CH_RV] > 0)
-                {
-                    pitch_set((uint8_t)(PWM_INIT_PITCH - rc->rc.ch[RC_CH_RV]));
-                }
-                /* Lift the arrow horizontally */
-                else if (rc->rc.ch[RC_CH_RV] < -550)
-                {
-                }
-                /* -440 ~ -10, Clip the arrow and lift it */
-                else if (rc->rc.ch[RC_CH_RV] < -110)
-                {
-                    /* Clamp the arrow */
-                    gpio_pin_set(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
-                    /* Lift it */
-                }
-            }
-        }
-
         /* Task delay */
         osDelay(4);
     }

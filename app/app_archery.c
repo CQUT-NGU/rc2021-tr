@@ -44,7 +44,7 @@ void archery_update(void)
         if (READ_BIT(archery.jet, ARCHERY_JET_LEFT))
         {
             CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
-            gpio_pin_reset(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+            gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
         }
         if (READ_BIT(archery.jet, ARCHERY_JET_MIDDLE))
         {
@@ -54,7 +54,7 @@ void archery_update(void)
         if (READ_BIT(archery.jet, ARCHERY_JET_RIGHT))
         {
             CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
-            gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
+            gpio_pin_reset(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
         }
         usart_dma_tx(&huart_os, (const void *)"b\n", 2);
     }
@@ -128,7 +128,7 @@ void task_archery(void *pvParameters)
             if (rc->rc.ch[RC_CH_S] < -650)
             {
                 /* It starts to spew out gas */
-                jet_left_on();
+                jet_middle_on();
             }
             else
             {

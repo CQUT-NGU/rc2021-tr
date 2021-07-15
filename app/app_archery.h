@@ -122,7 +122,7 @@ void jet_left_on(void)
     if (!READ_BIT(archery.jet, ARCHERY_JET_ON))
     {
         CLEAR_BIT(archery.load, ARCHERY_LOAD_L);
-        gpio_pin_set(POWER1_LU_GPIO_Port, POWER1_LU_Pin);
+        gpio_pin_set(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
         SET_BIT(archery.jet, ARCHERY_JET_ON | ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
     }
 }
@@ -144,7 +144,7 @@ void jet_right_on(void)
     if (!READ_BIT(archery.jet, ARCHERY_JET_ON))
     {
         CLEAR_BIT(archery.load, ARCHERY_LOAD_R);
-        gpio_pin_set(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
+        gpio_pin_set(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
         SET_BIT(archery.jet, ARCHERY_JET_ON | ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
     }
 }
