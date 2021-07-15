@@ -54,7 +54,7 @@ __BEGIN_DECLS
  * @param[in]    i: motor number,range [0,3]
  * @return       motor data point
 */
-extern const motor_t *chassis_point(uint8_t i);
+extern const motor_t *chassis_point(int i);
 
 /**
  * @brief        send control current of motor (0x201, 0x202, 0x203, 0x204)

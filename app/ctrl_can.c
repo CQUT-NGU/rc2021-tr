@@ -80,9 +80,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     }
 }
 
-const motor_t *chassis_point(uint8_t i)
+const motor_t *chassis_point(int i)
 {
-    return &motor_chassis[(i & 0x07)];
+    return motor_chassis + (i & 0x07);
 }
 
 void chassis_ctrl(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)

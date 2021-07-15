@@ -19,10 +19,12 @@ typedef enum
 {
     /* chassis will stop */
     CHASSIS_VECTOR_STOP,
-    /* chassis will have rotation speed control */
-    CHASSIS_VECTOR_NORMAL,
+    /* chassis will auto run */
+    CHASSIS_VECTOR_AUTO,
     /* chassis will have rotation speed control slowly */
     CHASSIS_VECTOR_SLOW,
+    /* chassis will have rotation speed control */
+    CHASSIS_VECTOR_NORMAL,
     /* chassis will have yaw angle(chassis_yaw) close-looped control */
     CHASSIS_VECTOR_YAW,
 } chassis_mode_e;
@@ -48,39 +50,45 @@ typedef struct
     chassis_mode_e mode;   /* state machine */
     chassis_motor_t mo[4]; /* chassis motor data */
 
-    ca_pid_f32_t pid_speed[4]; /* motor speed PID */
-
+    ca_pid_f32_t pid_speed[4];  /* motor speed PID */
     ca_pid_f32_t pid_offset[3]; /* offset PID */
 
-    /* chassis horizontal offset, positive means letf,unit m */
+    /* chassis horizontal offset, positive means letf, unit m */
     float x;
-    /* chassis vertical offset, positive means forward,unit m */
+    /* chassis vertical offset, positive means forward, unit m */
     float y;
-    /* chassis rotation offset, positive means counterclockwise,unit rad */
+    /* chassis rotation offset, positive means counterclockwise, unit rad */
     float z;
 
-    /* chassis horizontal speed, positive means letf,unit m/s */
+    /* chassis set horizontal offset, positive means letf, unit m */
+    float x_set;
+    /* chassis set vertical offset, positive means forward, unit m */
+    float y_set;
+    /* chassis set rotation offset, positive means counterclockwise, unit rad */
+    float z_set;
+
+    /* chassis horizontal speed, positive means letf, unit m/s */
     float vx;
-    /* chassis vertical speed, positive means forward,unit m/s */
+    /* chassis vertical speed, positive means forward, unit m/s */
     float vy;
-    /* chassis rotation speed, positive means counterclockwise,unit rad/s */
+    /* chassis rotation speed, positive means counterclockwise, unit rad/s */
     float wz;
 
-    /* use first order filter to slow set-point */
-    ca_lpf_f32_t vx_slow;
-    /* use first order filter to slow set-point */
-    ca_lpf_f32_t vy_slow;
-    /* use first order filter to slow set-point */
-    ca_lpf_f32_t wz_slow;
-
-    /* chassis set horizontal speed,positive means left,unit m/s */
+    /* chassis set horizontal speed, positive means left, unit m/s */
     float vx_set;
-    /* chassis set vertical speed,positive means forward,unit m/s */
+    /* chassis set vertical speed, positive means forward, unit m/s */
     float vy_set;
-    /* chassis set rotation speed,positive means counterclockwise,unit rad/s */
+    /* chassis set rotation speed, positive means counterclockwise, unit rad/s */
     float wz_set;
 
-    ca_pid_f32_t pid_l1s;
+    /* use first order filter to slow set-point */
+    ca_lpf_f32_t vx_slow[1];
+    /* use first order filter to slow set-point */
+    ca_lpf_f32_t vy_slow[1];
+    /* use first order filter to slow set-point */
+    ca_lpf_f32_t wz_slow[1];
+
+    ca_pid_f32_t pid_l1s[1];
     float yaw_set;
 } chassis_move_t;
 

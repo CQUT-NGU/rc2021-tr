@@ -73,6 +73,8 @@ void archery_update(void)
         pitch_update();
     }
 
+    l1s_check();
+
     ++archery.tick;
 }
 
