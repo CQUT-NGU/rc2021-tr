@@ -44,35 +44,52 @@ typedef struct l1s_dis_t
     l1s_error_t error;  //!< error stats
 } l1s_dis_t;
 
+#define L1S_TOTAL 3
+
 typedef struct l1s_t
 {
+#if L1S_TOTAL > 0
     l1s_dis_t dis0;
+#endif /* L1S_TOTAL */
+#if L1S_TOTAL > 1
     l1s_dis_t dis1;
+#endif /* L1S_TOTAL */
+#if L1S_TOTAL > 2
     l1s_dis_t dis2;
-    // l1s_dis_t dis3;
+#endif /* L1S_TOTAL */
+#if L1S_TOTAL > 3
+    l1s_dis_t dis3;
+#endif /* L1S_TOTAL */
     int8_t flag;
 } l1s_t;
 
+#if L1S_TOTAL > 0
 #define huart_l1s0 huart7 /* uart, connect to l1s 0 */
 #undef L1S0_IRQHandler
 #define L1S0_IRQHandler UART7_IRQHandler
+extern UART_HandleTypeDef huart_l1s0;
+#endif /* L1S_TOTAL */
 
+#if L1S_TOTAL > 1
 #define huart_l1s1 huart8 /* uart, connect to l1s 1 */
 #undef L1S1_IRQHandler
 #define L1S1_IRQHandler UART8_IRQHandler
+extern UART_HandleTypeDef huart_l1s1;
+#endif /* L1S_TOTAL */
 
+#if L1S_TOTAL > 2
 #define huart_l1s2 huart3 /* usart, connect to l1s 2 */
 #undef L1S2_IRQHandler
 #define L1S2_IRQHandler USART3_IRQHandler
-
-// #define huart_l1s3 huart5 /* usart, connect to l1s 3 */
-// #undef L1S3_IRQHandler
-// #define L1S3_IRQHandler UART5_IRQHandler
-
-extern UART_HandleTypeDef huart_l1s0;
-extern UART_HandleTypeDef huart_l1s1;
 extern UART_HandleTypeDef huart_l1s2;
-// extern UART_HandleTypeDef huart_l1s3;
+#endif /* L1S_TOTAL */
+
+#if L1S_TOTAL > 3
+#define huart_l1s3 huart5 /* usart, connect to l1s 3 */
+#undef L1S3_IRQHandler
+#define L1S3_IRQHandler UART5_IRQHandler
+extern UART_HandleTypeDef huart_l1s3;
+#endif /* L1S_TOTAL */
 
 #define BUFSIZ_L1S  0x10
 #define BUFSIZ_L1S0 BUFSIZ_L1S
