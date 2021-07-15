@@ -38,7 +38,9 @@ typedef enum
 
 typedef struct l1s_dis_t
 {
-    uint32_t data;      //!< distance
+    uint32_t raw;       //!< raw value
+    uint32_t base;      //!< base value
+    int32_t data;       //!< distance
     l1s_error_t error;  //!< error stats
 } l1s_dis_t;
 
@@ -92,6 +94,7 @@ extern void l1s_start(UART_HandleTypeDef *huart);
 extern void l1s_stop(UART_HandleTypeDef *huart);
 extern void l1s_init(void);
 extern void l1s_check(void);
+extern void l1s_cli(void);
 
 __END_DECLS
 

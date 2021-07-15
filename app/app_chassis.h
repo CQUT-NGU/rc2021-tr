@@ -39,6 +39,7 @@ typedef struct
 
 typedef struct
 {
+    TickType_t tick;
     /* the point to serial */
     ctrl_serial_t *serial;
     /* the point to remote control */

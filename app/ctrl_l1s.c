@@ -73,26 +73,6 @@ void l1s_config(UART_HandleTypeDef *huart)
     HAL_Delay(10);
 }
 
-void l1s_check(void)
-{
-    if (l1s.dis0.error == L1S_ERROR_NORUN)
-    {
-        l1s_start(&huart_l1s0);
-    }
-    if (l1s.dis1.error == L1S_ERROR_NORUN)
-    {
-        l1s_start(&huart_l1s1);
-    }
-    if (l1s.dis2.error == L1S_ERROR_NORUN)
-    {
-        l1s_start(&huart_l1s2);
-    }
-    // if (l1s.dis3.error == L1S_ERROR_NORUN)
-    // {
-    //     l1s_start(&huart_l1s3);
-    // }
-}
-
 void l1s_start(UART_HandleTypeDef *huart)
 {
     HAL_UART_Transmit(huart, l1s_send_start, sizeof(l1s_send_start), 0xFFFF);
@@ -126,6 +106,46 @@ void l1s_init(void)
     // l1s_start(&huart_l1s3);
 }
 
+void l1s_check(void)
+{
+    if (l1s.dis0.error == L1S_ERROR_NORUN)
+    {
+        l1s_start(&huart_l1s0);
+    }
+    if (l1s.dis1.error == L1S_ERROR_NORUN)
+    {
+        l1s_start(&huart_l1s1);
+    }
+    if (l1s.dis2.error == L1S_ERROR_NORUN)
+    {
+        l1s_start(&huart_l1s2);
+    }
+    // if (l1s.dis3.error == L1S_ERROR_NORUN)
+    // {
+    //     l1s_start(&huart_l1s3);
+    // }
+}
+
+void l1s_cli(void)
+{
+    if (l1s.dis0.error == L1S_ERROR_NONE && l1s.dis0.raw > 0)
+    {
+        l1s.dis0.base = l1s.dis0.raw;
+    }
+    if (l1s.dis1.error == L1S_ERROR_NONE && l1s.dis1.raw > 0)
+    {
+        l1s.dis1.base = l1s.dis1.raw;
+    }
+    if (l1s.dis2.error == L1S_ERROR_NONE && l1s.dis2.raw > 0)
+    {
+        l1s.dis2.base = l1s.dis2.raw;
+    }
+    // if (l1s.dis3.error == L1S_ERROR_NONE && l1s.dis3.raw > 0)
+    // {
+    //     l1s.dis3.base = l1s.dis3.raw;
+    // }
+}
+
 static void l1s_irq(l1s_dis_t *dis, int8_t flag, uint8_t *buf, uint8_t len)
 {
     if (len < 8)
@@ -135,7 +155,7 @@ static void l1s_irq(l1s_dis_t *dis, int8_t flag, uint8_t *buf, uint8_t len)
 
     if (buf[0] == 0xB4 && buf[1] == 0x69 && BCC(buf, 7) == buf[7])
     {
-        dis->data = 0;
+        dis->raw = 0;
         dis->error = 0;
         if (buf[2] & 0x80)
         {
@@ -146,15 +166,16 @@ static void l1s_irq(l1s_dis_t *dis, int8_t flag, uint8_t *buf, uint8_t len)
         }
         else
         {
-            dis->data |= buf[3];
-            dis->data <<= 8;
-            dis->data |= buf[4];
-            dis->data <<= 8;
-            dis->data |= buf[5];
-            dis->data <<= 8;
-            dis->data |= buf[6];
+            dis->raw |= buf[3];
+            dis->raw <<= 8;
+            dis->raw |= buf[4];
+            dis->raw <<= 8;
+            dis->raw |= buf[5];
+            dis->raw <<= 8;
+            dis->raw |= buf[6];
             l1s.flag = (int8_t)(l1s.flag | flag);
         }
+        dis->data = (int32_t)(dis->raw - dis->base);
     }
 }
 
