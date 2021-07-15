@@ -42,12 +42,13 @@ void angle_update(motor_t *mo)
     int delta = (int)(mo->ecd_last - mo->ecd);
     if (delta > ECD_RANGE_HALF)
     {
-        delta = (int)(delta - ECD_RANGE);
+        delta -= ECD_RANGE;
     }
     else if (delta < -ECD_RANGE_HALF)
     {
-        delta = (int)(delta + ECD_RANGE);
+        delta += ECD_RANGE;
     }
+    mo->angle += delta;
 }
 
 /**
@@ -70,6 +71,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     {
         uint32_t id = (header_rx.StdId - CAN_ID_3508_M1);
         MOTOR_MEASURE(&motor_chassis[id], data_rx);
+        angle_update(motor_chassis + id);
         break;
     }
 

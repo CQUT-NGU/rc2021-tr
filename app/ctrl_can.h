@@ -39,6 +39,7 @@ typedef enum
 */
 typedef struct
 {
+    int32_t angle;
     uint16_t ecd_last;
     uint16_t ecd;
     int16_t v_rpm;
