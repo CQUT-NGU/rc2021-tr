@@ -13,6 +13,9 @@
 #ifndef __APP_H__
 #define __APP_H__
 
+#define NOTEFREQS_PROPORT ((180000000 >> 1) / BUZZER_PWM_MAX)
+#define NOTEFREQS_TYPE    unsigned int
+
 #include "ca.h"
 #include "bsp.h"
 #include "ctrl.h"

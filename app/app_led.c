@@ -9,10 +9,6 @@
  * *****************************************************************************
 */
 
-#define NOTEFREQS_PROPORT ((180000000 >> 1) / BUZZER_PWM_MAX)
-#define NOTEFREQS_TYPE    unsigned int
-#include "notefreqs.h"
-
 #include "app_led.h"
 
 static unsigned int song[][2] = {
