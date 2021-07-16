@@ -24,6 +24,7 @@
 
 #define RC_ROCKER_MAX (RC_CH_VALUE_MAX - RC_CH_VALUE_OFFSET)
 #define RC_ROCKER_MIN (RC_CH_VALUE_MIN - RC_CH_VALUE_OFFSET)
+#define RC_DEADLINE   10
 
 /* ----------------------- RC Switch Definition----------------------------- */
 #define RC_SW_R 0 /* switch right */
