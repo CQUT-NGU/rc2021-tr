@@ -17,6 +17,7 @@
 
 #define SHIFTH_FLAG_RUN     (1 << 0)
 #define SHIFTH_FLAG_REVERSE (1 << 1)
+#define SHIFTH_FLAG_CLI     (1 << 2)
 
 typedef struct
 {
@@ -32,6 +33,7 @@ extern ctrl_step_t step;
 __BEGIN_DECLS
 
 extern void shifth_init(void);
+extern void shifth_cli(int32_t idx);
 extern void shifth_set(uint32_t hz);
 extern void shifth_index(uint32_t idx);
 extern void shifth_start(int32_t count);

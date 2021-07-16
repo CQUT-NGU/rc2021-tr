@@ -55,6 +55,15 @@ void shifth_update(void)
     }
 }
 
+void shifth_cli(int32_t idx)
+{
+    if (!READ_BIT(step.flag, SHIFTH_FLAG_CLI))
+    {
+        SET_BIT(step.flag, SHIFTH_FLAG_CLI);
+        shifth_start(idx);
+    }
+}
+
 void shifth_index(uint32_t idx)
 {
     if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
@@ -127,6 +136,16 @@ void COUNT_IRQHandler(void)
         shifth_stop();
 
         os_printf("idx:%u\r\n", step.idx);
+    }
+
+    if (READ_BIT(step.flag, SHIFTH_FLAG_CLI))
+    {
+        CLEAR_BIT(step.flag, SHIFTH_FLAG_CLI);
+
+        shifth_stop();
+
+        step.idx = 0;
+        step.set = 0;
     }
 }
 
