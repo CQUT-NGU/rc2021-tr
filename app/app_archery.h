@@ -31,9 +31,9 @@
 /* clip arrow device at the edge */
 #define ARCHERY_CLIP_F (ARCHERY_CLIP_FL | ARCHERY_CLIP_FR)
 
-#define ARCHERY_AIM_NONE (0)       //!< none
-#define ARCHERY_AIM_DO   (1 << 0)  //!< aim do
-#define ARCHERY_AIM_DONE (1 << 1)  //!< aim done
+#define ARCHERY_SIGNAL_NONE (0)       //!< none
+#define ARCHERY_SIGNAL_DO   (1 << 0)  //!< signal do
+#define ARCHERY_SIGNAL_DONE (1 << 1)  //!< signal done
 
 #define ARCHERY_JET_NONE   (0)       //!< none
 #define ARCHERY_JET_ON     (1 << 0)  //!< open the jet
@@ -44,14 +44,18 @@
 #define ARCHERY_JET_RIGHT  (1 << 6)  //!< jet on the right
 #define ARCHERY_JET_COUNT  (ARCHERY_JET_TIME_MS / ARCHERY_CONTROL_TIME_MS)
 
+#define ARCHERY_TASK_ARROW (1 << 0)  //!< run arrow
+
 typedef struct
 {
-    int load;  //!< stats of loading
-    int aim;   //!< stats of aiming
-    int jet;   //!< stats of jet
+    int jet;     //!< state of jet
+    int task;    //!< state of task
+    int load;    //!< state of loading
+    int signal;  //!< state of signaling
 
     unsigned int jet_count;  //!< count of jet time
     uint32_t tick;           //!< count of run
+    char msg[2];             //!<
 } archery_t;
 
 extern archery_t archery;
@@ -159,20 +163,27 @@ void jet_off(void)
 }
 
 __STATIC_INLINE
-void aim_on(void)
+void signal_on(void *data)
 {
-    if (!READ_BIT(archery.aim, ARCHERY_AIM_DONE))
+    if (!READ_BIT(archery.signal, ARCHERY_SIGNAL_DONE))
     {
-        SET_BIT(archery.aim, ARCHERY_AIM_DO);
+        SET_BIT(archery.signal, ARCHERY_SIGNAL_DO);
+        char *msg = (char *)data;
+        archery.msg[0] = msg[0];
+        archery.msg[1] = msg[1];
     }
 }
 
 __STATIC_INLINE
-void aim_off(void)
+void signal_off(void *data)
 {
-    if (READ_BIT(archery.aim, ARCHERY_AIM_DONE))
+    if (READ_BIT(archery.signal, ARCHERY_SIGNAL_DONE))
     {
-        CLEAR_BIT(archery.aim, ARCHERY_AIM_DONE);
+        char *msg = (char *)data;
+        if (archery.msg[0] == msg[0])
+        {
+            CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_DONE);
+        }
     }
 }
 

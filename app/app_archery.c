@@ -16,24 +16,24 @@
 #define FLAG_SHOOT_COUNT (1 << 1)
 #define FLAG_SHOOT_STOP  (1 << 2)
 
-#define SIGNAL_AIMING_NONE (1 << 0)  //!< none
-#define SIGNAL_AIMING_DO   (1 << 1)  //!< aim do
-#define SIGNAL_AIMING_DONE (1 << 2)  //!< aim done
+#define SIGNAL_SIGNALING_NONE (1 << 0)  //!< none
+#define SIGNAL_SIGNALING_DO   (1 << 1)  //!< signal do
+#define SIGNAL_SIGNALING_DONE (1 << 2)  //!< signal done
 
 archery_t archery = {
-    .load = ARCHERY_LOAD_NONE,
-    .aim = ARCHERY_AIM_NONE,
     .jet = ARCHERY_JET_NONE,
+    .load = ARCHERY_LOAD_NONE,
+    .signal = ARCHERY_SIGNAL_NONE,
     .jet_count = 0,
 };
 
 void archery_update(void)
 {
-    if (READ_BIT(archery.aim, ARCHERY_AIM_DO))
+    if (READ_BIT(archery.signal, ARCHERY_SIGNAL_DO))
     {
-        CLEAR_BIT(archery.aim, ARCHERY_AIM_DO);
-        SET_BIT(archery.aim, ARCHERY_AIM_DONE);
-        usart_dma_tx(&huart_os, (const void *)"a\n", 2);
+        CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_DO);
+        SET_BIT(archery.signal, ARCHERY_SIGNAL_DONE);
+        usart_dma_tx(&huart_os, archery.msg, 2);
     }
 
     if (READ_BIT(archery.jet, ARCHERY_JET_CNT) &&
@@ -56,13 +56,12 @@ void archery_update(void)
             CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
             gpio_pin_reset(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
         }
-        usart_dma_tx(&huart_os, (const void *)"b\n", 2);
     }
 
     shifth_update();
     shiftv_update();
 
-    if (archery.tick % 2 == 0)
+    if (archery.tick % (SERVO_UPDATE_MS / ARCHERY_CONTROL_TIME_MS) == 0)
     {
         /**
          * Updated arrow steering gear Angle,
@@ -91,15 +90,17 @@ void task_archery(void *pvParameters)
         uint32_t pwm[7] = {
             SERVO_FETCH_PWMMID,
             SERVO_PITCH_PWMMAX - 200,
-            SERVO_SHIFTV_PWMMAX,
+            SERVO_SHIFTV_PWMMIN,
             SERVO_PITCH_PWMMAX - 200,
-            SERVO_SHIFTV_PWMMAX,
+            SERVO_SHIFTV_PWMMIN,
             SERVO_PITCH_PWMMAX - 200,
-            SERVO_SHIFTV_PWMMAX,
+            SERVO_SHIFTV_PWMMIN,
         };
-        shifth_init();
         servo_init();
         servo_start(pwm);
+        pitch_update();
+        shifth_init();
+        shifth_cli(-330000);
     }
 
     for (;;)
@@ -109,33 +110,51 @@ void task_archery(void *pvParameters)
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
             /* restart control */
-            if (rc->rc.ch[RC_CH_LV] < -220)
+            if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MIN / 3))
             {
                 serial->c = 0;
             }
 
-            /* Start sending aiming signal */
-            if (rc->rc.ch[RC_CH_LV] > 220)
+            /* Start sending signaling signal */
+            if (rc->rc.ch[RC_CH_LV] > (RC_ROCKER_MAX / 3))
             {
-                aim_on();
+                signal_on("a\n");
             }
 
-            /* End sending aiming signal */
-            else if (rc->rc.ch[RC_CH_LV] < 220)
+            /* End sending signaling signal */
+            else if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MAX / 3))
             {
-                aim_off();
+                signal_off("a\n");
             }
 
             /* relay control, shoot an arrow */
-            if (rc->rc.ch[RC_CH_S] < -650)
+            if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MIN + RC_DEADLINE)
             {
                 /* It starts to spew out gas */
-                jet_middle_on();
+                signal_on("b\n");
             }
             else
             {
+                signal_off("b\n");
                 /* Stop ejecting gas */
                 jet_off();
+            }
+        }
+
+        if (switch_is_down(rc->rc.s[RC_SW_L]) &&
+            switch_is_down(rc->rc.s[RC_SW_R]))
+        {
+            /* relay control, shoot an arrow */
+            if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MIN + RC_DEADLINE)
+            {
+                if (!READ_BIT(archery.task, ARCHERY_TASK_ARROW))
+                {
+                    SET_BIT(archery.task, ARCHERY_TASK_ARROW);
+                    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+                    {
+                        xTaskNotifyGive(task_arrow_handler);
+                    }
+                }
             }
         }
 
@@ -151,13 +170,28 @@ void task_archery(void *pvParameters)
             break;
         }
 
+        case 'D':
+        case 'd':
+        {
+            serial->c = 0;
+            uint32_t set = SERVO_PITCHR_PWMMAX - (uint32_t)((1 / 0.18F) * serial->x);
+            pitch_set(set);
+            do
+            {
+                pitch_update();
+                osDelay(SERVO_UPDATE_MS_PITCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_PITCH) != SERVO_MATCH_PITCH);
+            jet_middle_on();
+            break;
+        }
+
         default:
             break;
         }
 
         archery_update();
 
-        osDelay(2);
+        osDelay(ARCHERY_CONTROL_TIME_MS);
     }
 }
 
