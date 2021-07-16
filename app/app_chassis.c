@@ -63,7 +63,7 @@
 /* in some mode, can use remote control to control rotation speed */
 #define CHASSIS_WZ_CHANNEL RC_CH_LH
 /* rocker value deadline */
-#define CHASSIS_RC_DEADLINE 10
+#define CHASSIS_RC_DEADLINE RC_DEADLINE
 /* chassi forward, back, left, right key */
 #define CHASSIS_FRONT_KEY KEY_PRESSED_OFFSET_W
 #define CHASSIS_BACK_KEY  KEY_PRESSED_OFFSET_S
@@ -100,7 +100,7 @@
 
 #define LIMIT_RC(x, max) ((x) > -(max) && ((x) < (max)) ? 0 : x)
 
-static chassis_move_t move;
+chassis_move_t move;
 
 static void chassis_omni4(float wheel_speed[4],
                           const float vx_set,
@@ -446,6 +446,15 @@ void task_chassis(void *pvParameters)
                 //            l1s.dis2.data,
                 //            l1s.dis2.base,
                 //            l1s.dis2.error);
+                // dma_printf("%i,%u,%X\n",
+                //           l1s.dis2.data,
+                //           l1s.dis2.base,
+                //           l1s.dis2.error);
+                // dma_printf("%i,%i,%i,%i\n",
+                //           move.mo[0].fb->angle,
+                //           move.mo[1].fb->angle,
+                //           move.mo[2].fb->angle,
+                //           move.mo[3].fb->angle);
             }
 
             if (move.rc->rc.ch[RC_CH_LV] < RC_ROCKER_MIN + CHASSIS_RC_DEADLINE)
@@ -473,9 +482,9 @@ void task_chassis(void *pvParameters)
         chassis_ctrl(move.mo[0].i, move.mo[1].i, move.mo[2].i, move.mo[3].i);
 
         // dma_printf("%g,%g,%g\n",
-        //            move.x,
-        //            move.y,
-        //            move.z);
+        //           move.x,
+        //           move.y,
+        //           move.z);
 
         osDelay(CHASSIS_CONTROL_TIME_MS);
     }

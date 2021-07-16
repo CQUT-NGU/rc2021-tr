@@ -92,6 +92,8 @@ typedef struct
     float yaw_set;
 } chassis_move_t;
 
+extern chassis_move_t move;
+
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __APP_CHASSIS_H__ */
 
