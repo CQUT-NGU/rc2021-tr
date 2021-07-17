@@ -23,88 +23,99 @@ extern TIM_HandleTypeDef COUNT_TIM;
 #define SHIFTH_IT_CC   TIM_IT_CC4
 #define SHIFTH_CHANNEL TIM_CHANNEL_4
 
-#define SHIFTH_PWM_DIVIDE 6400
-#define SHIFTH_PWM_DELTA  500
-
 ctrl_step_t step;
 
 void shifth_init(void)
 {
-    __HAL_TIM_ENABLE_IT(&COUNT_TIM, SHIFTH_IT_CC);
+    shifth_zero_cli(SHIFTH_INDEX_CLI);
 }
 
-void shifth_set(uint32_t hz)
+uint32_t shifth_set_dir(int32_t offset)
+{
+    if (offset < 0)
+    {
+        gpio_pin_set(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
+        SET_BIT(step.flag, SHIFTH_FLAG_REVERSE);
+        step.cnt = (uint32_t)-offset;
+    }
+    else
+    {
+        gpio_pin_reset(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
+        CLEAR_BIT(step.flag, SHIFTH_FLAG_REVERSE);
+        step.cnt = (uint32_t)offset;
+    }
+
+    return step.cnt;
+}
+
+void shifth_set_freq(uint32_t hz)
 {
     uint32_t x = (uint32_t)ca_sqrt_u32(SystemCoreClock / hz);
 
     __HAL_TIM_SET_PRESCALER(&SHIFTH_TIM, x - 1);
     __HAL_TIM_SET_AUTORELOAD(&SHIFTH_TIM, x - 1);
-    __HAL_TIM_SetCompare(&SHIFTH_TIM, SHIFTH_CHANNEL, (x >> 1));
+    __HAL_TIM_SET_COMPARE(&SHIFTH_TIM, SHIFTH_CHANNEL, (x >> 1));
 }
 
-void shifth_update(void)
+void shifth_update(uint32_t inc, uint32_t cnt)
 {
-    if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
+    if (READ_BIT(step.flag, SHIFTH_FLAG_AUTO))
     {
         step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
-        if (step.cnt < SHIFTH_PWM_DIVIDE)
+        if (step.cnt < cnt)
         {
-            step.fr += SHIFTH_PWM_DELTA;
-            shifth_set(step.fr);
+            step.fr += inc;
+            shifth_set_freq(step.fr);
         }
     }
 }
 
-void shifth_cli(int32_t idx)
+void shifth_zero_cli(int32_t idx)
 {
-    if (!READ_BIT(step.flag, SHIFTH_FLAG_CLI))
+    if (!READ_BIT(step.flag, SHIFTH_FLAG_ZERO))
     {
-        SET_BIT(step.flag, SHIFTH_FLAG_CLI);
+        SET_BIT(step.flag, SHIFTH_FLAG_ZERO);
+
         shifth_start(idx);
     }
 }
 
 void shifth_index(uint32_t idx)
 {
-    if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
+    step.set = idx;
+
+    if (READ_BIT(step.flag, SHIFTH_FLAG_AUTO))
     {
         shifth_stop();
     }
-    step.set = idx;
+
     if (step.idx != step.set)
     {
-        shifth_start((int32_t)(step.set - step.idx));
+        int32_t delta = (int32_t)(step.set - step.idx);
+        shifth_start(delta);
     }
 }
 
-void shifth_start(int32_t count)
+void shifth_start(int32_t offset)
 {
-    if (count < 0)
-    {
-        gpio_pin_set(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
-        SET_BIT(step.flag, SHIFTH_FLAG_REVERSE);
-        step.cnt = (uint32_t)-count;
-    }
-    else
-    {
-        gpio_pin_reset(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin);
-        CLEAR_BIT(step.flag, SHIFTH_FLAG_REVERSE);
-        step.cnt = (uint32_t)count;
-    }
+    step.fr = 0;
+    SET_BIT(step.flag, SHIFTH_FLAG_AUTO);
 
-    CLEAR_REG(step.fr);
-    SET_BIT(step.flag, SHIFTH_FLAG_RUN);
-
-    __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, step.cnt);
+    __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, shifth_set_dir(offset));
+    __HAL_TIM_ENABLE_IT(&COUNT_TIM, SHIFTH_IT_CC);
     __HAL_TIM_ENABLE(&COUNT_TIM);
 
     HAL_TIM_PWM_Start(&SHIFTH_TIM, SHIFTH_CHANNEL);
-    shifth_update();
+
+    shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
 }
 
 void shifth_stop(void)
 {
+    HAL_TIM_PWM_Stop(&SHIFTH_TIM, SHIFTH_CHANNEL);
+
     step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
+    __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
     __HAL_TIM_DISABLE(&COUNT_TIM);
     if (READ_BIT(step.flag, SHIFTH_FLAG_REVERSE))
     {
@@ -114,7 +125,6 @@ void shifth_stop(void)
     {
         step.idx += step.cnt;
     }
-    __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
 }
 
 /**
@@ -125,22 +135,21 @@ void COUNT_IRQHandler(void)
     if (__HAL_TIM_GET_FLAG(&COUNT_TIM, SHIFTH_IT_CC))
     {
         __HAL_TIM_CLEAR_FLAG(&COUNT_TIM, SHIFTH_IT_CC);
-
-        HAL_TIM_PWM_Stop_IT(&SHIFTH_TIM, SHIFTH_CHANNEL);
+        __HAL_TIM_DISABLE_IT(&COUNT_TIM, SHIFTH_IT_CC);
     }
 
-    if (READ_BIT(step.flag, SHIFTH_FLAG_RUN))
+    if (READ_BIT(step.flag, SHIFTH_FLAG_AUTO))
     {
-        CLEAR_BIT(step.flag, SHIFTH_FLAG_RUN);
+        CLEAR_BIT(step.flag, SHIFTH_FLAG_AUTO);
 
         shifth_stop();
 
         os_printf("idx:%u\r\n", step.idx);
     }
 
-    if (READ_BIT(step.flag, SHIFTH_FLAG_CLI))
+    if (READ_BIT(step.flag, SHIFTH_FLAG_ZERO))
     {
-        CLEAR_BIT(step.flag, SHIFTH_FLAG_CLI);
+        CLEAR_BIT(step.flag, SHIFTH_FLAG_ZERO);
 
         shifth_stop();
 
