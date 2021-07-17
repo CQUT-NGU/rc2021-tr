@@ -33,22 +33,22 @@ ctrl_servo_t servo = {
     .match = SERVO_MATCH_FETCH | SERVO_MATCH_PITCH_ALL | SERVO_MATCH_SHIFTV_ALL,
 };
 
-#define SERVO_UPDATE(htim, ch, flag, ref, set)       \
+#define SERVO_UPDATE(htim, ch, flag, ref, set, inc)  \
     do                                               \
     {                                                \
         int delta = (int)((set) - (ref));            \
         if (delta > 0)                               \
         {                                            \
-            ++(ref);                                 \
+            (ref) += (inc);                          \
         }                                            \
         else if (delta < 0)                          \
         {                                            \
-            --(ref);                                 \
+            (ref) -= (inc);                          \
         }                                            \
         if (delta)                                   \
         {                                            \
-            __HAL_TIM_SET_COMPARE(&htim, ch, (ref)); \
             CLEAR_BIT(servo.match, flag);            \
+            __HAL_TIM_SET_COMPARE(&htim, ch, (ref)); \
         }                                            \
         else                                         \
         {                                            \
@@ -95,66 +95,100 @@ void servo_start(uint32_t pwm[7])
     servo.shiftvr = servo.shiftvr_set - 1;
 }
 
-void fetch_update(void)
+void fetch_set_pwm(uint32_t pwm)
+{
+    fetch_set(pwm);
+    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, FETCH_CHANNEL, pwm);
+}
+
+void fetch_update(uint32_t inc)
 {
     SERVO_UPDATE(MIDDLE_TIM,
                  FETCH_CHANNEL,
                  SERVO_MATCH_FETCH,
                  servo.fetch,
-                 servo.fetch_set);
+                 servo.fetch_set,
+                 inc);
 }
 
-void pitch_update(void)
+void pitch_set_pwm(uint32_t pwm)
+{
+    pitch_set(pwm);
+    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, PITCH_CHANNEL, pwm);
+}
+
+void pitchl_set_pwm(uint32_t pwm)
+{
+    pitchl_set(pwm);
+    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCHL_CHANNEL, pwm);
+}
+
+void pitchr_set_pwm(uint32_t pwm)
+{
+    pitchr_set(pwm);
+    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCHR_CHANNEL, pwm);
+}
+
+void pitch_update(uint32_t inc)
 {
     SERVO_UPDATE(MIDDLE_TIM,
                  PITCH_CHANNEL,
                  SERVO_MATCH_PITCH,
                  servo.pitch,
-                 servo.pitch_set);
+                 servo.pitch_set,
+                 inc);
     SERVO_UPDATE(BESIDE_TIM,
                  PITCHL_CHANNEL,
                  SERVO_MATCH_PITCHL,
                  servo.pitchl,
-                 servo.pitchl_set);
+                 servo.pitchl_set,
+                 inc);
     SERVO_UPDATE(BESIDE_TIM,
                  PITCHR_CHANNEL,
                  SERVO_MATCH_PITCHR,
                  servo.pitchr,
-                 servo.pitchr_set);
+                 servo.pitchr_set,
+                 inc);
 }
 
-void shiftv_update(void)
+void shiftv_set_pwm(uint32_t pwm)
 {
-#if SERVO_CONFIG_SHIFTV_FAST
-    if (servo.shiftv != servo.shiftv_set)
-    {
-        __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, SHIFTV_CHANNEL, servo.shiftv_set);
-    }
-    if (servo.shiftvl != servo.shiftvl_set)
-    {
-        __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVL_CHANNEL, servo.shiftvl_set);
-    }
-    if (servo.shiftvr != servo.shiftvr_set)
-    {
-        __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVR_CHANNEL, servo.shiftvr_set);
-    }
-#else
+    shiftv_set(pwm);
+    __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, SHIFTV_CHANNEL, pwm);
+}
+
+void shiftvl_set_pwm(uint32_t pwm)
+{
+    shiftvl_set(pwm);
+    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVL_CHANNEL, pwm);
+}
+
+void shiftvr_set_pwm(uint32_t pwm)
+{
+    shiftvr_set(pwm);
+    __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVR_CHANNEL, pwm);
+}
+
+void shiftv_update(uint32_t inc)
+{
     SERVO_UPDATE(MIDDLE_TIM,
                  SHIFTV_CHANNEL,
                  SERVO_MATCH_SHIFTV,
                  servo.shiftv,
-                 servo.shiftv_set);
+                 servo.shiftv_set,
+                 inc);
     SERVO_UPDATE(BESIDE_TIM,
                  SHIFTVL_CHANNEL,
                  SERVO_MATCH_SHIFTVL,
                  servo.shiftvl,
-                 servo.shiftvl_set);
+                 servo.shiftvl_set,
+                 inc);
     SERVO_UPDATE(BESIDE_TIM,
                  SHIFTVR_CHANNEL,
                  SERVO_MATCH_SHIFTVR,
                  servo.shiftvr,
-                 servo.shiftvr_set);
-#endif
+                 servo.shiftvr_set,
+                 inc);
 }
 
 /************************ (C) COPYRIGHT NGU ********************END OF FILE****/

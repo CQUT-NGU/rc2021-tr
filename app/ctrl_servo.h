@@ -15,15 +15,18 @@
 
 #include "ctrl.h"
 
-#define SERVO_CONFIG_SHIFTV_FAST 1
+#define SERVO_UPDATE_MS        2
+#define SERVO_UPDATE_MS_PITCH  SERVO_UPDATE_MS
+#define SERVO_UPDATE_MS_FETCH  SERVO_UPDATE_MS
+#define SERVO_UPDATE_MS_SHIFTV 2
 
 #define SERVO_PWMMID 1500
 
 #define SERVO_FETCH_PWMMAX 1780
 #define SERVO_FETCH_PWMMID 1660
-#define SERVO_FETCH_PWMMIN 1100
+#define SERVO_FETCH_PWMMIN 1050
 
-#define SERVO_PITCH_PWMMAX 2200
+#define SERVO_PITCH_PWMMAX 2300
 #define SERVO_PITCH_PWMMID 1500
 #define SERVO_PITCH_PWMMIN 1000
 
@@ -96,52 +99,116 @@ extern void servo_init(void);
 */
 extern void servo_start(uint32_t pwm[7]);
 
-extern void fetch_update(void);
-extern void pitch_update(void);
-extern void shiftv_update(void);
+extern void fetch_set_pwm(uint32_t pwm);
+extern void pitch_set_pwm(uint32_t pwm);
+extern void pitchl_set_pwm(uint32_t pwm);
+extern void pitchr_set_pwm(uint32_t pwm);
+extern void shiftv_set_pwm(uint32_t pwm);
+extern void shiftvr_set_pwm(uint32_t pwm);
+extern void shiftvl_set_pwm(uint32_t pwm);
+
+extern void fetch_update(uint32_t inc);
+extern void pitch_update(uint32_t inc);
+extern void shiftv_update(uint32_t inc);
 
 __END_DECLS
 
 __STATIC_INLINE
 void fetch_set(uint32_t pwm)
 {
-    servo.fetch_set = pwm;
+    if (servo.fetch != pwm)
+    {
+        servo.fetch_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_FETCH);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_FETCH);
+    }
 }
 
 __STATIC_INLINE
 void pitch_set(uint32_t pwm)
 {
-    servo.pitch_set = pwm;
+    if (servo.pitch != pwm)
+    {
+        servo.pitch_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_PITCH);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_PITCH);
+    }
 }
 
 __STATIC_INLINE
 void pitchl_set(uint32_t pwm)
 {
-    servo.pitchr_set = pwm;
+    if (servo.pitchl != pwm)
+    {
+        servo.pitchl_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_PITCHL);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_PITCHL);
+    }
 }
 
 __STATIC_INLINE
 void pitchr_set(uint32_t pwm)
 {
-    servo.pitchr_set = pwm;
+    if (servo.pitchr != pwm)
+    {
+        servo.pitchr_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_PITCHR);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_PITCHR);
+    }
 }
 
 __STATIC_INLINE
 void shiftv_set(uint32_t pwm)
 {
-    servo.shiftv_set = pwm;
+    if (servo.shiftv != pwm)
+    {
+        servo.shiftv_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_SHIFTV);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_SHIFTV);
+    }
 }
 
 __STATIC_INLINE
 void shiftvl_set(uint32_t pwm)
 {
-    servo.shiftvl_set = pwm;
+    if (servo.shiftvl != pwm)
+    {
+        servo.shiftvl_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_SHIFTVL);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_SHIFTVL);
+    }
 }
 
 __STATIC_INLINE
 void shiftvr_set(uint32_t pwm)
 {
-    servo.shiftvr_set = pwm;
+    if (servo.shiftvr != pwm)
+    {
+        servo.shiftvr_set = pwm;
+        CLEAR_BIT(servo.match, SERVO_MATCH_SHIFTVR);
+    }
+    else
+    {
+        SET_BIT(servo.match, SERVO_MATCH_SHIFTVR);
+    }
 }
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
