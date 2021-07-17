@@ -19,23 +19,23 @@
 #define ARCHERY_CONTROL_TIME_MS 2
 #define ARCHERY_CONTROL_TIME    0.002F
 
-#define ARCHERY_LOAD_NONE (0)       //!< none
-#define ARCHERY_CLIP_FL   (1 << 0)  //!< clip arrow device on the far left
-#define ARCHERY_CLIP_L    (1 << 1)  //!< clip arrow device on the left
-#define ARCHERY_CLIP_M    (1 << 2)  //!< clip arrow device in the middle
-#define ARCHERY_CLIP_R    (1 << 3)  //!< clip arrow device on the right
-#define ARCHERY_CLIP_FR   (1 << 4)  //!< clip arrow device on the far right
-#define ARCHERY_LOAD_L    (1 << 5)  //!< load arrow device on the left
-#define ARCHERY_LOAD_M    (1 << 6)  //!< load arrow device in the middle
-#define ARCHERY_LOAD_R    (1 << 7)  //!< load arrow device on the right
+#define ARCHERY_LOAD_RESET (0)       //!< reset
+#define ARCHERY_CLIP_FL    (1 << 0)  //!< clip arrow device on the far left
+#define ARCHERY_CLIP_L     (1 << 1)  //!< clip arrow device on the left
+#define ARCHERY_CLIP_M     (1 << 2)  //!< clip arrow device in the middle
+#define ARCHERY_CLIP_R     (1 << 3)  //!< clip arrow device on the right
+#define ARCHERY_CLIP_FR    (1 << 4)  //!< clip arrow device on the far right
+#define ARCHERY_LOAD_L     (1 << 5)  //!< load arrow device on the left
+#define ARCHERY_LOAD_M     (1 << 6)  //!< load arrow device in the middle
+#define ARCHERY_LOAD_R     (1 << 7)  //!< load arrow device on the right
 /* clip arrow device at the edge */
 #define ARCHERY_CLIP_F (ARCHERY_CLIP_FL | ARCHERY_CLIP_FR)
 
-#define ARCHERY_SIGNAL_NONE (0)       //!< none
-#define ARCHERY_SIGNAL_DO   (1 << 0)  //!< signal do
-#define ARCHERY_SIGNAL_DONE (1 << 1)  //!< signal done
+#define ARCHERY_SIGNAL_RESET (0)       //!< reset
+#define ARCHERY_SIGNAL_DO    (1 << 0)  //!< signal do
+#define ARCHERY_SIGNAL_DONE  (1 << 1)  //!< signal done
 
-#define ARCHERY_JET_NONE   (0)       //!< none
+#define ARCHERY_JET_RESET  (0)       //!< reset
 #define ARCHERY_JET_ON     (1 << 0)  //!< open the jet
 #define ARCHERY_JET_OFF    (1 << 1)  //!< shot down the jet
 #define ARCHERY_JET_CNT    (1 << 2)  //!< jet counting
@@ -44,6 +44,7 @@
 #define ARCHERY_JET_RIGHT  (1 << 6)  //!< jet on the right
 #define ARCHERY_JET_COUNT  (ARCHERY_JET_TIME_MS / ARCHERY_CONTROL_TIME_MS)
 
+#define ARCHERY_TASK_RESET (0)       //!< reset
 #define ARCHERY_TASK_ARROW (1 << 0)  //!< run arrow
 
 typedef struct
@@ -55,7 +56,7 @@ typedef struct
 
     unsigned int jet_count;  //!< count of jet time
     uint32_t tick;           //!< count of run
-    char msg[2];             //!<
+    char msg[2];             //!< content of message
 } archery_t;
 
 extern archery_t archery;

@@ -11,19 +11,12 @@
 
 #include "app_archery.h"
 
-#define SHOOT_COUNT      100
-#define FLAG_SHOOT_START (1 << 0)
-#define FLAG_SHOOT_COUNT (1 << 1)
-#define FLAG_SHOOT_STOP  (1 << 2)
-
-#define SIGNAL_SIGNALING_NONE (1 << 0)  //!< none
-#define SIGNAL_SIGNALING_DO   (1 << 1)  //!< signal do
-#define SIGNAL_SIGNALING_DONE (1 << 2)  //!< signal done
-
 archery_t archery = {
-    .jet = ARCHERY_JET_NONE,
-    .load = ARCHERY_LOAD_NONE,
-    .signal = ARCHERY_SIGNAL_NONE,
+    .jet = ARCHERY_JET_RESET,
+    .task = ARCHERY_TASK_RESET,
+    .load = ARCHERY_LOAD_RESET,
+    .signal = ARCHERY_SIGNAL_RESET,
+    .tick = 0,
     .jet_count = 0,
 };
 
@@ -39,7 +32,7 @@ void archery_update(void)
     if (READ_BIT(archery.jet, ARCHERY_JET_CNT) &&
         archery.jet_count++ == ARCHERY_JET_COUNT)
     {
-        archery.jet_count = 0;
+        CLEAR_REG(archery.jet_count);
         SET_BIT(archery.jet, ARCHERY_JET_OFF);
         if (READ_BIT(archery.jet, ARCHERY_JET_LEFT))
         {
@@ -58,8 +51,10 @@ void archery_update(void)
         }
     }
 
-    shifth_update();
-    shiftv_update();
+    shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
+    shiftv_update(10);
+    fetch_update(1);
+    pitch_update(1);
 
     if (archery.tick % (SERVO_UPDATE_MS / ARCHERY_CONTROL_TIME_MS) == 0)
     {
@@ -68,8 +63,6 @@ void archery_update(void)
          * prevent the PWM from changing too much to
          * cause the steering gear to jam
         */
-        fetch_update();
-        pitch_update();
     }
 
     l1s_check();
@@ -98,9 +91,8 @@ void task_archery(void *pvParameters)
         };
         servo_init();
         servo_start(pwm);
-        pitch_update();
+        pitch_update(1);
         shifth_init();
-        shifth_cli(-330000);
     }
 
     for (;;)
@@ -178,7 +170,7 @@ void task_archery(void *pvParameters)
             pitch_set(set);
             do
             {
-                pitch_update();
+                pitch_update(1);
                 osDelay(SERVO_UPDATE_MS_PITCH);
             } while (READ_BIT(servo.match, SERVO_MATCH_PITCH) != SERVO_MATCH_PITCH);
             jet_middle_on();
