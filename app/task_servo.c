@@ -35,8 +35,6 @@ void task_servo(void *pvParameters)
 
     osDelay(500);
 
-    const ctrl_rc_t *rc = ctrl_rc_point();
-
     ctrl_serial_t *serial = ctrl_serial_point();
 
     while (1)
