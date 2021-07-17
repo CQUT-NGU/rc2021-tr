@@ -33,27 +33,32 @@ ctrl_servo_t servo = {
     .match = SERVO_MATCH_FETCH | SERVO_MATCH_PITCH_ALL | SERVO_MATCH_SHIFTV_ALL,
 };
 
-#define SERVO_UPDATE(htim, ch, flag, ref, set, inc)  \
-    do                                               \
-    {                                                \
-        int delta = (int)((set) - (ref));            \
-        if (delta > 0)                               \
-        {                                            \
-            (ref) += (inc);                          \
-        }                                            \
-        else if (delta < 0)                          \
-        {                                            \
-            (ref) -= (inc);                          \
-        }                                            \
-        if (delta)                                   \
-        {                                            \
-            CLEAR_BIT(servo.match, flag);            \
-            __HAL_TIM_SET_COMPARE(&htim, ch, (ref)); \
-        }                                            \
-        else                                         \
-        {                                            \
-            SET_BIT(servo.match, flag);              \
-        }                                            \
+#define SERVO_UPDATE(htim, ch, flag, ref, set, inc) \
+    do                                              \
+    {                                               \
+        int delta = (int)((set) - (ref));           \
+        if (delta >= (int)(inc))                    \
+        {                                           \
+            (ref) = (ref) + (inc);                  \
+        }                                           \
+        else if (delta <= -(int)(inc))              \
+        {                                           \
+            (ref) = (ref) - (inc);                  \
+        }                                           \
+        else                                        \
+        {                                           \
+            (ref) = (set);                          \
+            delta = 0;                              \
+        }                                           \
+        if (delta)                                  \
+        {                                           \
+            CLEAR_BIT(servo.match, flag);           \
+        }                                           \
+        else                                        \
+        {                                           \
+            SET_BIT(servo.match, flag);             \
+        }                                           \
+        __HAL_TIM_SET_COMPARE(&htim, ch, (ref));    \
     } while (0)
 
 void servo_init(void)
@@ -76,28 +81,20 @@ void servo_start(uint32_t pwm[7])
     HAL_TIM_PWM_Start(&BESIDE_TIM, PITCHR_CHANNEL);
     HAL_TIM_PWM_Start(&BESIDE_TIM, SHIFTVR_CHANNEL);
 
-    servo.fetch_set = pwm[0];
-    servo.fetch = servo.fetch_set - 1;
+    fetch_set_pwm(pwm[0]);
+    pitch_set_pwm(pwm[1]);
+    shiftv_set_pwm(pwm[2]);
 
-    servo.pitch_set = pwm[1];
-    servo.pitch = servo.pitch_set - 1;
-    servo.shiftv_set = pwm[2];
-    servo.shiftv = servo.shiftv_set - 1;
-
-    servo.pitchl_set = pwm[3];
-    servo.pitchl = servo.pitchl_set - 1;
-    servo.shiftvl_set = pwm[4];
-    servo.shiftvl = servo.shiftvl_set - 1;
-
-    servo.pitchr_set = pwm[5];
-    servo.pitchr = servo.pitchr_set - 1;
-    servo.shiftvr_set = pwm[6];
-    servo.shiftvr = servo.shiftvr_set - 1;
+    pitchl_set_pwm(pwm[3]);
+    shiftvl_set_pwm(pwm[4]);
+    pitchr_set_pwm(pwm[5]);
+    shiftvr_set_pwm(pwm[6]);
 }
 
 void fetch_set_pwm(uint32_t pwm)
 {
     fetch_set(pwm);
+    servo.fetch = pwm;
     __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, FETCH_CHANNEL, pwm);
 }
 
@@ -114,18 +111,21 @@ void fetch_update(uint32_t inc)
 void pitch_set_pwm(uint32_t pwm)
 {
     pitch_set(pwm);
+    servo.pitch = pwm;
     __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, PITCH_CHANNEL, pwm);
 }
 
 void pitchl_set_pwm(uint32_t pwm)
 {
     pitchl_set(pwm);
+    servo.pitchl = pwm;
     __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCHL_CHANNEL, pwm);
 }
 
 void pitchr_set_pwm(uint32_t pwm)
 {
     pitchr_set(pwm);
+    servo.pitchr = pwm;
     __HAL_TIM_SET_COMPARE(&BESIDE_TIM, PITCHR_CHANNEL, pwm);
 }
 
@@ -154,18 +154,21 @@ void pitch_update(uint32_t inc)
 void shiftv_set_pwm(uint32_t pwm)
 {
     shiftv_set(pwm);
+    servo.shiftv = pwm;
     __HAL_TIM_SET_COMPARE(&MIDDLE_TIM, SHIFTV_CHANNEL, pwm);
 }
 
 void shiftvl_set_pwm(uint32_t pwm)
 {
     shiftvl_set(pwm);
+    servo.shiftvl = pwm;
     __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVL_CHANNEL, pwm);
 }
 
 void shiftvr_set_pwm(uint32_t pwm)
 {
     shiftvr_set(pwm);
+    servo.shiftvr = pwm;
     __HAL_TIM_SET_COMPARE(&BESIDE_TIM, SHIFTVR_CHANNEL, pwm);
 }
 
