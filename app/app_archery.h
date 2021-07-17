@@ -15,7 +15,7 @@
 
 #include "app.h"
 
-#define ARCHERY_JET_TIME_MS     200
+#define ARCHERY_JET_TIME_MS     250
 #define ARCHERY_CONTROL_TIME_MS 2
 #define ARCHERY_CONTROL_TIME    0.002F
 
@@ -164,23 +164,23 @@ void jet_off(void)
 }
 
 __STATIC_INLINE
-void signal_on(void *data)
+void signal_on(const void *data)
 {
     if (!READ_BIT(archery.signal, ARCHERY_SIGNAL_DONE))
     {
         SET_BIT(archery.signal, ARCHERY_SIGNAL_DO);
-        char *msg = (char *)data;
+        const char *msg = (const char *)data;
         archery.msg[0] = msg[0];
         archery.msg[1] = msg[1];
     }
 }
 
 __STATIC_INLINE
-void signal_off(void *data)
+void signal_off(const void *data)
 {
     if (READ_BIT(archery.signal, ARCHERY_SIGNAL_DONE))
     {
-        char *msg = (char *)data;
+        const char *msg = (const char *)data;
         if (archery.msg[0] == msg[0])
         {
             CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_DONE);

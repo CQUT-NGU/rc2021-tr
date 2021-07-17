@@ -173,6 +173,7 @@ void task_archery(void *pvParameters)
                 pitch_update(1);
                 osDelay(SERVO_UPDATE_MS_PITCH);
             } while (READ_BIT(servo.match, SERVO_MATCH_PITCH) != SERVO_MATCH_PITCH);
+            osDelay(500);
             jet_middle_on();
             break;
         }

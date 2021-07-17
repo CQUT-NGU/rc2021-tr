@@ -25,114 +25,164 @@ void task_arrow(void *pvParameters)
         {
         }
 
-        pitch_set(SERVO_PITCH_PWMMAX);
-        pitchl_set(SERVO_PITCHL_PWMMAX);
-        pitchr_set(SERVO_PITCHR_PWMMAX);
-
-        /* clip is in the vertical position */
-        fetch_set(SERVO_FETCH_PWMMID);
-        do
+        /* Indicates that the operator task is about to begin */
         {
-            osDelay(10);
+            buzzer_start();
+            buzzer_set(NOTEFREQS_A5, BUZZER_PWM_DIV2);
+            osDelay(200);
+            buzzer_stop();
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-        osDelay(1000);
-
-        /* clip to the low */
-        fetch_set(SERVO_FETCH_PWMMAX);
-        do
+        /* Check whether the pitching device is in the middle position */
         {
-            osDelay(10);
+            pitch_set_pwm(SERVO_PITCH_PWMMAX - 200);
+            pitchl_set_pwm(SERVO_PITCHL_PWMMAX - 200);
+            pitchr_set_pwm(SERVO_PITCHR_PWMMAX - 200);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-        osDelay(1000);
-
-        /* clip on all */
-        clip_edge_on();
-        clip_left_on();
-        clip_middle_on();
-        clip_right_on();
-        osDelay(500);
-
-        /* lift up */
-        fetch_set(SERVO_FETCH_PWMMID);
-        do
+        /* Check whether the clip arrow device is in the vertical position */
         {
-            osDelay(10);
+            fetch_set(SERVO_FETCH_PWMMID);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_PITCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
+            osDelay(1000);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-        osDelay(1000);
-
-        /* backward */
-        // osDelay(1000);
-
-        /*  */
-        fetch_set(SERVO_FETCH_PWMMIN);
-        do
+        /* Check that the horizontal moving device is in proper position */
         {
-            osDelay(10);
+            shifth_index(SHIFTH_INDEX_MIDDLE);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-        osDelay(1000);
-
-        shiftv_set(SERVO_SHIFTV_PWMMIN);
-        shiftvl_set(SERVO_SHIFTVL_PWMMIN);
-        shiftvr_set(SERVO_SHIFTVR_PWMMIN);
-        do
+        /* Check whether the clip arrow device is aligned with its arrow */
         {
-            osDelay(10);
+            fetch_set(SERVO_FETCH_PWMMAX);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_FETCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
+            osDelay(1000);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV_ALL) != SERVO_MATCH_SHIFTV_ALL);
-        osDelay(1000);
-
-        /* clip off in the middle and at edge */
-        clip_edge_off();
-        clip_middle_off();
-        osDelay(500);
-
-        pitch_set(SERVO_PITCH_PWMMAX - 200);
-        pitchl_set(SERVO_PITCHL_PWMMAX - 200);
-        pitchr_set(SERVO_PITCHR_PWMMAX - 200);
-        do
+        /* Clamp all the arrows */
         {
-            osDelay(10);
+            clip_edge_on();
+            clip_left_on();
+            clip_middle_on();
+            clip_right_on();
+            osDelay(500);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
-        osDelay(1000);
-
-        shiftv_set(SERVO_SHIFTV_PWMMAX);
-        shiftvl_set(SERVO_SHIFTV_PWMMAX);
-        shiftvr_set(SERVO_SHIFTV_PWMMAX);
-        do
+        /* Check whether the clip arrow device is in the vertical direction */
         {
-            osDelay(10);
+            fetch_set(SERVO_FETCH_PWMMID);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_FETCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
+            osDelay(1000);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV_ALL) != SERVO_MATCH_SHIFTV_ALL);
-        osDelay(1000);
-
-        pitch_set(SERVO_PITCH_PWMMAX - 500);
-        pitchl_set(SERVO_PITCHL_PWMMAX - 500);
-        pitchr_set(SERVO_PITCHR_PWMMAX - 500);
-        do
+        /* Check whether the archery device is down */
         {
-            osDelay(10);
+            pitch_set(SERVO_PITCH_PWMMAX);
+            pitchl_set(SERVO_PITCHL_PWMMAX);
+            pitchr_set(SERVO_PITCHR_PWMMAX);
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
-        osDelay(2000);
-
-        pitch_set(SERVO_PITCH_PWMMAX - 200);
-        pitchl_set(SERVO_PITCHL_PWMMAX - 200);
-        pitchr_set(SERVO_PITCHR_PWMMAX - 200);
-        do
+        /* The robot move back and lift the arrow */
         {
-            osDelay(10);
+            // move.vy_set = -0.5F;
+            fetch_set(SERVO_FETCH_PWMMIN);
+            osDelay(1000);
+            move.vy_set = 0;
+        }
 
-        } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
+        /* Check if the clip arrow is horizontal */
+        {
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_FETCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
+            osDelay(100);
+        }
 
-        buzzer_start();
-        buzzer_set(0, BUZZER_PWM_DIV2);
-        osDelay(200);
-        buzzer_stop();
+        /* Put the arrow */
+        {
+            shiftv_set(SERVO_SHIFTV_PWMMAX + 400);
+            shiftvl_set(SERVO_SHIFTVL_PWMMAX + 400);
+            shiftvr_set(SERVO_SHIFTVR_PWMMAX + 400);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_SHIFTV);
+            } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV_ALL) != SERVO_MATCH_SHIFTV_ALL);
+            osDelay(1000);
+        }
+
+        /* Loosen the arrows on both sides and in the middle */
+        {
+            clip_edge_off();
+            clip_middle_off();
+            osDelay(500);
+        }
+
+        /* The archery device lifts the arrow */
+        {
+            pitch_set(SERVO_PITCH_PWMMAX - 200);
+            pitchl_set(SERVO_PITCHL_PWMMAX - 200);
+            pitchr_set(SERVO_PITCHR_PWMMAX - 200);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_PITCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
+            osDelay(1000);
+        }
+
+        /* The archery set back */
+        {
+            shiftv_set(SERVO_SHIFTV_PWMMIN);
+            shiftvl_set(SERVO_SHIFTV_PWMMIN);
+            shiftvr_set(SERVO_SHIFTV_PWMMIN);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_SHIFTV);
+            } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV_ALL) != SERVO_MATCH_SHIFTV_ALL);
+            osDelay(1000);
+        }
+
+        /* The archery apparatus was raised to the top to load the arrows */
+        {
+            pitch_set(SERVO_PITCH_PWMMAX - 400);
+            pitchl_set(SERVO_PITCHL_PWMMAX - 400);
+            pitchr_set(SERVO_PITCHR_PWMMAX - 400);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_PITCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
+            osDelay(1000);
+        }
+
+        /* The archery device drops an arrow */
+        {
+            pitch_set(SERVO_PITCH_PWMMAX - 200);
+            pitchl_set(SERVO_PITCHL_PWMMAX - 200);
+            pitchr_set(SERVO_PITCHR_PWMMAX - 200);
+            do
+            {
+                osDelay(SERVO_UPDATE_MS_PITCH);
+            } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
+        }
+
+        /* Indicates that the operator task has been completed */
+        {
+            buzzer_start();
+            buzzer_set(NOTEFREQS_A5, BUZZER_PWM_DIV2);
+            osDelay(200);
+            buzzer_stop();
+        }
+
+        CLEAR_BIT(archery.task, ARCHERY_TASK_ARROW);
     }
 }
 

@@ -35,12 +35,10 @@ C_SOURCES += app/ctrl_step.c
 C_SOURCES += app/ctrl_l1s.c
 
 C_SOURCES += app/app_led.c
+C_SOURCES += app/app_debug.c
 C_SOURCES += app/app_chassis.c
 C_SOURCES += app/app_archery.c
 C_SOURCES += app/app_arrow.c
-
-C_SOURCES += app/task_servo.c
-C_SOURCES += app/task_step.c
 
 C_SOURCES += ca/ca-pid.c
 C_SOURCES += ca/ca-math.c
