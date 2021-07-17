@@ -114,9 +114,9 @@ void shifth_stop(void)
 {
     HAL_TIM_PWM_Stop(&SHIFTH_TIM, SHIFTH_CHANNEL);
 
+    __HAL_TIM_DISABLE(&COUNT_TIM);
     step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
     __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
-    __HAL_TIM_DISABLE(&COUNT_TIM);
     if (READ_BIT(step.flag, SHIFTH_FLAG_REVERSE))
     {
         step.idx -= step.cnt;

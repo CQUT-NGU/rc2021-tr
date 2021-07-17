@@ -27,17 +27,17 @@ void task_debug(void *pvParameters)
         {
             uint32_t tmp;
 
-            tmp = (uint32_t)serial->y;
+            tmp = (uint32_t)serial->x;
             if (tmp > 100)
             {
                 pitch_set(tmp);
             }
-            tmp = (uint32_t)serial->z;
+            tmp = (uint32_t)serial->y;
             if (tmp > 100)
             {
                 shiftv_set(tmp);
             }
-            tmp = (uint32_t)serial->x;
+            tmp = (uint32_t)serial->z;
             if (tmp > 100)
             {
                 fetch_set(tmp);
