@@ -21,8 +21,6 @@
 #define CHASSIS_CONTROL_TIME (0.001F * CHASSIS_CONTROL_TIME_MS)
 /* chassis control frequence */
 #define CHASSIS_CONTROL_FREQUENCE (1000 / CHASSIS_CONTROL_TIME_MS)
-/* chassis 3508 max motor control current */
-#define MAX_MOTOR_CAN_CURRENT 0x4000
 
 /*!
  M3508 rmp change to chassis speed
