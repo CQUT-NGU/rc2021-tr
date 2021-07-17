@@ -52,7 +52,16 @@ void task_debug(void *pvParameters)
             int32_t tmp;
 
             tmp = (int32_t)serial->x;
-            shifth_start(tmp);
+            if (tmp)
+            {
+                shifth_start(tmp);
+            }
+
+            tmp = (int32_t)serial->y;
+            if (tmp)
+            {
+                shifth_index(tmp);
+            }
 
             serial->c = 0;
             break;
