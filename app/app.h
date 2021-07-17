@@ -31,6 +31,8 @@
 #include "app_archery.h"
 #include "app_arrow.h"
 
+extern TaskHandle_t task_arrow_handler;
+
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __APP_H__ */
 

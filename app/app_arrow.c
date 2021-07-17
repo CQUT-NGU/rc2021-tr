@@ -35,9 +35,16 @@ void task_arrow(void *pvParameters)
 
         /* Check whether the pitching device is in the middle position */
         {
-            pitch_set_pwm(SERVO_PITCH_PWMMAX - 200);
-            pitchl_set_pwm(SERVO_PITCHL_PWMMAX - 200);
-            pitchr_set_pwm(SERVO_PITCHR_PWMMAX - 200);
+            pitch_set(SERVO_PITCH_PWMMAX - 200);
+            pitchl_set(SERVO_PITCHL_PWMMAX - 200);
+            pitchr_set(SERVO_PITCHR_PWMMAX - 200);
+        }
+
+        /* The archery set back */
+        {
+            shiftv_set_pwm(SERVO_SHIFTV_PWMMIN);
+            shiftvl_set_pwm(SERVO_SHIFTV_PWMMIN);
+            shiftvr_set_pwm(SERVO_SHIFTV_PWMMIN);
         }
 
         /* Check whether the clip arrow device is in the vertical position */
@@ -52,7 +59,7 @@ void task_arrow(void *pvParameters)
 
         /* Check that the horizontal moving device is in proper position */
         {
-            shifth_index(SHIFTH_INDEX_MIDDLE);
+            shifth_index(SHIFTH_INDEX_LEFT);
         }
 
         /* Check whether the clip arrow device is aligned with its arrow */
@@ -123,7 +130,7 @@ void task_arrow(void *pvParameters)
         /* Loosen the arrows on both sides and in the middle */
         {
             clip_edge_off();
-            clip_middle_off();
+            clip_left_off();
             osDelay(500);
         }
 
@@ -161,6 +168,11 @@ void task_arrow(void *pvParameters)
                 osDelay(SERVO_UPDATE_MS_PITCH);
             } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
             osDelay(1000);
+        }
+
+        /* Check that the horizontal moving device is in proper position */
+        {
+            shifth_index(SHIFTH_INDEX_MIDDLE);
         }
 
         /* The archery device drops an arrow */

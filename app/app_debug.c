@@ -60,7 +60,7 @@ void task_debug(void *pvParameters)
             tmp = (int32_t)serial->y;
             if (tmp)
             {
-                shifth_index(tmp);
+                shifth_index((uint32_t)tmp);
             }
 
             serial->c = 0;
@@ -110,6 +110,22 @@ void task_debug(void *pvParameters)
             }
 
             serial->c = 0;
+            break;
+        }
+
+        case 't':
+        {
+            serial->c = 0;
+
+            int tmp = (int)serial->x;
+            if (tmp == 1)
+            {
+                if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+                {
+                    xTaskNotifyGive(task_arrow_handler);
+                }
+            }
+
             break;
         }
 

@@ -53,8 +53,8 @@ void archery_update(void)
 
     shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
     shiftv_update(10);
-    fetch_update(1);
     pitch_update(1);
+    fetch_update(1);
 
     if (archery.tick % (SERVO_UPDATE_MS / ARCHERY_CONTROL_TIME_MS) == 0)
     {
@@ -91,7 +91,6 @@ void task_archery(void *pvParameters)
         };
         servo_init();
         servo_start(pwm);
-        pitch_update(1);
         shifth_init();
     }
 
@@ -152,16 +151,6 @@ void task_archery(void *pvParameters)
 
         switch (serial->c)
         {
-        case 't':
-        {
-            serial->c = 0;
-            if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-            {
-                xTaskNotifyGive(task_arrow_handler);
-            }
-            break;
-        }
-
         case 'D':
         case 'd':
         {
