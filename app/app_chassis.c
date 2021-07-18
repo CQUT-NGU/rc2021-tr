@@ -389,27 +389,30 @@ void task_chassis(void *pvParameters)
         }
 
         case CHASSIS_VECTOR_SLOW:
+        {
+            chassis_rc();
+
+            /* in slow mode, the speed will decrease */
+            move.vx_set *= CHASSIS_RC_SLOW_SEN;
+            move.vy_set *= CHASSIS_RC_SLOW_SEN;
+            move.wz_set *= CHASSIS_RC_SLOW_SEN;
+
+            chassis_serial();
+
+            break;
+        }
+
         case CHASSIS_VECTOR_NORMAL:
         {
             chassis_rc();
 
-            if (move.mode == CHASSIS_VECTOR_SLOW)
-            {
-                /* in slow mode, the speed will decrease */
-                move.vx_set *= CHASSIS_RC_SLOW_SEN;
-                move.vy_set *= CHASSIS_RC_SLOW_SEN;
-                move.wz_set *= CHASSIS_RC_SLOW_SEN;
-            }
-            else
-            {
-                /**
-                 * first order low-pass replace ramp function,
-                 * calculate chassis speed set-point to improve control performance
-                */
-                move.vx_set = ca_lpf_f32(move.vx_slow, move.vx_set);
-                move.vy_set = ca_lpf_f32(move.vy_slow, move.vy_set);
-                move.wz_set = ca_lpf_f32(move.wz_slow, move.wz_set);
-            }
+            /**
+             * first order low-pass replace ramp function,
+             * calculate chassis speed set-point to improve control performance
+            */
+            move.vx_set = ca_lpf_f32(move.vx_slow, move.vx_set);
+            move.vy_set = ca_lpf_f32(move.vy_slow, move.vy_set);
+            move.wz_set = ca_lpf_f32(move.wz_slow, move.wz_set);
 
             break; /* CHASSIS_VECTOR_SLOW CHASSIS_VECTOR_NORMAL */
         }
