@@ -19,7 +19,7 @@ void task_debug(void *pvParameters)
 
     ctrl_serial_t *serial = ctrl_serial_point();
 
-    while (1)
+    for (;;)
     {
         switch (serial->c)
         {
@@ -62,6 +62,46 @@ void task_debug(void *pvParameters)
             {
                 shifth_index((uint32_t)tmp);
             }
+
+            serial->c = 0;
+            break;
+        }
+
+        case 'd':
+        {
+            uint32_t set = 200;
+
+            int match = SERVO_MATCH_PITCH;
+            void (*pitch)(uint32_t) = pitch_set;
+            void (*jet_on)(void) = jet_middle_on;
+
+            if (serial->y > 0)
+            {
+                set = (uint32_t)((1 / 0.18F) * serial->y);
+            }
+            else if (serial->x > 0)
+            {
+                set = (uint32_t)((1 / 0.18F) * serial->x);
+                match = SERVO_MATCH_PITCHL;
+                pitch = pitchl_set;
+                jet_on = jet_left_on;
+            }
+            else if (serial->z > 0)
+            {
+                set = (uint32_t)((1 / 0.18F) * serial->z);
+                match = SERVO_MATCH_PITCHR;
+                pitch = pitchr_set;
+                jet_on = jet_right_on;
+            }
+
+            pitch(2000 - set);
+            do
+            {
+                pitch_update(2);
+                osDelay(SERVO_UPDATE_MS_PITCH);
+            } while (READ_BIT(servo.match, match) != match);
+            osDelay(400);
+            jet_on();
 
             serial->c = 0;
             break;
@@ -123,6 +163,13 @@ void task_debug(void *pvParameters)
                 if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
                 {
                     xTaskNotifyGive(task_arrow_handler);
+                }
+            }
+            else if (tmp == 2)
+            {
+                if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+                {
+                    xTaskNotifyGive(task_shoot_handler);
                 }
             }
 
