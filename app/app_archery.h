@@ -46,6 +46,7 @@
 
 #define ARCHERY_TASK_RESET (0)       //!< reset
 #define ARCHERY_TASK_ARROW (1 << 0)  //!< run arrow
+#define ARCHERY_TASK_SHOOT (1 << 1)  //!< run shoot
 
 typedef struct
 {
@@ -54,9 +55,10 @@ typedef struct
     int load;    //!< state of loading
     int signal;  //!< state of signaling
 
+    char msg[2];             //!< content of message
     unsigned int jet_count;  //!< count of jet time
     uint32_t tick;           //!< count of run
-    char msg[2];             //!< content of message
+    float angle;             //!< angle of shoot
 } archery_t;
 
 extern archery_t archery;

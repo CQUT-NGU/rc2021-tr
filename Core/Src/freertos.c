@@ -104,6 +104,13 @@ const osThreadAttr_t debug_attributes = {
   .stack_size = sizeof(debugBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for shoot */
+osThreadId_t shootHandle;
+const osThreadAttr_t shoot_attributes = {
+  .name = "shoot",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityRealtime,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -115,6 +122,7 @@ extern void task_chassis(void *argument);
 extern void task_archery(void *argument);
 extern void task_arrow(void *argument);
 extern void task_debug(void *argument);
+extern void task_shoot(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -159,6 +167,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of debug */
   debugHandle = osThreadNew(task_debug, NULL, &debug_attributes);
+
+  /* creation of shoot */
+  shootHandle = osThreadNew(task_shoot, NULL, &shoot_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

@@ -32,7 +32,7 @@ void archery_update(void)
     if (READ_BIT(archery.jet, ARCHERY_JET_CNT) &&
         archery.jet_count++ == ARCHERY_JET_COUNT)
     {
-        CLEAR_REG(archery.jet_count);
+        archery.jet_count = 0;
         SET_BIT(archery.jet, ARCHERY_JET_OFF);
         if (READ_BIT(archery.jet, ARCHERY_JET_LEFT))
         {
@@ -84,10 +84,10 @@ void task_archery(void *pvParameters)
             SERVO_FETCH_PWMMID,
             SERVO_PITCH_PWMMAX - 200,
             SERVO_SHIFTV_PWMMIN,
-            SERVO_PITCH_PWMMAX - 200,
-            SERVO_SHIFTV_PWMMIN,
-            SERVO_PITCH_PWMMAX - 200,
-            SERVO_SHIFTV_PWMMIN,
+            SERVO_PITCHL_PWMMAX - 200,
+            SERVO_SHIFTVL_PWMMIN,
+            SERVO_PITCHR_PWMMAX - 200,
+            SERVO_SHIFTVR_PWMMIN,
         };
         servo_init();
         servo_start(pwm);
@@ -152,18 +152,19 @@ void task_archery(void *pvParameters)
         switch (serial->c)
         {
         case 'D':
-        case 'd':
         {
-            serial->c = 0;
-            uint32_t set = SERVO_PITCHR_PWMMAX - (uint32_t)((1 / 0.18F) * serial->x);
-            pitch_set(set);
-            do
+            archery.angle = serial->x;
+
+            if (!READ_BIT(archery.task, ARCHERY_TASK_SHOOT))
             {
-                pitch_update(1);
-                osDelay(SERVO_UPDATE_MS_PITCH);
-            } while (READ_BIT(servo.match, SERVO_MATCH_PITCH) != SERVO_MATCH_PITCH);
-            osDelay(500);
-            jet_middle_on();
+                SET_BIT(archery.task, ARCHERY_TASK_SHOOT);
+                if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+                {
+                    xTaskNotifyGive(task_shoot_handler);
+                }
+            }
+
+            serial->c = 0;
             break;
         }
 
