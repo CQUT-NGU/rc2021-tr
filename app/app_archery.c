@@ -14,61 +14,150 @@
 archery_t archery = {
     .jet = ARCHERY_JET_RESET,
     .task = ARCHERY_TASK_RESET,
-    .load = ARCHERY_LOAD_RESET,
+    .load = ARCHERY_LOAD_ALL,
     .signal = ARCHERY_SIGNAL_RESET,
     .tick = 0,
     .jet_count = 0,
 };
 
+void archery_arrow(void)
+{
+    if (!READ_BIT(archery.task, ARCHERY_TASK_ARROW))
+    {
+        SET_BIT(archery.task, ARCHERY_TASK_ARROW);
+        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        {
+            xTaskNotifyGive(task_arrow_handler);
+        }
+    }
+}
+
+void archery_reday(void)
+{
+    uint32_t angle = (uint32_t)(archery.angle);
+
+    if (READ_BIT(archery.load, ARCHERY_LOAD_M))
+    {
+        archery.jet_on = jet_middle_on;
+        shifth_index(SHIFTH_INDEX_MIDDLE);
+        pitch_set(SERVO_PITCH_PWMMAX - angle);
+        do
+        {
+            archery_update();
+            osDelay(ARCHERY_CONTROL_TIME_MS);
+        } while (READ_BIT(step.flag, SHIFTH_FLAG_AUTO) ||
+                 !READ_BIT(servo.match, SERVO_MATCH_PITCH));
+        osDelay(500);
+    }
+    else if (READ_BIT(archery.load, ARCHERY_LOAD_L))
+    {
+        archery.jet_on = jet_left_on;
+        pitchl_set(SERVO_PITCHL_PWMMAX - angle);
+        do
+        {
+            archery_update();
+            osDelay(ARCHERY_CONTROL_TIME_MS);
+        } while (READ_BIT(servo.match, SERVO_MATCH_PITCHL) != SERVO_MATCH_PITCHL);
+        osDelay(500);
+    }
+    else if (READ_BIT(archery.load, ARCHERY_LOAD_R))
+    {
+        archery.jet_on = jet_right_on;
+        pitchr_set(SERVO_PITCHR_PWMMAX - angle);
+        do
+        {
+            archery_update();
+            osDelay(ARCHERY_CONTROL_TIME_MS);
+        } while (READ_BIT(servo.match, SERVO_MATCH_PITCHR) != SERVO_MATCH_PITCHR);
+        osDelay(500);
+    }
+    else
+    {
+        archery.jet_on = 0;
+    }
+}
+
+void archery_shoot(void)
+{
+    archery_reday();
+
+    if (!READ_BIT(archery.task, ARCHERY_TASK_SHOOT))
+    {
+        SET_BIT(archery.task, ARCHERY_TASK_SHOOT);
+        SET_BIT(archery.wait, ARCHERY_WAIT_SHOOT);
+        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        {
+            xTaskNotifyGive(task_shoot_handler);
+        }
+    }
+
+    /* Wait for archery inspection to complete */
+    do
+    {
+        archery_update();
+        osDelay(ARCHERY_CONTROL_TIME_MS);
+    } while (READ_BIT(archery.wait, ARCHERY_WAIT_SHOOT));
+    if (archery.jet_on)
+    {
+        archery.jet_on();
+        archery.jet_on = 0;
+    }
+}
+
 void archery_update(void)
 {
-    if (READ_BIT(archery.signal, ARCHERY_SIGNAL_DO))
+    if (xTaskGetCurrentTaskHandle() == task_archery_handler)
     {
-        CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_DO);
-        SET_BIT(archery.signal, ARCHERY_SIGNAL_DONE);
-        usart_dma_tx(&huart_os, archery.msg, 2);
-    }
-
-    if (READ_BIT(archery.jet, ARCHERY_JET_CNT) &&
-        archery.jet_count++ == ARCHERY_JET_COUNT)
-    {
-        archery.jet_count = 0;
-        SET_BIT(archery.jet, ARCHERY_JET_OFF);
-        if (READ_BIT(archery.jet, ARCHERY_JET_LEFT))
+        if (READ_BIT(archery.signal, ARCHERY_SIGNAL_DO))
         {
-            CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
-            gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
+            CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_DO);
+            SET_BIT(archery.signal, ARCHERY_SIGNAL_DONE);
+            usart_dma_tx(&huart_os, archery.msg, 2);
         }
-        if (READ_BIT(archery.jet, ARCHERY_JET_MIDDLE))
-        {
-            CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_MIDDLE);
-            gpio_pin_reset(POWER2_LD_GPIO_Port, POWER2_LD_Pin);
-        }
-        if (READ_BIT(archery.jet, ARCHERY_JET_RIGHT))
-        {
-            CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
-            gpio_pin_reset(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
-        }
-    }
 
-    shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
-    shiftv_update(10);
-    pitch_update(1);
-    fetch_update(1);
+        if (READ_BIT(archery.jet, ARCHERY_JET_CNT) &&
+            archery.jet_count++ == ARCHERY_JET_COUNT)
+        {
+            archery.jet_count = 0;
+            SET_BIT(archery.jet, ARCHERY_JET_OFF);
+            if (READ_BIT(archery.jet, ARCHERY_JET_LEFT))
+            {
+                CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
+                gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
+            }
+            if (READ_BIT(archery.jet, ARCHERY_JET_MIDDLE))
+            {
+                CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_MIDDLE);
+                gpio_pin_reset(POWER2_LD_GPIO_Port, POWER2_LD_Pin);
+            }
+            if (READ_BIT(archery.jet, ARCHERY_JET_RIGHT))
+            {
+                CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
+                gpio_pin_reset(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
+            }
+        }
 
-    if (archery.tick % (SERVO_UPDATE_MS / ARCHERY_CONTROL_TIME_MS) == 0)
-    {
-        /**
+        shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
+        shiftv_update(10);
+        pitch_update(1);
+        fetch_update(1);
+
+        if (archery.tick % (SERVO_UPDATE_MS / ARCHERY_CONTROL_TIME_MS) == 0)
+        {
+            /**
          * Updated arrow steering gear Angle,
          * prevent the PWM from changing too much to
          * cause the steering gear to jam
         */
+        }
+
+        l1s_check();
+
+        ++archery.tick;
     }
-
-    l1s_check();
-
-    ++archery.tick;
 }
+
+TaskHandle_t task_archery_handler;
 
 void task_archery(void *pvParameters)
 {
@@ -94,28 +183,40 @@ void task_archery(void *pvParameters)
         shifth_init();
     }
 
+    task_archery_handler = xTaskGetCurrentTaskHandle();
+
     for (;;)
     {
+        /* restart control */
+        if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MIN / 3))
+        {
+            serial->c = 0;
+        }
+        else if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MAX / 3))
+        {
+            signal_off("a\n");
+        }
+        if (rc->rc.ch[RC_CH_S] > RC_ROCKER_MIN + RC_DEADLINE)
+        {
+            signal_off("b\n");
+            jet_off();
+        }
+        if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MAX - RC_DEADLINE)
+        {
+            if (READ_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT))
+            {
+                CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT);
+            }
+        }
+
         /* remote control */
         if (switch_is_mid(rc->rc.s[RC_SW_L]) &&
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
-            /* restart control */
-            if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MIN / 3))
-            {
-                serial->c = 0;
-            }
-
             /* Start sending signaling signal */
             if (rc->rc.ch[RC_CH_LV] > (RC_ROCKER_MAX / 3))
             {
                 signal_on("a\n");
-            }
-
-            /* End sending signaling signal */
-            else if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MAX / 3))
-            {
-                signal_off("a\n");
             }
 
             /* relay control, shoot an arrow */
@@ -124,11 +225,15 @@ void task_archery(void *pvParameters)
                 /* It starts to spew out gas */
                 signal_on("b\n");
             }
-            else
+            else if (rc->rc.ch[RC_CH_S] > RC_ROCKER_MAX - RC_DEADLINE)
             {
-                signal_off("b\n");
-                /* Stop ejecting gas */
-                jet_off();
+                if (!READ_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT))
+                {
+                    SET_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT);
+
+                    archery.angle = 60;
+                    archery_shoot();
+                }
             }
         }
 
@@ -138,14 +243,7 @@ void task_archery(void *pvParameters)
             /* relay control, shoot an arrow */
             if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MIN + RC_DEADLINE)
             {
-                if (!READ_BIT(archery.task, ARCHERY_TASK_ARROW))
-                {
-                    SET_BIT(archery.task, ARCHERY_TASK_ARROW);
-                    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-                    {
-                        xTaskNotifyGive(task_arrow_handler);
-                    }
-                }
+                archery_arrow();
             }
         }
 
@@ -153,27 +251,19 @@ void task_archery(void *pvParameters)
         {
         case 'D':
         {
-            archery.angle = serial->x;
-
-            if (!READ_BIT(archery.task, ARCHERY_TASK_SHOOT))
-            {
-                SET_BIT(archery.task, ARCHERY_TASK_SHOOT);
-                if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-                {
-                    xTaskNotifyGive(task_shoot_handler);
-                }
-            }
-
+            archery.angle = (1.0F / 0.18F) * serial->x;
+            archery_shoot();
             serial->c = 0;
-            break;
         }
+        break;
 
         default:
-            break;
+        {
+        }
+        break;
         }
 
         archery_update();
-
         osDelay(ARCHERY_CONTROL_TIME_MS);
     }
 }

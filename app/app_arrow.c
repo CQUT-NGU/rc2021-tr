@@ -13,11 +13,14 @@
 
 TaskHandle_t task_arrow_handler;
 
+#define ARROW_DELAY_MIN  100
+#define ARROW_DELAY_WAIT 500
+
 void task_arrow(void *pvParameters)
 {
     (void)pvParameters;
 
-    task_arrow_handler = xTaskGetHandle(pcTaskGetName(NULL));
+    task_arrow_handler = xTaskGetCurrentTaskHandle();
 
     for (;;)
     {
@@ -52,14 +55,11 @@ void task_arrow(void *pvParameters)
             fetch_set(SERVO_FETCH_PWMMID);
             do
             {
-                osDelay(SERVO_UPDATE_MS_PITCH);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-            osDelay(1000);
-        }
-
-        /* Check that the horizontal moving device is in proper position */
-        {
+            /* Check that the horizontal moving device is in proper position */
             shifth_index(SHIFTH_INDEX_LEFT);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* Check whether the clip arrow device is aligned with its arrow */
@@ -67,9 +67,9 @@ void task_arrow(void *pvParameters)
             fetch_set(SERVO_FETCH_PWMMAX);
             do
             {
-                osDelay(SERVO_UPDATE_MS_FETCH);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-            osDelay(1000);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* Clamp all the arrows */
@@ -86,10 +86,15 @@ void task_arrow(void *pvParameters)
             fetch_set(SERVO_FETCH_PWMMID);
             do
             {
-                osDelay(SERVO_UPDATE_MS_FETCH);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-            osDelay(1000);
+            osDelay(ARROW_DELAY_WAIT);
         }
+
+        do
+        {
+            osDelay(ARROW_DELAY_MIN);
+        } while (READ_BIT(step.flag, SHIFTH_FLAG_AUTO));
 
         /* Check whether the archery device is down */
         {
@@ -110,9 +115,9 @@ void task_arrow(void *pvParameters)
         {
             do
             {
-                osDelay(SERVO_UPDATE_MS_FETCH);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-            osDelay(100);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* Put the arrow */
@@ -122,16 +127,16 @@ void task_arrow(void *pvParameters)
             shiftvr_set(SERVO_SHIFTVR_PWMMAX + 400);
             do
             {
-                osDelay(SERVO_UPDATE_MS_SHIFTV);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV_ALL) != SERVO_MATCH_SHIFTV_ALL);
-            osDelay(1000);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* Loosen the arrows on both sides and in the middle */
         {
             clip_edge_off();
             clip_left_off();
-            osDelay(500);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* The archery device lifts the arrow */
@@ -141,9 +146,9 @@ void task_arrow(void *pvParameters)
             pitchr_set(SERVO_PITCHR_PWMMAX - 200);
             do
             {
-                osDelay(SERVO_UPDATE_MS_PITCH);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
-            osDelay(1000);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* The archery set back */
@@ -153,9 +158,9 @@ void task_arrow(void *pvParameters)
             shiftvr_set(SERVO_SHIFTV_PWMMIN);
             do
             {
-                osDelay(SERVO_UPDATE_MS_SHIFTV);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV_ALL) != SERVO_MATCH_SHIFTV_ALL);
-            osDelay(1000);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* The archery apparatus was raised to the top to load the arrows */
@@ -165,9 +170,9 @@ void task_arrow(void *pvParameters)
             pitchr_set(SERVO_PITCHR_PWMMAX - 400);
             do
             {
-                osDelay(SERVO_UPDATE_MS_PITCH);
+                osDelay(ARROW_DELAY_MIN);
             } while (READ_BIT(servo.match, SERVO_MATCH_PITCH_ALL) != SERVO_MATCH_PITCH_ALL);
-            osDelay(1000);
+            osDelay(ARROW_DELAY_WAIT);
         }
 
         /* Check that the horizontal moving device is in proper position */

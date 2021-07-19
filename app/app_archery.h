@@ -29,11 +29,15 @@
 #define ARCHERY_LOAD_M     (1 << 6)  //!< load arrow device in the middle
 #define ARCHERY_LOAD_R     (1 << 7)  //!< load arrow device on the right
 /* clip arrow device at the edge */
-#define ARCHERY_CLIP_F (ARCHERY_CLIP_FL | ARCHERY_CLIP_FR)
+#define ARCHERY_LOAD_EDGE (ARCHERY_LOAD_L | ARCHERY_LOAD_R)
+#define ARCHERY_CLIP_EDGE (ARCHERY_CLIP_FL | ARCHERY_CLIP_FR)
+#define ARCHERY_LOAD_ALL  (ARCHERY_LOAD_L | ARCHERY_LOAD_M | ARCHERY_LOAD_R)
+#define ARCHERY_CLIP_ALL  (ARCHERY_CLIP_FL | ARCHERY_CLIP_L | ARCHERY_CLIP_M | ARCHERY_CLIP_R | ARCHERY_CLIP_FR)
 
 #define ARCHERY_SIGNAL_RESET (0)       //!< reset
 #define ARCHERY_SIGNAL_DO    (1 << 0)  //!< signal do
 #define ARCHERY_SIGNAL_DONE  (1 << 1)  //!< signal done
+#define ARCHERY_SIGNAL_SHOOT (1 << 2)  //!< signal shoot
 
 #define ARCHERY_JET_RESET  (0)       //!< reset
 #define ARCHERY_JET_ON     (1 << 0)  //!< open the jet
@@ -48,14 +52,19 @@
 #define ARCHERY_TASK_ARROW (1 << 0)  //!< run arrow
 #define ARCHERY_TASK_SHOOT (1 << 1)  //!< run shoot
 
+#define ARCHERY_WAIT_RESET (0)
+#define ARCHERY_WAIT_SHOOT (1 << 0)
+
 typedef struct
 {
     int jet;     //!< state of jet
     int task;    //!< state of task
     int load;    //!< state of loading
     int signal;  //!< state of signaling
+    int wait;    //!< state of wait
 
     char msg[2];             //!< content of message
+    void (*jet_on)(void);    //!< function of jet
     unsigned int jet_count;  //!< count of jet time
     uint32_t tick;           //!< count of run
     float angle;             //!< angle of shoot
@@ -65,20 +74,26 @@ extern archery_t archery;
 
 __BEGIN_DECLS
 
+extern void archery_arrow(void);
+extern void archery_reday(void);
+extern void archery_shoot(void);
+extern void archery_update(void);
+
 __END_DECLS
 
 __STATIC_INLINE
 void clip_edge_on(void)
 {
     gpio_pin_set(RELAY0_GPIO_Port, RELAY0_Pin);
-    SET_BIT(archery.load, ARCHERY_CLIP_F);
+    SET_BIT(archery.load, ARCHERY_CLIP_EDGE);
 }
 
 __STATIC_INLINE
 void clip_edge_off(void)
 {
     gpio_pin_reset(RELAY0_GPIO_Port, RELAY0_Pin);
-    CLEAR_BIT(archery.load, ARCHERY_CLIP_F);
+    CLEAR_BIT(archery.load, ARCHERY_CLIP_EDGE);
+    SET_BIT(archery.load, ARCHERY_LOAD_EDGE);
 }
 
 __STATIC_INLINE
@@ -93,6 +108,7 @@ void clip_left_off(void)
 {
     gpio_pin_reset(RELAY1_GPIO_Port, RELAY1_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_L);
+    SET_BIT(archery.load, ARCHERY_LOAD_M);
 }
 
 __STATIC_INLINE
@@ -107,6 +123,7 @@ void clip_middle_off(void)
 {
     gpio_pin_reset(RELAY2_GPIO_Port, RELAY2_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_M);
+    SET_BIT(archery.load, ARCHERY_LOAD_M);
 }
 
 __STATIC_INLINE
@@ -121,6 +138,7 @@ void clip_right_off(void)
 {
     gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_R);
+    SET_BIT(archery.load, ARCHERY_LOAD_M);
 }
 
 __STATIC_INLINE

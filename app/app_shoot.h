@@ -15,6 +15,11 @@
 
 #include "app.h"
 
+#define SHOOT_FLAG_RESET (0)
+#define SHOOT_FLAG_SHOOT (1 << 0)
+
+extern void shoot_reday(void);
+
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __APP_SHOOT_H__ */
 
