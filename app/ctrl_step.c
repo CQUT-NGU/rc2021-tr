@@ -128,7 +128,7 @@ void shifth_stop(void)
 }
 
 /**
-  * @brief This function handles TIM5 global interrupt.
+  * @brief This function handles TIM global interrupt.
   */
 void COUNT_IRQHandler(void)
 {
@@ -143,8 +143,6 @@ void COUNT_IRQHandler(void)
         CLEAR_BIT(step.flag, SHIFTH_FLAG_AUTO);
 
         shifth_stop();
-
-        os_printf("idx:%u\r\n", step.idx);
     }
 
     if (READ_BIT(step.flag, SHIFTH_FLAG_ZERO))
@@ -155,6 +153,8 @@ void COUNT_IRQHandler(void)
 
         step.idx = 0;
         step.set = 0;
+
+        shifth_index(SHIFTH_INDEX_MIDDLE);
     }
 }
 
