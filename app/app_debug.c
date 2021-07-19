@@ -25,56 +25,96 @@ void task_debug(void *pvParameters)
         {
         case 'a':
         {
-            uint32_t tmp;
-
-            tmp = (uint32_t)serial->x;
-            if (tmp > 100)
-            {
-                pitch_set(tmp);
-            }
-            tmp = (uint32_t)serial->y;
-            if (tmp > 100)
-            {
-                shiftv_set(tmp);
-            }
-            tmp = (uint32_t)serial->z;
-            if (tmp > 100)
-            {
-                fetch_set(tmp);
-            }
-
             serial->c = 0;
+            uint32_t pwm;
+            switch ((uint32_t)serial->x)
+            {
+            case 0:
+            {
+                pwm = (uint32_t)serial->y;
+                if (pwm > 100)
+                {
+                    fetch_set(pwm);
+                }
+            }
             break;
+
+            case 1:
+            {
+                pwm = (uint32_t)serial->y;
+                if (pwm > 100)
+                {
+                    pitchl_set_pwm(pwm);
+                }
+                pwm = (uint32_t)serial->z;
+                if (pwm > 100)
+                {
+                    shiftvl_set_pwm(pwm);
+                }
+            }
+            break;
+
+            case 2:
+            {
+                pwm = (uint32_t)serial->y;
+                if (pwm > 100)
+                {
+                    pitch_set_pwm(pwm);
+                }
+                pwm = (uint32_t)serial->z;
+                if (pwm > 100)
+                {
+                    shiftv_set_pwm(pwm);
+                }
+            }
+            break;
+
+            case 3:
+            {
+                pwm = (uint32_t)serial->y;
+                if (pwm > 100)
+                {
+                    pitchr_set_pwm(pwm);
+                }
+                pwm = (uint32_t)serial->z;
+                if (pwm > 100)
+                {
+                    shiftvr_set_pwm(pwm);
+                }
+            }
+            break;
+
+            default:
+            {
+            }
+            break;
+            }
         }
+        break;
 
         case 'h':
         {
-            int32_t tmp;
-
-            tmp = (int32_t)serial->x;
-            if (tmp)
-            {
-                shifth_start(tmp);
-            }
-
-            tmp = (int32_t)serial->y;
-            if (tmp)
-            {
-                shifth_index((uint32_t)tmp);
-            }
-
             serial->c = 0;
-            break;
+            int32_t count = (int32_t)serial->x;
+            if (count)
+            {
+                shifth_start(count);
+            }
+            uint32_t index = (uint32_t)serial->y;
+            if (index)
+            {
+                shifth_index(index);
+            }
         }
+        break;
 
-        case 'd':
+        case 'j':
         {
+            serial->c = 0;
             uint32_t set = 200;
-
             int match = SERVO_MATCH_PITCH;
             void (*pitch)(uint32_t) = pitch_set;
             void (*jet_on)(void) = jet_middle_on;
-
             if (serial->y > 0)
             {
                 set = (uint32_t)((1 / 0.18F) * serial->y);
@@ -93,7 +133,6 @@ void task_debug(void *pvParameters)
                 pitch = pitchr_set;
                 jet_on = jet_right_on;
             }
-
             pitch(2000 - set);
             do
             {
@@ -102,15 +141,13 @@ void task_debug(void *pvParameters)
             } while (READ_BIT(servo.match, match) != match);
             osDelay(400);
             jet_on();
-
-            serial->c = 0;
-            break;
         }
+        break;
 
         case 'r':
         {
+            serial->c = 0;
             int tmp;
-
             tmp = (int)serial->x;
             if (tmp == 1)
             {
@@ -148,36 +185,42 @@ void task_debug(void *pvParameters)
             {
                 gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
             }
-
-            serial->c = 0;
-            break;
         }
+        break;
 
         case 't':
         {
             serial->c = 0;
-
-            int tmp = (int)serial->x;
-            if (tmp == 1)
+            switch ((int)serial->x)
             {
-                if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-                {
-                    xTaskNotifyGive(task_arrow_handler);
-                }
-            }
-            else if (tmp == 2)
+            case 1:
             {
-                if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-                {
-                    xTaskNotifyGive(task_shoot_handler);
-                }
+                archery_arrow();
             }
-
             break;
+
+            case 2:
+            {
+                if (serial->y > 0)
+                {
+                    archery.angle = serial->y;
+                    archery_shoot();
+                }
+            }
+            break;
+
+            default:
+            {
+            }
+            break;
+            }
         }
+        break;
 
         default:
-            break;
+        {
+        }
+        break;
         }
 
         /* Task delay */
