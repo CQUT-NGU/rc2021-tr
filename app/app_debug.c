@@ -111,35 +111,34 @@ void task_debug(void *pvParameters)
         case 'j':
         {
             serial->c = 0;
-            uint32_t set = 200;
+            uint32_t set = SERVO_PITCH_PWMMAX - 200 * 3 / 2;
             int match = SERVO_MATCH_PITCH;
             void (*pitch)(uint32_t) = pitch_set;
             void (*jet_on)(void) = jet_middle_on;
             if (serial->y > 0)
             {
-                set = (uint32_t)((1 / 0.18F) * serial->y);
+                set = SERVO_PITCH_PWMMAX - (uint32_t)((1 / 0.18F) * serial->y) * 3 / 2;
             }
             else if (serial->x > 0)
             {
-                set = (uint32_t)((1 / 0.18F) * serial->x);
+                set = SERVO_PITCHL_PWMMAX - (uint32_t)((1 / 0.18F) * serial->x);
                 match = SERVO_MATCH_PITCHL;
                 pitch = pitchl_set;
                 jet_on = jet_left_on;
             }
             else if (serial->z > 0)
             {
-                set = (uint32_t)((1 / 0.18F) * serial->z);
+                set = SERVO_PITCHR_PWMMIN + (uint32_t)((1 / 0.18F) * serial->z);
                 match = SERVO_MATCH_PITCHR;
                 pitch = pitchr_set;
                 jet_on = jet_right_on;
             }
-            pitch(2000 - set);
+            pitch(set);
             do
             {
-                pitch_update(2);
                 osDelay(SERVO_UPDATE_MS_PITCH);
             } while (READ_BIT(servo.match, match) != match);
-            osDelay(400);
+            osDelay(500);
             jet_on();
         }
         break;
@@ -224,7 +223,7 @@ void task_debug(void *pvParameters)
         }
 
         /* Task delay */
-        osDelay(10);
+        osDelay(2);
     }
 }
 

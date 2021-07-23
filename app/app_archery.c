@@ -34,13 +34,15 @@ void archery_arrow(void)
 
 void archery_reday(void)
 {
+    archery.angle = (1.0F / 0.18F) * archery.angle;
+
     uint32_t angle = (uint32_t)(archery.angle);
 
     if (READ_BIT(archery.load, ARCHERY_LOAD_M))
     {
         archery.jet_on = jet_middle_on;
         shifth_index(SHIFTH_INDEX_MIDDLE);
-        pitch_set(SERVO_PITCH_PWMMAX - angle);
+        pitch_set(SERVO_PITCH_PWMMAX - angle * 3 / 2);
         do
         {
             archery_update();
@@ -63,7 +65,7 @@ void archery_reday(void)
     else if (READ_BIT(archery.load, ARCHERY_LOAD_R))
     {
         archery.jet_on = jet_right_on;
-        pitchr_set(SERVO_PITCHR_PWMMAX - angle);
+        pitchr_set(SERVO_PITCHR_PWMMIN + angle);
         do
         {
             archery_update();
@@ -124,31 +126,34 @@ void archery_update(void)
             {
                 CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
                 gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
+                pitchl_set(SERVO_PITCHL_PWMMAX - 100);
             }
             if (READ_BIT(archery.jet, ARCHERY_JET_MIDDLE))
             {
                 CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_MIDDLE);
                 gpio_pin_reset(POWER2_LD_GPIO_Port, POWER2_LD_Pin);
+                pitch_set(SERVO_PITCH_PWMMAX - 100);
             }
             if (READ_BIT(archery.jet, ARCHERY_JET_RIGHT))
             {
                 CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
                 gpio_pin_reset(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
+                pitchr_set(SERVO_PITCHR_PWMMIN + 100);
             }
         }
 
         shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
-        shiftv_update(10);
+        shiftv_update(16);
         pitch_update(1);
         fetch_update(1);
 
-        if (archery.tick % (SERVO_UPDATE_MS / ARCHERY_CONTROL_TIME_MS) == 0)
+        if (archery.tick % ARCHERY_CONTROL_TIME_MS == 0)
         {
             /**
-         * Updated arrow steering gear Angle,
-         * prevent the PWM from changing too much to
-         * cause the steering gear to jam
-        */
+             * Updated arrow steering gear Angle,
+             * prevent the PWM from changing too much to
+             * cause the steering gear to jam
+            */
         }
 
         l1s_check();
@@ -170,13 +175,13 @@ void task_archery(void *pvParameters)
 
     {
         uint32_t pwm[7] = {
-            SERVO_FETCH_PWMMID,
-            SERVO_PITCH_PWMMAX - 200,
+            SERVO_FETCH_PWMMAX,
+            SERVO_PITCH_PWMMAX - 200 * 3 / 2,
             SERVO_SHIFTV_PWMMIN,
             SERVO_PITCHL_PWMMAX - 200,
             SERVO_SHIFTVL_PWMMIN,
-            SERVO_PITCHR_PWMMAX - 200,
-            SERVO_SHIFTVR_PWMMIN,
+            SERVO_PITCHR_PWMMIN + 200,
+            SERVO_SHIFTVR_PWMMAX,
         };
         servo_init();
         servo_start(pwm);

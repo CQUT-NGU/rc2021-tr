@@ -41,9 +41,6 @@ C_SOURCES += app/app_archery.c
 C_SOURCES += app/app_arrow.c
 C_SOURCES += app/app_shoot.c
 
-C_SOURCES += ca/ca-pid.c
-C_SOURCES += ca/ca-math.c
-C_SOURCES += ca/ahrs.c
-C_SOURCES += ca/zyx.c
+C_SOURCES += $(wildcard ca/*.c)
 
 # C_SOURCES += DSP/Source/FastMathFunctions/FastMathFunctions.c

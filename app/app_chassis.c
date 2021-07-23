@@ -290,9 +290,9 @@ void task_chassis(void *pvParameters)
         };
 
         static float kpid_p[3][3] = {
-            {4.0F, 0.0F, 0.0F}, /* x */
-            {4.0F, 0.0F, 0.0F}, /* y */
-            {4.0F, 0.0F, 0.0F}, /* z */
+            {1.0F, 0.0F, 0.0F}, /* x */
+            {1.0F, 0.0F, 0.0F}, /* y */
+            {1.0F, 0.0F, 0.0F}, /* z */
         };
 
         static float kpid_l1s[3] = {
@@ -384,9 +384,8 @@ void task_chassis(void *pvParameters)
             move.vx_set = 0;
             move.vy_set = 0;
             move.wz_set = 0;
-
-            break; /* CHASSIS_VECTOR_STOP */
         }
+        break; /* CHASSIS_VECTOR_STOP */
 
         case CHASSIS_VECTOR_SLOW:
         {
@@ -398,9 +397,8 @@ void task_chassis(void *pvParameters)
             move.wz_set *= CHASSIS_RC_SLOW_SEN;
 
             chassis_serial();
-
-            break;
         }
+        break;
 
         case CHASSIS_VECTOR_NORMAL:
         {
@@ -413,68 +411,67 @@ void task_chassis(void *pvParameters)
             move.vx_set = ca_lpf_f32(move.vx_slow, move.vx_set);
             move.vy_set = ca_lpf_f32(move.vy_slow, move.vy_set);
             move.wz_set = ca_lpf_f32(move.wz_slow, move.wz_set);
-
-            break; /* CHASSIS_VECTOR_SLOW CHASSIS_VECTOR_NORMAL */
         }
+        break; /* CHASSIS_VECTOR_SLOW CHASSIS_VECTOR_NORMAL */
 
         case CHASSIS_VECTOR_YAW:
         {
             chassis_rc();
 
-            TickType_t tick_delta = tick - move.tick;
-            if (tick_delta >= 50)
-            {
-                move.tick = tick;
-                move.wz_set = 0;
+            // TickType_t tick_delta = tick - move.tick;
+            // if (tick_delta >= 50)
+            // {
+            //     move.tick = tick;
 
-                int32_t delta = l1s.dis1.data - l1s.dis0.data;
-                if (move.rc->rc.ch[RC_CH_LV] > RC_ROCKER_MIN + CHASSIS_RC_DEADLINE &&
-                    l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
-                    (2 < delta || delta < -2) &&
-                    -400 < delta && delta < 400)
-                {
-                    float in = (float)delta / (float)(l1s.dis1.raw - l1s.dis0.raw);
-                    move.wz_set = ca_pid_f32(move.pid_l1s, 0, tanf(in));
-                }
+            //     int32_t delta = l1s.dis1.data - l1s.dis0.data;
+            //     if (move.rc->rc.ch[RC_CH_LV] > RC_ROCKER_MIN + CHASSIS_RC_DEADLINE &&
+            //         l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
+            //         (2 < delta || delta < -2) &&
+            //         -400 < delta && delta < 400)
+            //     {
+            //         float in = (float)delta / (float)(l1s.dis1.raw - l1s.dis0.raw);
+            //         move.wz_set = ca_pid_f32(move.pid_l1s, 0, tanf(in));
+            //     }
 
-                // dma_printf("%u,%u,%X,%u,%u,%X,%u,%u,%X\n",
-                //            l1s.dis0.data,
-                //            l1s.dis0.base,
-                //            l1s.dis0.error,
-                //            l1s.dis1.data,
-                //            l1s.dis1.base,
-                //            l1s.dis1.error,
-                //            l1s.dis2.data,
-                //            l1s.dis2.base,
-                //            l1s.dis2.error);
-                // dma_printf("%i,%u,%X\n",
-                //           l1s.dis2.data,
-                //           l1s.dis2.base,
-                //           l1s.dis2.error);
-                // dma_printf("%i,%i,%i,%i\n",
-                //           move.mo[0].fb->angle,
-                //           move.mo[1].fb->angle,
-                //           move.mo[2].fb->angle,
-                //           move.mo[3].fb->angle);
-            }
+            //     // dma_printf("%u,%u,%X,%u,%u,%X,%u,%u,%X\n",
+            //     //            l1s.dis0.data,
+            //     //            l1s.dis0.base,
+            //     //            l1s.dis0.error,
+            //     //            l1s.dis1.data,
+            //     //            l1s.dis1.base,
+            //     //            l1s.dis1.error,
+            //     //            l1s.dis2.data,
+            //     //            l1s.dis2.base,
+            //     //            l1s.dis2.error);
+            //     // dma_printf("%i,%u,%X\n",
+            //     //           l1s.dis2.data,
+            //     //           l1s.dis2.base,
+            //     //           l1s.dis2.error);
+            //     // dma_printf("%i,%i,%i,%i\n",
+            //     //           move.mo[0].fb->angle,
+            //     //           move.mo[1].fb->angle,
+            //     //           move.mo[2].fb->angle,
+            //     //           move.mo[3].fb->angle);
+            // }
 
-            if (move.rc->rc.ch[RC_CH_LV] < RC_ROCKER_MIN + CHASSIS_RC_DEADLINE)
-            {
-                l1s_cli();
-                move.wz_set *= CHASSIS_RC_SLOW_SEN;
-            }
-
-            break; /* CHASSIS_VECTOR_YAW */
+            // if (move.rc->rc.ch[RC_CH_LV] < RC_ROCKER_MIN + CHASSIS_RC_DEADLINE)
+            // {
+            //     l1s_cli();
+            //     move.wz_set *= CHASSIS_RC_SLOW_SEN;
+            // }
         }
+        break; /* CHASSIS_VECTOR_YAW */
 
         case CHASSIS_VECTOR_AUTO:
         {
             chassis_serial();
-            break;
         }
+        break;
 
         default:
-            break; /* move.mode */
+        {
+        }
+        break;
         }
 
         /* control loop */

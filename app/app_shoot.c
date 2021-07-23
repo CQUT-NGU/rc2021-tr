@@ -13,7 +13,7 @@
 
 TaskHandle_t task_shoot_handler;
 
-#define SHOOT_DELAY_MIN  100
+#define SHOOT_DELAY_MIN  10
 #define SHOOT_DELAY_WAIT 500
 
 void task_shoot(void *pvParameters)
@@ -75,7 +75,7 @@ void task_shoot(void *pvParameters)
             }
             /* Put the arrow */
             {
-                shiftv_set(SERVO_SHIFTV_PWMMAX + 400);
+                shiftv_set(SERVO_SHIFTV_PWMMAX);
                 do
                 {
                     osDelay(SHOOT_DELAY_MIN);
@@ -100,7 +100,7 @@ void task_shoot(void *pvParameters)
             }
             /* The archery device lifts the arrow */
             {
-                pitch_set(SERVO_PITCH_PWMMAX - 200);
+                pitch_set_pwm(SERVO_PITCH_PWMMAX - 200 * 3 / 2);
                 do
                 {
                     osDelay(SHOOT_DELAY_MIN);
@@ -114,14 +114,16 @@ void task_shoot(void *pvParameters)
                 {
                     osDelay(SHOOT_DELAY_MIN);
                 } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV) != SERVO_MATCH_SHIFTV);
+                osDelay(SHOOT_DELAY_WAIT);
             }
             /* The archery apparatus was raised to the top to load the arrows */
             {
-                pitch_set(SERVO_PITCH_PWMMAX - 400);
+                pitch_set(SERVO_PITCH_PWMMAX - 400 * 3 / 2);
                 do
                 {
                     osDelay(SHOOT_DELAY_MIN);
                 } while (READ_BIT(servo.match, SERVO_MATCH_PITCH) != SERVO_MATCH_PITCH);
+                osDelay(SHOOT_DELAY_WAIT << 1);
             }
 
             if (READ_BIT(archery.wait, ARCHERY_WAIT_SHOOT))
@@ -134,7 +136,7 @@ void task_shoot(void *pvParameters)
                 shifth_index(SHIFTH_INDEX_MIDDLE);
 
                 /* The archery device drops an arrow */
-                pitch_set(SERVO_PITCH_PWMMAX - 200);
+                pitch_set(SERVO_PITCH_PWMMAX - 150 * 3 / 2);
                 do
                 {
                     osDelay(SHOOT_DELAY_WAIT);
@@ -144,6 +146,7 @@ void task_shoot(void *pvParameters)
 
         if (!READ_BIT(archery.load, ARCHERY_LOAD_ALL))
         {
+            fetch_set(SERVO_FETCH_PWMMAX);
             /* Prompt that the hand arrow clip is empty */
             buzzer_start();
             buzzer_set(NOTEFREQS_A5, BUZZER_PWM_DIV2);
