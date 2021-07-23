@@ -74,8 +74,8 @@
 #define CHASSIS_VY_RC_SEN (NORMAL_MAX_CHASSIS_SPEED_Y / RC_ROCKER_MAX)
 /* in not following yaw angle mode, rocker value change to rotation speed */
 #define CHASSIS_WZ_RC_SEN (MAX_WHEEL_SPEED / RC_ROCKER_MAX)
-/* vertial speed slowly (dm/s) */
-#define CHASSIS_RC_SLOW_SEN 0.1F
+/* vertial speed slowly (m/s) */
+#define CHASSIS_RC_SLOW_SEN 0.2F
 
 #define CHASSIS_ACCEL_X_NUM 0.1F
 #define CHASSIS_ACCEL_Y_NUM 0.1F
