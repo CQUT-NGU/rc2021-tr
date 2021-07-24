@@ -30,6 +30,7 @@
 */
 #define M3508_MOTOR_RPM_TO_VECTOR       0.00027998755579361663F
 #define CHASSIS_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
+#define M3508_MOTOR_ECD_TO_DISTANCE     0.000002050690105910278F
 
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_VX 0.25F
 #define MOTOR_SPEED_TO_CHASSIS_SPEED_VY 0.25F
@@ -77,9 +78,9 @@
 /* vertial speed slowly (m/s) */
 #define CHASSIS_RC_SLOW_SEN 0.2F
 
-#define CHASSIS_ACCEL_X_NUM 0.1F
-#define CHASSIS_ACCEL_Y_NUM 0.1F
-#define CHASSIS_ACCEL_Z_NUM 0.1F
+#define CHASSIS_ACCEL_X_NUM 0.2F
+#define CHASSIS_ACCEL_Y_NUM 0.2F
+#define CHASSIS_ACCEL_Z_NUM 0.2F
 
 // /* in following yaw angle mode, rocker value add to angle */
 // #define CHASSIS_ANGLE_Z_RC_SEN 0.000002F
@@ -143,6 +144,58 @@ static void chassis_update(void)
     move.z += move.wz * CHASSIS_CONTROL_TIME;
 }
 
+void position_set(float x, float y, float z)
+{
+    float t = 0.001F * (float)xTaskGetTickCount();
+    float source[4] = {t, 0, 0, 0};
+    float target[4] = {0};
+    float q = x - move.x;
+    target[0] = t + ABS(q);
+    target[1] = q;
+    polynomial5_init(move.path + 0, source, target);
+    q = y - move.y;
+    target[0] = t + ABS(q);
+    target[1] = q;
+    polynomial5_init(move.path + 1, source, target);
+    q = z - move.z;
+    target[0] = t + ABS(q);
+    target[1] = q;
+    polynomial5_init(move.path + 2, source, target);
+}
+
+void position_setx(float x)
+{
+    float t = 0.001F * (float)xTaskGetTickCount();
+    float source[4] = {t, 0, 0, 0};
+    float target[4] = {0};
+    float q = x - move.x;
+    target[0] = t + ABS(q);
+    target[1] = q;
+    polynomial5_init(move.path + 0, source, target);
+}
+
+void position_sety(float y)
+{
+    float t = 0.001F * (float)xTaskGetTickCount();
+    float source[4] = {t, 0, 0, 0};
+    float target[4] = {0};
+    float q = y - move.y;
+    target[0] = t + ABS(q);
+    target[1] = q;
+    polynomial5_init(move.path + 1, source, target);
+}
+
+void position_setz(float z)
+{
+    float t = 0.001F * (float)xTaskGetTickCount();
+    float source[4] = {t, 0, 0, 0};
+    float target[4] = {0};
+    float q = z - move.z;
+    target[0] = t + ABS(q);
+    target[1] = q;
+    polynomial5_init(move.path + 2, source, target);
+}
+
 /**
  * @brief        get the value of serial
 */
@@ -162,9 +215,11 @@ static void chassis_serial(void)
     case 'P':
     case 'p':
     {
-        move.x_set = move.serial->x;
-        move.y_set = move.serial->y;
-        move.z_set = move.serial->z;
+        move.serial->c = 0;
+
+        position_set(move.serial->x,
+                     move.serial->y,
+                     move.serial->z);
         break;
     }
 
@@ -296,8 +351,8 @@ void task_chassis(void *pvParameters)
         };
 
         static float kpid_l1s[3] = {
-            1.0F,
-            0.0F,
+            2.0F,
+            0.001F,
             0.0F,
         };
 
@@ -358,7 +413,7 @@ void task_chassis(void *pvParameters)
             /* middle, up */
             if (switch_is_up(move.rc->rc.s[RC_SW_R]))
             {
-                move.mode = CHASSIS_VECTOR_YAW;
+                move.mode = CHASSIS_VECTOR_PATH;
             }
             /* middle, middle */
             else if (switch_is_mid(move.rc->rc.s[RC_SW_R]))
@@ -414,53 +469,70 @@ void task_chassis(void *pvParameters)
         }
         break; /* CHASSIS_VECTOR_SLOW CHASSIS_VECTOR_NORMAL */
 
-        case CHASSIS_VECTOR_YAW:
+        case CHASSIS_VECTOR_PATH:
         {
             chassis_rc();
+            chassis_serial();
 
-            // TickType_t tick_delta = tick - move.tick;
-            // if (tick_delta >= 50)
+            // float t = (float)tick * 0.001F;
+            // if (t < move.path[0].t[1])
             // {
-            //     move.tick = tick;
-
-            //     int32_t delta = l1s.dis1.data - l1s.dis0.data;
-            //     if (move.rc->rc.ch[RC_CH_LV] > RC_ROCKER_MIN + CHASSIS_RC_DEADLINE &&
-            //         l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
-            //         (2 < delta || delta < -2) &&
-            //         -400 < delta && delta < 400)
-            //     {
-            //         float in = (float)delta / (float)(l1s.dis1.raw - l1s.dis0.raw);
-            //         move.wz_set = ca_pid_f32(move.pid_l1s, 0, tanf(in));
-            //     }
-
-            //     // dma_printf("%u,%u,%X,%u,%u,%X,%u,%u,%X\n",
-            //     //            l1s.dis0.data,
-            //     //            l1s.dis0.base,
-            //     //            l1s.dis0.error,
-            //     //            l1s.dis1.data,
-            //     //            l1s.dis1.base,
-            //     //            l1s.dis1.error,
-            //     //            l1s.dis2.data,
-            //     //            l1s.dis2.base,
-            //     //            l1s.dis2.error);
-            //     // dma_printf("%i,%u,%X\n",
-            //     //           l1s.dis2.data,
-            //     //           l1s.dis2.base,
-            //     //           l1s.dis2.error);
-            //     // dma_printf("%i,%i,%i,%i\n",
-            //     //           move.mo[0].fb->angle,
-            //     //           move.mo[1].fb->angle,
-            //     //           move.mo[2].fb->angle,
-            //     //           move.mo[3].fb->angle);
+            //     move.vx_set = polynomial5_vec(move.path + 0, t);
+            // }
+            // else
+            // {
+            //     move.vx_set = 0;
+            // }
+            // if (t < move.path[1].t[1])
+            // {
+            //     move.vy_set = polynomial5_vec(move.path + 1, t);
+            // }
+            // else
+            // {
+            //     move.vy_set = 0;
+            // }
+            // if (t < move.path[2].t[1])
+            // {
+            //     move.wz_set = polynomial5_vec(move.path + 2, t);
+            // }
+            // else
+            // {
+            //     move.wz_set = 0;
             // }
 
-            // if (move.rc->rc.ch[RC_CH_LV] < RC_ROCKER_MIN + CHASSIS_RC_DEADLINE)
-            // {
-            //     l1s_cli();
-            //     move.wz_set *= CHASSIS_RC_SLOW_SEN;
-            // }
+            move.tick = tick;
+            int32_t delta = l1s.dis1.data - l1s.dis0.data;
+            if (move.rc->rc.ch[RC_CH_LV] > RC_ROCKER_MIN + CHASSIS_RC_DEADLINE &&
+                l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
+                (1 < delta || delta < -1) &&
+                -400 < delta && delta < 400)
+            {
+                // (float)(l1s.dis1.raw - l1s.dis0.raw)
+                float in = 2 * (float)delta / (float)(l1s.dis1.data + l1s.dis0.data);
+                move.wz_set = ca_pid_f32(move.pid_l1s, 0, tanf(in));
+            }
+
+            if (move.rc->rc.ch[RC_CH_LV] < RC_ROCKER_MIN + CHASSIS_RC_DEADLINE)
+            {
+                l1s_cli();
+                move.wz_set *= CHASSIS_RC_SLOW_SEN;
+            }
+
+            /**
+             *
+             * calculate horizontal speed, vertical speed, rotation speed,
+             * right hand rule
+            */
+            // float x = (float)(move.mo[0].fb->angle + move.mo[1].fb->angle - move.mo[2].fb->angle - move.mo[3].fb->angle) *
+            //           M3508_MOTOR_ECD_TO_DISTANCE * MOTOR_SPEED_TO_CHASSIS_SPEED_VX * (float)M_SQRT1_2;
+            // float y = (float)(-move.mo[0].fb->angle + move.mo[1].fb->angle + move.mo[2].fb->angle - move.mo[3].fb->angle) *
+            //           M3508_MOTOR_ECD_TO_DISTANCE * MOTOR_SPEED_TO_CHASSIS_SPEED_VY * (float)M_SQRT1_2;
+            // float z = (float)(-move.mo[0].fb->angle - move.mo[1].fb->angle - move.mo[2].fb->angle - move.mo[3].fb->angle) *
+            //           M3508_MOTOR_ECD_TO_DISTANCE * MOTOR_SPEED_TO_CHASSIS_SPEED_WZ / MOTOR_DISTANCE_TO_CENTER;
+            // dma_printf("%g,%g,%g,%g,%g,%g\n", move.x, move.y, move.z, x, y, z);
+            // dma_printf("%g,%g,%g\n", move.x, move.y, move.z);
         }
-        break; /* CHASSIS_VECTOR_YAW */
+        break; /* CHASSIS_VECTOR_PATH */
 
         case CHASSIS_VECTOR_AUTO:
         {

@@ -42,7 +42,7 @@ void archery_reday(void)
     {
         archery.jet_on = jet_middle_on;
         shifth_index(SHIFTH_INDEX_MIDDLE);
-        pitch_set(SERVO_PITCH_PWMMAX - angle * 3 / 2);
+        pitch_set(SERVO_PITCH_PWMMAX - angle);
         do
         {
             archery_update();
@@ -176,7 +176,7 @@ void task_archery(void *pvParameters)
     {
         uint32_t pwm[7] = {
             SERVO_FETCH_PWMMAX,
-            SERVO_PITCH_PWMMAX - 200 * 3 / 2,
+            SERVO_PITCH_PWMMAX - 200,
             SERVO_SHIFTV_PWMMIN,
             SERVO_PITCHL_PWMMAX - 200,
             SERVO_SHIFTVL_PWMMIN,

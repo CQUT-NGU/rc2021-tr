@@ -111,13 +111,13 @@ void task_debug(void *pvParameters)
         case 'j':
         {
             serial->c = 0;
-            uint32_t set = SERVO_PITCH_PWMMAX - 200 * 3 / 2;
+            uint32_t set = SERVO_PITCH_PWMMAX - 200;
             int match = SERVO_MATCH_PITCH;
             void (*pitch)(uint32_t) = pitch_set;
             void (*jet_on)(void) = jet_middle_on;
             if (serial->y > 0)
             {
-                set = SERVO_PITCH_PWMMAX - (uint32_t)((1 / 0.18F) * serial->y) * 3 / 2;
+                set = SERVO_PITCH_PWMMAX - (uint32_t)((1 / 0.18F) * serial->y);
             }
             else if (serial->x > 0)
             {

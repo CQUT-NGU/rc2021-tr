@@ -39,7 +39,7 @@ static uint8_t chassis_tx_can_data[8];
 
 void angle_update(motor_t *mo)
 {
-    int delta = (int)(mo->ecd_last - mo->ecd);
+    int delta = (int)(mo->ecd - mo->ecd_last);
     if (delta > ECD_RANGE_HALF)
     {
         delta -= ECD_RANGE;

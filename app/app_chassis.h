@@ -25,8 +25,8 @@ typedef enum
     CHASSIS_VECTOR_SLOW,
     /* chassis will have rotation speed control */
     CHASSIS_VECTOR_NORMAL,
-    /* chassis will have yaw angle(chassis_yaw) close-looped control */
-    CHASSIS_VECTOR_YAW,
+    /* chassis will speed trajectory */
+    CHASSIS_VECTOR_PATH,
 } chassis_mode_e;
 
 typedef struct
@@ -52,6 +52,7 @@ typedef struct
 
     ca_pid_f32_t pid_speed[4];  /* motor speed PID */
     ca_pid_f32_t pid_offset[3]; /* offset PID */
+    polynomial5_t path[3];      /* speed trajectory */
 
     /* chassis horizontal offset, positive means letf, unit m */
     float x;

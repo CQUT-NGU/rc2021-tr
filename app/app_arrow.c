@@ -38,7 +38,7 @@ void task_arrow(void *pvParameters)
 
         /* Check whether the pitching device is in the middle position */
         {
-            pitch_set(SERVO_PITCH_PWMMAX - 200 * 3 / 2);
+            pitch_set(SERVO_PITCH_PWMMAX - 200);
             pitchl_set(SERVO_PITCHL_PWMMAX - 200);
             pitchr_set(SERVO_PITCHR_PWMMIN + 200);
         }
@@ -141,7 +141,7 @@ void task_arrow(void *pvParameters)
 
         /* The archery device lifts the arrow */
         {
-            pitch_set_pwm(SERVO_PITCH_PWMMAX - 200 * 3 / 2);
+            pitch_set_pwm(SERVO_PITCH_PWMMAX - 200);
             pitchl_set_pwm(SERVO_PITCHL_PWMMAX - 200);
             pitchr_set_pwm(SERVO_PITCHR_PWMMIN + 200);
             do
@@ -165,7 +165,7 @@ void task_arrow(void *pvParameters)
 
         /* The archery apparatus was raised to the top to load the arrows */
         {
-            pitch_set(SERVO_PITCH_PWMMAX - 400 * 3 / 2);
+            pitch_set(SERVO_PITCH_PWMMAX - 400);
             pitchl_set(SERVO_PITCHL_PWMMAX - 400);
             pitchr_set(SERVO_PITCHR_PWMMIN + 400);
             do
@@ -182,7 +182,7 @@ void task_arrow(void *pvParameters)
 
         /* The archery device drops an arrow */
         {
-            pitch_set(SERVO_PITCH_PWMMAX - 150 * 3 / 2);
+            pitch_set(SERVO_PITCH_PWMMAX - 150);
             pitchl_set(SERVO_PITCHL_PWMMAX - 150);
             pitchr_set(SERVO_PITCHR_PWMMIN + 150);
             do

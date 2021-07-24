@@ -100,7 +100,7 @@ void task_shoot(void *pvParameters)
             }
             /* The archery device lifts the arrow */
             {
-                pitch_set_pwm(SERVO_PITCH_PWMMAX - 200 * 3 / 2);
+                pitch_set_pwm(SERVO_PITCH_PWMMAX - 200);
                 do
                 {
                     osDelay(SHOOT_DELAY_MIN);
@@ -118,7 +118,7 @@ void task_shoot(void *pvParameters)
             }
             /* The archery apparatus was raised to the top to load the arrows */
             {
-                pitch_set(SERVO_PITCH_PWMMAX - 400 * 3 / 2);
+                pitch_set(SERVO_PITCH_PWMMAX - 400);
                 do
                 {
                     osDelay(SHOOT_DELAY_MIN);
@@ -136,7 +136,7 @@ void task_shoot(void *pvParameters)
                 shifth_index(SHIFTH_INDEX_MIDDLE);
 
                 /* The archery device drops an arrow */
-                pitch_set(SERVO_PITCH_PWMMAX - 150 * 3 / 2);
+                pitch_set(SERVO_PITCH_PWMMAX - 150);
                 do
                 {
                     osDelay(SHOOT_DELAY_WAIT);
