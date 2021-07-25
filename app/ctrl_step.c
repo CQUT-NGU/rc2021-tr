@@ -50,7 +50,10 @@ uint32_t shifth_set_dir(int32_t offset)
 
 void shifth_set_freq(uint32_t hz)
 {
+    step.fr = hz;
+
     uint32_t x = (uint32_t)ca_sqrt_u32(SystemCoreClock / hz);
+    uint32_t xh = x >> 1;
 
     __HAL_TIM_SET_PRESCALER(&SHIFTH_TIM, x - 1);
     __HAL_TIM_SET_AUTORELOAD(&SHIFTH_TIM, x - 1);
@@ -82,15 +85,14 @@ void shifth_zero_cli(int32_t idx)
 
 void shifth_index(uint32_t idx)
 {
-    step.set = idx;
-
     if (READ_BIT(step.flag, SHIFTH_FLAG_AUTO))
     {
         shifth_stop();
     }
 
-    if (step.idx != step.set)
+    if (step.idx != idx)
     {
+        step.set = idx;
         int32_t delta = (int32_t)(step.set - step.idx);
         shifth_start(delta);
     }
@@ -98,23 +100,25 @@ void shifth_index(uint32_t idx)
 
 void shifth_start(int32_t offset)
 {
-    step.fr = 0;
+    step.cnt = shifth_set_dir(offset);
+    shifth_set_freq(SHIFTH_PWM_DELTA);
+
     SET_BIT(step.flag, SHIFTH_FLAG_AUTO);
 
-    __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, shifth_set_dir(offset));
+    __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
+    __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, step.cnt);
     __HAL_TIM_ENABLE_IT(&COUNT_TIM, SHIFTH_IT_CC);
     __HAL_TIM_ENABLE(&COUNT_TIM);
 
     HAL_TIM_PWM_Start(&SHIFTH_TIM, SHIFTH_CHANNEL);
-
-    shifth_update(SHIFTH_PWM_DELTA, SHIFTH_PWM_DIVIDE);
 }
 
 void shifth_stop(void)
 {
     HAL_TIM_PWM_Stop(&SHIFTH_TIM, SHIFTH_CHANNEL);
 
-    __HAL_TIM_DISABLE(&COUNT_TIM);
+    CLEAR_BIT(step.flag, SHIFTH_FLAG_AUTO);
+
     step.cnt = __HAL_TIM_GET_COUNTER(&COUNT_TIM);
     __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
     if (READ_BIT(step.flag, SHIFTH_FLAG_REVERSE))
@@ -140,16 +144,12 @@ void COUNT_IRQHandler(void)
 
     if (READ_BIT(step.flag, SHIFTH_FLAG_AUTO))
     {
-        CLEAR_BIT(step.flag, SHIFTH_FLAG_AUTO);
-
         shifth_stop();
     }
 
     if (READ_BIT(step.flag, SHIFTH_FLAG_ZERO))
     {
         CLEAR_BIT(step.flag, SHIFTH_FLAG_ZERO);
-
-        shifth_stop();
 
         step.idx = 0;
         step.set = 0;
