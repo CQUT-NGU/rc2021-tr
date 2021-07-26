@@ -245,7 +245,7 @@ void task_archery(void *pvParameters)
         if (switch_is_down(rc->rc.s[RC_SW_L]) &&
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
-            /* relay control, shoot an arrow */
+            /* take arrow */
             if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MIN + RC_DEADLINE)
             {
                 archery_arrow();
@@ -256,9 +256,9 @@ void task_archery(void *pvParameters)
         {
         case 'D':
         {
-            archery.angle = (1.0F / 0.18F) * serial->x;
-            archery_shoot();
             serial->c = 0;
+            archery.angle = serial->x;
+            archery_shoot();
         }
         break;
 
