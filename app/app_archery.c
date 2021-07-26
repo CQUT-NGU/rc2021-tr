@@ -34,7 +34,7 @@ void archery_arrow(void)
 
 void archery_reday(void)
 {
-    archery.angle = (1.0F / 0.18F) * archery.angle;
+    archery.angle = (1 / 0.18F) * archery.angle;
 
     uint32_t angle = (uint32_t)(archery.angle);
 
@@ -208,6 +208,7 @@ void task_archery(void *pvParameters)
         }
         if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MAX - RC_DEADLINE)
         {
+            signal_off("c\n");
             if (READ_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT))
             {
                 CLEAR_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT);
@@ -232,13 +233,8 @@ void task_archery(void *pvParameters)
             }
             else if (rc->rc.ch[RC_CH_S] > RC_ROCKER_MAX - RC_DEADLINE)
             {
-                if (!READ_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT))
-                {
-                    SET_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT);
-
-                    archery.angle = 60;
-                    archery_shoot();
-                }
+                /* It starts to spew out gas */
+                signal_on("c\n");
             }
         }
 
@@ -249,6 +245,16 @@ void task_archery(void *pvParameters)
             if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MIN + RC_DEADLINE)
             {
                 archery_arrow();
+            }
+            else if (rc->rc.ch[RC_CH_S] > RC_ROCKER_MAX - RC_DEADLINE)
+            {
+                if (!READ_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT))
+                {
+                    SET_BIT(archery.signal, ARCHERY_SIGNAL_SHOOT);
+
+                    archery.angle = 60;
+                    archery_shoot();
+                }
             }
         }
 

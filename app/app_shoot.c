@@ -62,7 +62,7 @@ void task_shoot(void *pvParameters)
                 {
                     osDelay(SHOOT_DELAY_MIN);
                 } while (READ_BIT(step.flag, SHIFTH_FLAG_AUTO));
-                osDelay(SHOOT_DELAY_WAIT);
+                // osDelay(SHOOT_DELAY_WAIT);
             }
             /* Check whether the archery device is down */
             {
@@ -109,6 +109,8 @@ void task_shoot(void *pvParameters)
             }
             /* The archery set back */
             {
+                /* Check that the horizontal moving device is in proper position */
+                shifth_index(SHIFTH_INDEX_MIDDLE);
                 shiftv_set(SERVO_SHIFTV_PWMMIN);
                 do
                 {
@@ -132,9 +134,6 @@ void task_shoot(void *pvParameters)
             }
             else
             {
-                /* Check that the horizontal moving device is in proper position */
-                shifth_index(SHIFTH_INDEX_MIDDLE);
-
                 /* The archery device drops an arrow */
                 pitch_set(SERVO_PITCH_PWMMAX - 150);
                 do
