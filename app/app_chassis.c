@@ -91,7 +91,7 @@
 // #define SWING_MOVE_ANGLE 0.31415926535897932384626433832795F
 
 /* chassis motor speed PID */
-#define M3505_MOTOR_SPEED_PID_KP       15000.0F
+#define M3505_MOTOR_SPEED_PID_KP       16000.0F
 #define M3505_MOTOR_SPEED_PID_KI       10.0F
 #define M3505_MOTOR_SPEED_PID_KD       0.0F
 #define M3505_MOTOR_SPEED_PID_MAX_OUT  MAX_MOTOR_CAN_CURRENT
@@ -120,8 +120,9 @@ static void chassis_update(void)
     for (int i = 0; i != 4; ++i)
     {
         /* update motor speed, accel is differential of speed PID */
-        move.mo[i].v = move.mo[i].fb->v_rpm * CHASSIS_MOTOR_RPM_TO_VECTOR_SEN;
-        move.mo[i].accel = move.pid_speed[i].x[0] - move.mo[i].v;
+        float v = move.mo[i].fb->v_rpm * CHASSIS_MOTOR_RPM_TO_VECTOR_SEN;
+        move.mo[i].accel = v - move.mo[i].v;
+        move.mo[i].v = v;
         move.mo[i].accel *= CHASSIS_CONTROL_TIME;
     }
 
@@ -146,54 +147,105 @@ static void chassis_update(void)
 
 void position_set(float x, float y, float z)
 {
-    float t = 0.001F * (float)xTaskGetTickCount();
-    float source[4] = {t, 0, 0, 0};
-    float target[4] = {0};
-    float q = x - move.x;
-    target[0] = t + ABS(q);
-    target[1] = q;
-    polynomial5_init(move.path + 0, source, target);
-    q = y - move.y;
-    target[0] = t + ABS(q);
-    target[1] = q;
-    polynomial5_init(move.path + 1, source, target);
-    q = z - move.z;
-    target[0] = t + ABS(q);
-    target[1] = q;
-    polynomial5_init(move.path + 2, source, target);
+    float delta;
+    move.source[0] = 0.001F * (float)xTaskGetTickCount();
+    move.target[2] = 0;
+    move.source[3] = 0;
+    move.target[3] = 0;
+
+    move.x_set = x;
+    move.source[1] = move.x;
+    move.source[2] = move.vx;
+    delta = move.x_set - move.x;
+    move.target[0] = move.source[0] + ABS(delta);
+    move.target[1] = move.x_set;
+    polynomial5_init(move.path + 0, move.source, move.target);
+    move.y_set = move.serial->y;
+    move.z_set = move.serial->z;
+
+    move.y_set = y;
+    move.source[1] = move.y;
+    move.source[2] = move.vy;
+    delta = move.y_set - move.y;
+    move.target[0] = move.source[0] + ABS(delta);
+    move.target[1] = move.y_set;
+    polynomial5_init(move.path + 1, move.source, move.target);
+
+    move.z_set = z;
+    move.source[1] = move.z;
+    move.source[2] = move.wz;
+    delta = move.z_set - move.z;
+    move.target[0] = move.source[0] + ABS(delta);
+    move.target[1] = move.z_set;
+    polynomial5_init(move.path + 2, move.source, move.target);
 }
 
 void position_setx(float x)
 {
-    float t = 0.001F * (float)xTaskGetTickCount();
-    float source[4] = {t, 0, 0, 0};
-    float target[4] = {0};
-    float q = x - move.x;
-    target[0] = t + ABS(q);
-    target[1] = q;
-    polynomial5_init(move.path + 0, source, target);
+    move.source[0] = 0.001F * (float)xTaskGetTickCount();
+    move.target[2] = 0;
+    move.source[3] = 0;
+    move.target[3] = 0;
+
+    move.x_set = x;
+    move.source[1] = move.x;
+    move.source[2] = move.vx;
+    float delta = move.x_set - move.x;
+    move.target[0] = move.source[0] + ABS(delta);
+    move.target[1] = move.x_set;
+    polynomial5_init(move.path + 0, move.source, move.target);
 }
 
 void position_sety(float y)
 {
-    float t = 0.001F * (float)xTaskGetTickCount();
-    float source[4] = {t, 0, 0, 0};
-    float target[4] = {0};
-    float q = y - move.y;
-    target[0] = t + ABS(q);
-    target[1] = q;
-    polynomial5_init(move.path + 1, source, target);
+    move.source[0] = 0.001F * (float)xTaskGetTickCount();
+    move.target[2] = 0;
+    move.source[3] = 0;
+    move.target[3] = 0;
+
+    move.y_set = y;
+    move.source[1] = move.y;
+    move.source[2] = move.vy;
+    float delta = move.y_set - move.y;
+    move.target[0] = move.source[0] + ABS(delta);
+    move.target[1] = move.y_set;
+    polynomial5_init(move.path + 1, move.source, move.target);
 }
 
 void position_setz(float z)
 {
-    float t = 0.001F * (float)xTaskGetTickCount();
-    float source[4] = {t, 0, 0, 0};
-    float target[4] = {0};
-    float q = z - move.z;
-    target[0] = t + ABS(q);
-    target[1] = q;
-    polynomial5_init(move.path + 2, source, target);
+    move.source[0] = 0.001F * (float)xTaskGetTickCount();
+    move.target[2] = 0;
+    move.source[3] = 0;
+    move.target[3] = 0;
+
+    move.z_set = z;
+    move.source[1] = move.z;
+    move.source[2] = move.wz;
+    float delta = move.z_set - move.z;
+    move.target[0] = move.source[0] + ABS(delta);
+    move.target[1] = move.z_set;
+    polynomial5_init(move.path + 2, move.source, move.target);
+}
+
+int32_t laser_set_wz(float scale)
+{
+    (void)scale;
+
+    int32_t diff = l1s.dis1.data - l1s.dis0.data;
+    if (l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
+        -400 < diff && diff < 400)
+    {
+        int32_t sum = (l1s.dis1.data + l1s.dis0.data) >> 1;
+        float in = (float)diff / (float)(sum);
+        // move.wz_set = ca_pid_f32(move.pid_l1s, 0, tanf(in));
+        move.wz_set = scale * in;
+    }
+    else
+    {
+        move.wz_set = 0;
+    }
+    return diff;
 }
 
 /**
@@ -216,7 +268,6 @@ static void chassis_serial(void)
     case 'p':
     {
         move.serial->c = 0;
-
         position_set(move.serial->x,
                      move.serial->y,
                      move.serial->z);
@@ -345,14 +396,14 @@ void task_chassis(void *pvParameters)
         };
 
         static float kpid_p[3][3] = {
-            {1.0F, 0.0F, 0.0F}, /* x */
-            {1.0F, 0.0F, 0.0F}, /* y */
-            {1.0F, 0.0F, 0.0F}, /* z */
+            {4.0F, 0.01F, 0.0F}, /* x */
+            {4.0F, 0.01F, 0.0F}, /* y */
+            {4.0F, 0.01F, 0.0F}, /* z */
         };
 
         static float kpid_l1s[3] = {
-            2.0F,
-            0.001F,
+            1.0F,
+            0.002F,
             0.0F,
         };
 
@@ -402,7 +453,7 @@ void task_chassis(void *pvParameters)
 
     for (;;)
     {
-        TickType_t tick = xTaskGetTickCount();
+        move.tick = xTaskGetTickCount();
 
         /* update chassis measure data */
         chassis_update();
@@ -472,44 +523,31 @@ void task_chassis(void *pvParameters)
         case CHASSIS_VECTOR_PATH:
         {
             chassis_rc();
-            chassis_serial();
 
-            // float t = (float)tick * 0.001F;
-            // if (t < move.path[0].t[1])
-            // {
-            //     move.vx_set = polynomial5_vec(move.path + 0, t);
-            // }
-            // else
-            // {
-            //     move.vx_set = 0;
-            // }
-            // if (t < move.path[1].t[1])
-            // {
-            //     move.vy_set = polynomial5_vec(move.path + 1, t);
-            // }
-            // else
-            // {
-            //     move.vy_set = 0;
-            // }
-            // if (t < move.path[2].t[1])
-            // {
-            //     move.wz_set = polynomial5_vec(move.path + 2, t);
-            // }
-            // else
-            // {
-            //     move.wz_set = 0;
-            // }
-
-            move.tick = tick;
-            int32_t delta = l1s.dis1.data - l1s.dis0.data;
-            if (move.rc->rc.ch[RC_CH_LV] > RC_ROCKER_MIN + CHASSIS_RC_DEADLINE &&
-                l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE &&
-                (1 < delta || delta < -1) &&
-                -400 < delta && delta < 400)
+            move.source[0] = (float)move.tick * 0.001F;
+            if (move.source[0] < move.path[0].t[1])
             {
-                // (float)(l1s.dis1.raw - l1s.dis0.raw)
-                float in = 2 * (float)delta / (float)(l1s.dis1.data + l1s.dis0.data);
-                move.wz_set = ca_pid_f32(move.pid_l1s, 0, tanf(in));
+                move.vx_set = polynomial5_vec(move.path + 0, move.source[0]);
+            }
+            else
+            {
+                move.vx_set = ca_pid_f32(move.pid_offset + 0, move.x, move.x_set);
+            }
+            if (move.source[0] < move.path[1].t[1])
+            {
+                move.vy_set = polynomial5_vec(move.path + 1, move.source[0]);
+            }
+            else
+            {
+                move.vy_set = ca_pid_f32(move.pid_offset + 1, move.y, move.y_set);
+            }
+            if (move.source[0] < move.path[2].t[1])
+            {
+                move.wz_set = polynomial5_vec(move.path + 2, move.source[0]);
+            }
+            else
+            {
+                move.wz_set = ca_pid_f32(move.pid_offset + 2, move.z, move.z_set);
             }
 
             if (move.rc->rc.ch[RC_CH_LV] < RC_ROCKER_MIN + CHASSIS_RC_DEADLINE)
@@ -518,11 +556,6 @@ void task_chassis(void *pvParameters)
                 move.wz_set *= CHASSIS_RC_SLOW_SEN;
             }
 
-            /**
-             *
-             * calculate horizontal speed, vertical speed, rotation speed,
-             * right hand rule
-            */
             // float x = (float)(move.mo[0].fb->angle + move.mo[1].fb->angle - move.mo[2].fb->angle - move.mo[3].fb->angle) *
             //           M3508_MOTOR_ECD_TO_DISTANCE * MOTOR_SPEED_TO_CHASSIS_SPEED_VX * (float)M_SQRT1_2;
             // float y = (float)(-move.mo[0].fb->angle + move.mo[1].fb->angle + move.mo[2].fb->angle - move.mo[3].fb->angle) *
@@ -531,6 +564,9 @@ void task_chassis(void *pvParameters)
             //           M3508_MOTOR_ECD_TO_DISTANCE * MOTOR_SPEED_TO_CHASSIS_SPEED_WZ / MOTOR_DISTANCE_TO_CENTER;
             // dma_printf("%g,%g,%g,%g,%g,%g\n", move.x, move.y, move.z, x, y, z);
             // dma_printf("%g,%g,%g\n", move.x, move.y, move.z);
+            // dma_printf("%u,%u,%u\n", l1s.dis0.raw, l1s.dis1.raw, l1s.dis2.raw);
+
+            chassis_serial();
         }
         break; /* CHASSIS_VECTOR_PATH */
 

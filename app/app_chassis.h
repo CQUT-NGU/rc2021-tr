@@ -52,7 +52,6 @@ typedef struct
 
     ca_pid_f32_t pid_speed[4];  /* motor speed PID */
     ca_pid_f32_t pid_offset[3]; /* offset PID */
-    polynomial5_t path[3];      /* speed trajectory */
 
     /* chassis horizontal offset, positive means letf, unit m */
     float x;
@@ -91,9 +90,16 @@ typedef struct
 
     ca_pid_f32_t pid_l1s[1];
     float yaw_set;
+
+    float source[4]; /* source speed trajectory */
+    float target[4]; /* target speed trajectory */
+
+    polynomial5_t path[3]; /* speed trajectory */
 } chassis_move_t;
 
 extern chassis_move_t move;
+
+extern int32_t laser_set_wz(float scale);
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
 #endif /* __APP_CHASSIS_H__ */

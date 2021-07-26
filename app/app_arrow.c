@@ -16,6 +16,112 @@ TaskHandle_t task_arrow_handler;
 #define ARROW_DELAY_MIN  10
 #define ARROW_DELAY_WAIT 1000
 
+#define ARROW_OFFSET_X 91
+#define ARROW_OFFSET_Y 482
+
+static ca_pid_f32_t pid[2];
+static float kpid[3];
+
+void laser_arrow(void)
+{
+    move.vx_set = 0;
+    move.vy_set = 0;
+    do
+    {
+        int32_t delta = laser_set_wz(1);
+        if (-2 < delta && delta < 2)
+        {
+            break;
+        }
+        osDelay(ARCHERY_CONTROL_TIME_MS);
+    } while (1);
+    move.vy_set = 0;
+    move.wz_set = 0;
+    kpid[0] = 0.002F;
+    kpid[1] = 0.00002F;
+    kpid[2] = 0;
+    ca_pid_f32_position(pid, kpid, -0.5F, 0.5F, 0.2F);
+    do
+    {
+        int32_t delta = laser_set_wz(1);
+        if (l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE)
+        {
+            uint32_t d = (l1s.dis0.raw + l1s.dis1.raw) >> 1;
+            if (d > ARROW_OFFSET_X)
+            {
+                if (d > ARROW_OFFSET_X + 500)
+                {
+                    move.vx_set = 0.5F;
+                }
+                else
+                {
+                    move.vx_set = ca_pid_f32(pid, ARROW_OFFSET_X, (float)d);
+                }
+            }
+            else
+            {
+                move.vx_set = 0;
+            }
+            if (d < ARROW_OFFSET_X && -2 < delta && delta < 2)
+            {
+                break;
+            }
+        }
+        else
+        {
+            move.vx_set = -0.2F;
+        }
+        osDelay(ARCHERY_CONTROL_TIME_MS);
+    } while (1);
+    move.vx_set = 0;
+    move.wz_set = 0;
+    kpid[0] = 0.002F;
+    kpid[1] = 0.00002F;
+    kpid[2] = 0;
+    ca_pid_f32_position(pid + 1, kpid, -0.5F, 0.5F, 0.2F);
+    do
+    {
+        laser_set_wz(1);
+        if (l1s.dis0.error + l1s.dis1.error == L1S_ERROR_NONE)
+        {
+            uint32_t d = (l1s.dis0.raw + l1s.dis1.raw) >> 1;
+            move.vx_set = ca_pid_f32(pid, ARROW_OFFSET_X, (float)d);
+        }
+        else
+        {
+            move.vx_set = -0.2F;
+        }
+        if (l1s.dis2.error == L1S_ERROR_NONE)
+        {
+            uint32_t d = l1s.dis2.raw;
+            if (d > ARROW_OFFSET_Y)
+            {
+                if (d > ARROW_OFFSET_Y + 500)
+                {
+                    move.vy_set = 0.5F;
+                }
+                else
+                {
+                    move.vy_set = ca_pid_f32(pid + 1, ARROW_OFFSET_Y, (float)d);
+                }
+            }
+            else
+            {
+                move.vy_set = 0;
+            }
+        }
+        else
+        {
+            move.vy_set = -0.2F;
+        }
+        osDelay(ARCHERY_CONTROL_TIME_MS);
+    } while (l1s.dis2.raw > ARROW_OFFSET_Y);
+    move.vx_set = 0;
+    move.vy_set = 0;
+    move.wz_set = 0;
+    osDelay(ARROW_DELAY_WAIT);
+}
+
 void task_arrow(void *pvParameters)
 {
     (void)pvParameters;
@@ -49,17 +155,6 @@ void task_arrow(void *pvParameters)
             shiftvl_set_pwm(SERVO_SHIFTV_PWMMIN);
             shiftvr_set_pwm(SERVO_SHIFTV_PWMMAX);
         }
-
-        // /* Check whether the clip arrow device is in the vertical position */
-        // {
-        //     fetch_set(SERVO_FETCH_PWMMID);
-        //     do
-        //     {
-        //         osDelay(ARROW_DELAY_MIN);
-        //     } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
-        //     /* Check that the horizontal moving device is in proper position */
-        //     osDelay(ARROW_DELAY_WAIT);
-        // }
 
         /* Check whether the clip arrow device is aligned with its arrow */
         {
