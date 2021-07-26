@@ -99,6 +99,19 @@ typedef struct
 
 extern chassis_move_t move;
 
+extern void position_set(float x,
+                         float tx,
+                         float y,
+                         float ty,
+                         float z,
+                         float tz);
+extern void position_setx(float x, float t);
+extern void position_sety(float y, float t);
+extern void position_setz(float z, float t);
+extern void position_update(void);
+extern void position_updatex(void);
+extern void position_updatey(void);
+extern void position_updatez(void);
 extern int32_t laser_set_wz(float scale);
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/

@@ -42,7 +42,7 @@ void archery_reday(void)
     {
         archery.jet_on = jet_middle_on;
         shifth_index(SHIFTH_INDEX_MIDDLE);
-        pitch_set(SERVO_PITCH_PWMMAX - angle);
+        pitch_set(SERVO_PITCH_STD - angle);
         do
         {
             archery_update();
@@ -54,23 +54,33 @@ void archery_reday(void)
     else if (READ_BIT(archery.load, ARCHERY_LOAD_L))
     {
         archery.jet_on = jet_left_on;
-        pitchl_set(SERVO_PITCHL_PWMMAX - angle);
+        position_setx(move.x + 0.403F * (float)M_SQRT1_2, 1);
+        pitchl_set(SERVO_PITCHL_STD - angle);
         do
         {
             archery_update();
+            position_updatex();
             osDelay(ARCHERY_CONTROL_TIME_MS);
-        } while (READ_BIT(servo.match, SERVO_MATCH_PITCHL) != SERVO_MATCH_PITCHL);
+        } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHL) ||
+                 move.x_set + 0.001F < move.x ||
+                 move.x < move.x_set - 0.001F);
+        move.vx_set = 0;
         osDelay(500);
     }
     else if (READ_BIT(archery.load, ARCHERY_LOAD_R))
     {
         archery.jet_on = jet_right_on;
-        pitchr_set(SERVO_PITCHR_PWMMIN + angle);
+        pitchr_set(SERVO_PITCHR_STD + angle);
+        position_setx(move.x - 0.41F * (float)M_SQRT1_2, 1);
         do
         {
             archery_update();
+            position_updatex();
             osDelay(ARCHERY_CONTROL_TIME_MS);
-        } while (READ_BIT(servo.match, SERVO_MATCH_PITCHR) != SERVO_MATCH_PITCHR);
+        } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHR) ||
+                 move.x_set + 0.001F < move.x ||
+                 move.x < move.x_set - 0.001F);
+        move.vx_set = 0;
         osDelay(500);
     }
     else
@@ -126,19 +136,19 @@ void archery_update(void)
             {
                 CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_LEFT);
                 gpio_pin_reset(POWER3_RU_GPIO_Port, POWER3_RU_Pin);
-                pitchl_set(SERVO_PITCHL_PWMMAX - 100);
+                pitchl_set(SERVO_PITCHL_STD - 100);
             }
             if (READ_BIT(archery.jet, ARCHERY_JET_MIDDLE))
             {
                 CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_MIDDLE);
                 gpio_pin_reset(POWER2_LD_GPIO_Port, POWER2_LD_Pin);
-                pitch_set(SERVO_PITCH_PWMMAX - 100);
+                pitch_set(SERVO_PITCH_STD - 100);
             }
             if (READ_BIT(archery.jet, ARCHERY_JET_RIGHT))
             {
                 CLEAR_BIT(archery.jet, ARCHERY_JET_CNT | ARCHERY_JET_RIGHT);
                 gpio_pin_reset(POWER4_RD_GPIO_Port, POWER4_RD_Pin);
-                pitchr_set(SERVO_PITCHR_PWMMIN + 100);
+                pitchr_set(SERVO_PITCHR_STD + 100);
             }
         }
 
@@ -176,11 +186,11 @@ void task_archery(void *pvParameters)
     {
         uint32_t pwm[7] = {
             SERVO_FETCH_PWMMAX,
-            SERVO_PITCH_PWMMAX - 200,
+            SERVO_PITCH_STD - 200,
             SERVO_SHIFTV_PWMMIN,
-            SERVO_PITCHL_PWMMAX - 200,
+            SERVO_PITCHL_STD - 200,
             SERVO_SHIFTVL_PWMMIN,
-            SERVO_PITCHR_PWMMIN + 200,
+            SERVO_PITCHR_STD + 200,
             SERVO_SHIFTVR_PWMMAX,
         };
         servo_init();

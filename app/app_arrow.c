@@ -144,9 +144,9 @@ void task_arrow(void *pvParameters)
 
         /* Check whether the pitching device is in the middle position */
         {
-            pitch_set(SERVO_PITCH_PWMMAX - 200);
-            pitchl_set(SERVO_PITCHL_PWMMAX - 200);
-            pitchr_set(SERVO_PITCHR_PWMMIN + 200);
+            pitch_set(SERVO_PITCH_STD - 200);
+            pitchl_set(SERVO_PITCHL_STD - 200);
+            pitchr_set(SERVO_PITCHR_STD + 200);
         }
 
         /* The archery set back */
@@ -166,6 +166,44 @@ void task_arrow(void *pvParameters)
             } while (READ_BIT(servo.match, SERVO_MATCH_FETCH) != SERVO_MATCH_FETCH);
             osDelay(ARROW_DELAY_WAIT);
         }
+
+        // move.vx_set = 0;
+        // move.wz_set = 0;
+        // kpid[0] = 0.001F;
+        // kpid[1] = 0;
+        // kpid[2] = 0;
+        // ca_pid_f32_position(pid + 1, kpid, -0.5F, 0.5F, 0.2F);
+        // do
+        // {
+        //     if (l1s.dis2.error == L1S_ERROR_NONE)
+        //     {
+        //         uint32_t d = l1s.dis2.raw;
+        //         if (d > ARROW_OFFSET_Y)
+        //         {
+        //             if (d > ARROW_OFFSET_Y + 500)
+        //             {
+        //                 move.vy_set = 0.5F;
+        //             }
+        //             else
+        //             {
+        //                 move.vy_set = ca_pid_f32(pid + 1, ARROW_OFFSET_Y, (float)d);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             move.vy_set = 0;
+        //         }
+        //     }
+        //     else
+        //     {
+        //         move.vy_set = -0.2F;
+        //     }
+        //     osDelay(ARCHERY_CONTROL_TIME_MS);
+        // } while (l1s.dis2.raw > ARROW_OFFSET_Y);
+        // move.vx_set = 0;
+        // move.vy_set = 0;
+        // move.wz_set = 0;
+        // osDelay(ARROW_DELAY_WAIT);
 
         /* Clamp all the arrows */
         {
@@ -236,9 +274,9 @@ void task_arrow(void *pvParameters)
 
         /* The archery device lifts the arrow */
         {
-            pitch_set_pwm(SERVO_PITCH_PWMMAX - 200);
-            pitchl_set_pwm(SERVO_PITCHL_PWMMAX - 200);
-            pitchr_set_pwm(SERVO_PITCHR_PWMMIN + 200);
+            pitch_set_pwm(SERVO_PITCH_STD - 200);
+            pitchl_set_pwm(SERVO_PITCHL_STD - 200);
+            pitchr_set_pwm(SERVO_PITCHR_STD + 200);
             do
             {
                 osDelay(ARROW_DELAY_MIN);
@@ -260,9 +298,9 @@ void task_arrow(void *pvParameters)
 
         /* The archery apparatus was raised to the top to load the arrows */
         {
-            pitch_set(SERVO_PITCH_PWMMAX - 400);
-            pitchl_set(SERVO_PITCHL_PWMMAX - 400);
-            pitchr_set(SERVO_PITCHR_PWMMIN + 400);
+            pitch_set(SERVO_PITCH_STD - 400);
+            pitchl_set(SERVO_PITCHL_STD - 400);
+            pitchr_set(SERVO_PITCHR_STD + 400);
             do
             {
                 osDelay(ARROW_DELAY_MIN);
@@ -277,9 +315,9 @@ void task_arrow(void *pvParameters)
 
         /* The archery device drops an arrow */
         {
-            pitch_set(SERVO_PITCH_PWMMAX - 150);
-            pitchl_set(SERVO_PITCHL_PWMMAX - 150);
-            pitchr_set(SERVO_PITCHR_PWMMIN + 150);
+            pitch_set(SERVO_PITCH_STD - 150);
+            pitchl_set(SERVO_PITCHL_STD - 150);
+            pitchr_set(SERVO_PITCHR_STD + 150);
             do
             {
                 osDelay(SERVO_UPDATE_MS_PITCH);

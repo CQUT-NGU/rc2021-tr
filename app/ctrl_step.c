@@ -57,7 +57,7 @@ void shifth_set_freq(uint32_t hz)
 
     __HAL_TIM_SET_PRESCALER(&SHIFTH_TIM, x - 1);
     __HAL_TIM_SET_AUTORELOAD(&SHIFTH_TIM, x - 1);
-    __HAL_TIM_SET_COMPARE(&SHIFTH_TIM, SHIFTH_CHANNEL, (x >> 1));
+    __HAL_TIM_SET_COMPARE(&SHIFTH_TIM, SHIFTH_CHANNEL, xh);
 }
 
 void shifth_update(uint32_t inc, uint32_t cnt)
@@ -107,6 +107,7 @@ void shifth_start(int32_t offset)
 
     __HAL_TIM_SET_COUNTER(&COUNT_TIM, 0);
     __HAL_TIM_SET_COMPARE(&COUNT_TIM, SHIFTH_CHANNEL, step.cnt);
+    __HAL_TIM_CLEAR_FLAG(&COUNT_TIM, SHIFTH_IT_CC);
     __HAL_TIM_ENABLE_IT(&COUNT_TIM, SHIFTH_IT_CC);
     __HAL_TIM_ENABLE(&COUNT_TIM);
 
