@@ -35,9 +35,9 @@ void archery_arrow(void)
 void archery_reday(void)
 {
     archery.angle = (1 / 0.18F) * archery.angle;
-
     uint32_t angle = (uint32_t)(archery.angle);
-    SET_BIT(move.flag, MOVO_FLAG_NORC);
+#define ARCHERY_REDAY_MOVE 1
+    SET_BIT(move.flag, MOVE_FLAG_NORC);
     if (READ_BIT(archery.load, ARCHERY_LOAD_M))
     {
         archery.jet_on = jet_middle_on;
@@ -54,40 +54,65 @@ void archery_reday(void)
     else if (READ_BIT(archery.load, ARCHERY_LOAD_L))
     {
         archery.jet_on = jet_left_on;
-        position_setx(move.x + 0.403F * (float)M_SQRT1_2, 1);
         pitchl_set(SERVO_PITCHL_STD - angle);
+#if ARCHERY_REDAY_MOVE
+        position_setx(1, move.x + 0.403F, 0);
+        move.y_set = move.y;
+        move.z_set = move.z;
         do
         {
             archery_update();
-            position_updatex();
+            position_update();
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHL) ||
                  move.x_set + 0.001F < move.x ||
                  move.x < move.x_set - 0.001F);
         move.vx_set = 0;
+        move.vy_set = 0;
+        move.wz_set = 0;
+#else
+        do
+        {
+            archery_update();
+            osDelay(ARCHERY_CONTROL_TIME_MS);
+        } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHL));
+#endif
         osDelay(500);
     }
     else if (READ_BIT(archery.load, ARCHERY_LOAD_R))
     {
         archery.jet_on = jet_right_on;
         pitchr_set(SERVO_PITCHR_STD + angle);
-        position_setx(move.x - 0.41F * (float)M_SQRT1_2, 1);
+#if ARCHERY_REDAY_MOVE
+        position_setx(1, move.x - 0.41F, 0);
+        move.y_set = move.y;
+        move.z_set = move.z;
         do
         {
             archery_update();
-            position_updatex();
+            position_update();
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHR) ||
                  move.x_set + 0.001F < move.x ||
                  move.x < move.x_set - 0.001F);
         move.vx_set = 0;
+        move.vy_set = 0;
+        move.wz_set = 0;
+#else
+        do
+        {
+            archery_update();
+            osDelay(ARCHERY_CONTROL_TIME_MS);
+        } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHR));
+#endif
         osDelay(500);
     }
     else
     {
         archery.jet_on = 0;
     }
-    CLEAR_BIT(move.flag, MOVO_FLAG_NORC);
+    CLEAR_BIT(move.flag, MOVE_FLAG_NORC);
+#undef ARCHERY_REDAY_MOVE
 }
 
 void archery_shoot(void)
@@ -204,11 +229,11 @@ void task_archery(void *pvParameters)
     for (;;)
     {
         /* restart control */
-        if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MIN / 3))
+        if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MIN >> 1))
         {
             serial->c = 0;
         }
-        else if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MAX / 3))
+        else if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MAX >> 1))
         {
             signal_off("a\n");
         }

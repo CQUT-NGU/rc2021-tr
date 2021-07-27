@@ -62,7 +62,6 @@ void task_shoot(void *pvParameters)
                 {
                     osDelay(SHOOT_DELAY_MIN);
                 } while (READ_BIT(step.flag, SHIFTH_FLAG_AUTO));
-                // osDelay(SHOOT_DELAY_WAIT);
             }
             /* Check whether the archery device is down */
             {

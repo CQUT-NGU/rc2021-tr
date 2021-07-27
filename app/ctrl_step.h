@@ -22,7 +22,7 @@
 #define SHIFTH_INDEX_CLI    -330000
 
 #define SHIFTH_PWM_DIVIDE 6400
-#define SHIFTH_PWM_DELTA  400
+#define SHIFTH_PWM_DELTA  1000
 
 #define SHIFTH_FLAG_REVERSE (1 << 0)
 #define SHIFTH_FLAG_AUTO    (1 << 1)

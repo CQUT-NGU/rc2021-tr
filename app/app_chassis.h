@@ -15,7 +15,8 @@
 
 #include "app.h"
 
-#define MOVO_FLAG_NORC (1 << 0)
+#define MOVE_FLAG_NORC     (1 << 0)
+#define MOVE_FLAG_NOSERIAL (1 << 1)
 
 typedef enum
 {
@@ -102,19 +103,20 @@ typedef struct
 
 extern chassis_move_t move;
 
-extern void position_set(float x,
-                         float tx,
-                         float y,
+extern void position_set(float tx,
+                         float x,
                          float ty,
-                         float z,
-                         float tz);
-extern void position_setx(float x, float t);
-extern void position_sety(float y, float t);
-extern void position_setz(float z, float t);
+                         float y,
+                         float tz,
+                         float z);
+extern void position_setx(float t, float x, float v);
+extern void position_sety(float t, float y, float v);
+extern void position_setz(float t, float z, float v);
 extern void position_update(void);
 extern void position_updatex(void);
 extern void position_updatey(void);
 extern void position_updatez(void);
+
 extern int32_t laser_set_wz(float scale);
 
 /* Enddef to prevent recursive inclusion -------------------------------------*/
