@@ -18,6 +18,7 @@ C_INCLUDES += -I app
 C_INCLUDES += -I bsp/boards
 C_INCLUDES += -I DSP/Include
 
+C_SOURCES += bsp/boards/bsp_nvic.c
 C_SOURCES += bsp/boards/bsp_delay.c
 C_SOURCES += bsp/boards/bsp_flash.c
 C_SOURCES += bsp/boards/bsp_gpio.c
