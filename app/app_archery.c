@@ -36,7 +36,8 @@ void archery_reday(void)
 {
     archery.angle = (1 / 0.18F) * archery.angle;
     uint32_t angle = (uint32_t)(archery.angle);
-#define ARCHERY_REDAY_MOVE 1
+#define ARCHERY_REDAY_ANGLE_CONST_BESIDE
+#define ARCHERY_REDAY_MOVE 0
     SET_BIT(move.flag, MOVE_FLAG_NORC);
     if (READ_BIT(archery.load, ARCHERY_LOAD_M))
     {
@@ -53,6 +54,9 @@ void archery_reday(void)
     }
     else if (READ_BIT(archery.load, ARCHERY_LOAD_L))
     {
+#ifdef ARCHERY_REDAY_ANGLE_CONST_BESIDE
+        angle = 333;
+#endif /* ARCHERY_REDAY_ANGLE_CONST_BESIDE */
         archery.jet_on = jet_left_on;
         pitchl_set(SERVO_PITCHL_STD - angle);
 #if ARCHERY_REDAY_MOVE
@@ -70,17 +74,20 @@ void archery_reday(void)
         move.vx_set = 0;
         move.vy_set = 0;
         move.wz_set = 0;
-#else
+#else  /* !ARCHERY_REDAY_MOVE */
         do
         {
             archery_update();
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHL));
-#endif
+#endif /* ARCHERY_REDAY_MOVE */
         osDelay(500);
     }
     else if (READ_BIT(archery.load, ARCHERY_LOAD_R))
     {
+#ifdef ARCHERY_REDAY_ANGLE_CONST_BESIDE
+        angle = 333;
+#endif /* ARCHERY_REDAY_ANGLE_CONST_BESIDE */
         archery.jet_on = jet_right_on;
         pitchr_set(SERVO_PITCHR_STD + angle);
 #if ARCHERY_REDAY_MOVE
@@ -98,13 +105,13 @@ void archery_reday(void)
         move.vx_set = 0;
         move.vy_set = 0;
         move.wz_set = 0;
-#else
+#else  /* !ARCHERY_REDAY_MOVE */
         do
         {
             archery_update();
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHR));
-#endif
+#endif /* ARCHERY_REDAY_MOVE */
         osDelay(500);
     }
     else
