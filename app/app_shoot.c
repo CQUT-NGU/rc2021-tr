@@ -80,7 +80,7 @@ void task_shoot(void *pvParameters)
                 {
                     osDelay(SHOOT_DELAY_MIN);
                 } while (READ_BIT(servo.match, SERVO_MATCH_SHIFTV) != SERVO_MATCH_SHIFTV);
-                osDelay(SHOOT_DELAY_WAIT);
+                osDelay(SHOOT_DELAY_WAIT << 1);
             }
             /* Loosen the arrows */
             {

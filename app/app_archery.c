@@ -37,7 +37,7 @@ void archery_reday(void)
     archery.angle = (1 / 0.18F) * archery.angle;
 
     uint32_t angle = (uint32_t)(archery.angle);
-
+    SET_BIT(move.flag, MOVO_FLAG_NORC);
     if (READ_BIT(archery.load, ARCHERY_LOAD_M))
     {
         archery.jet_on = jet_middle_on;
@@ -87,6 +87,7 @@ void archery_reday(void)
     {
         archery.jet_on = 0;
     }
+    CLEAR_BIT(move.flag, MOVO_FLAG_NORC);
 }
 
 void archery_shoot(void)

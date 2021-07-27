@@ -529,6 +529,13 @@ void task_chassis(void *pvParameters)
         /* update chassis measure data */
         chassis_update();
 
+        if (switch_is_up(move.rc->rc.s[RC_SW_L]) &&
+            switch_is_up(move.rc->rc.s[RC_SW_R]))
+        {
+            __ASM volatile("cpsid i");
+            HAL_NVIC_SystemReset();
+        }
+
         /* chassis mode set */
         if (switch_is_mid(move.rc->rc.s[RC_SW_L]))
         {
@@ -566,7 +573,10 @@ void task_chassis(void *pvParameters)
 
         case CHASSIS_VECTOR_SLOW:
         {
-            chassis_rc();
+            if (!READ_BIT(move.flag, MOVO_FLAG_NORC))
+            {
+                chassis_rc();
+            }
 
             /* in slow mode, the speed will decrease */
             move.vx_set *= CHASSIS_RC_SLOW_SEN;

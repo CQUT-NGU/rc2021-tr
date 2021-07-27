@@ -15,6 +15,8 @@
 
 #include "app.h"
 
+#define MOVO_FLAG_NORC (1 << 0)
+
 typedef enum
 {
     /* chassis will stop */
@@ -41,6 +43,7 @@ typedef struct
 
 typedef struct
 {
+    int flag;
     TickType_t tick;
     /* the point to serial */
     ctrl_serial_t *serial;
