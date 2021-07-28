@@ -263,7 +263,7 @@ void task_archery(void *pvParameters)
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
             /* Start sending signaling signal */
-            if (rc->rc.ch[RC_CH_LV] > (RC_ROCKER_MAX / 3))
+            if (rc->rc.ch[RC_CH_LV] > (RC_ROCKER_MAX >> 1))
             {
                 signal_on("a\n");
             }
@@ -284,6 +284,15 @@ void task_archery(void *pvParameters)
         if (switch_is_down(rc->rc.s[RC_SW_L]) &&
             switch_is_down(rc->rc.s[RC_SW_R]))
         {
+            /* Start sending signaling signal */
+            if (rc->rc.ch[RC_CH_LV] > (RC_ROCKER_MAX >> 1))
+            {
+                fetch_set_pwm(SERVO_FETCH_PWMMAX);
+            }
+            else if (rc->rc.ch[RC_CH_LV] < (RC_ROCKER_MIN >> 1))
+            {
+                fetch_set_pwm(SERVO_FETCH_PWMMIN);
+            }
             /* take arrow */
             if (rc->rc.ch[RC_CH_S] < RC_ROCKER_MIN + RC_DEADLINE)
             {
