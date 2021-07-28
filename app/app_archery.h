@@ -53,7 +53,8 @@
 #define ARCHERY_TASK_SHOOT (1 << 1)  //!< run shoot
 
 #define ARCHERY_WAIT_RESET (0)
-#define ARCHERY_WAIT_SHOOT (1 << 0)
+#define ARCHERY_WAIT_ARROW (1 << 0)
+#define ARCHERY_WAIT_SHOOT (1 << 1)
 
 typedef struct
 {

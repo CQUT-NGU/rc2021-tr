@@ -50,7 +50,7 @@ void archery_reday(void)
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (READ_BIT(step.flag, SHIFTH_FLAG_AUTO) ||
                  !READ_BIT(servo.match, SERVO_MATCH_PITCH));
-        osDelay(500);
+        osDelay(200);
     }
     else if (READ_BIT(archery.load, ARCHERY_LOAD_L))
     {
@@ -81,7 +81,7 @@ void archery_reday(void)
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHL));
 #endif /* ARCHERY_REDAY_MOVE */
-        osDelay(500);
+        osDelay(200);
     }
     else if (READ_BIT(archery.load, ARCHERY_LOAD_R))
     {
@@ -112,7 +112,7 @@ void archery_reday(void)
             osDelay(ARCHERY_CONTROL_TIME_MS);
         } while (!READ_BIT(servo.match, SERVO_MATCH_PITCHR));
 #endif /* ARCHERY_REDAY_MOVE */
-        osDelay(500);
+        osDelay(200);
     }
     else
     {
@@ -124,6 +124,16 @@ void archery_reday(void)
 
 void archery_shoot(void)
 {
+    if (READ_BIT(archery.wait, ARCHERY_WAIT_ARROW))
+    {
+        archery_arrow();
+        do
+        {
+            archery_update();
+            osDelay(ARCHERY_CONTROL_TIME_MS);
+        } while (READ_BIT(archery.wait, ARCHERY_WAIT_ARROW));
+    }
+
     archery_reday();
 
     if (!READ_BIT(archery.task, ARCHERY_TASK_SHOOT))
