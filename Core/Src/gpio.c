@@ -55,11 +55,13 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOF_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOI, SHIFTH_DIR_Pin|RELAY3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(SHIFTH_DIR_GPIO_Port, SHIFTH_DIR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOH, POWER1_LU_Pin|POWER2_LD_Pin|POWER3_RU_Pin|POWER4_RD_Pin
-                          |RELAY2_Pin|RELAY1_Pin|RELAY0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(RELAY3_GPIO_Port, RELAY3_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOH, POWER1_LU_Pin|POWER2_LD_Pin|POWER3_RU_Pin|POWER4_RD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, LED_G8_Pin|LED_G7_Pin|LED_G6_Pin|LED_G5_Pin
@@ -67,6 +69,9 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(MPU_NSS_GPIO_Port, MPU_NSS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOH, RELAY2_Pin|RELAY1_Pin|RELAY0_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_G9_GPIO_Port, LED_G9_Pin, GPIO_PIN_SET);

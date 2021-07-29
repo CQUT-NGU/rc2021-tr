@@ -85,14 +85,14 @@ __END_DECLS
 __STATIC_INLINE
 void clip_edge_on(void)
 {
-    gpio_pin_set(RELAY0_GPIO_Port, RELAY0_Pin);
+    gpio_pin_reset(RELAY0_GPIO_Port, RELAY0_Pin);
     SET_BIT(archery.load, ARCHERY_CLIP_EDGE);
 }
 
 __STATIC_INLINE
 void clip_edge_off(void)
 {
-    gpio_pin_reset(RELAY0_GPIO_Port, RELAY0_Pin);
+    gpio_pin_set(RELAY0_GPIO_Port, RELAY0_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_EDGE);
     SET_BIT(archery.load, ARCHERY_LOAD_EDGE);
 }
@@ -100,14 +100,14 @@ void clip_edge_off(void)
 __STATIC_INLINE
 void clip_left_on(void)
 {
-    gpio_pin_set(RELAY1_GPIO_Port, RELAY1_Pin);
+    gpio_pin_reset(RELAY1_GPIO_Port, RELAY1_Pin);
     SET_BIT(archery.load, ARCHERY_CLIP_L);
 }
 
 __STATIC_INLINE
 void clip_left_off(void)
 {
-    gpio_pin_reset(RELAY1_GPIO_Port, RELAY1_Pin);
+    gpio_pin_set(RELAY1_GPIO_Port, RELAY1_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_L);
     SET_BIT(archery.load, ARCHERY_LOAD_M);
 }
@@ -115,14 +115,14 @@ void clip_left_off(void)
 __STATIC_INLINE
 void clip_middle_on(void)
 {
-    gpio_pin_set(RELAY2_GPIO_Port, RELAY2_Pin);
+    gpio_pin_reset(RELAY2_GPIO_Port, RELAY2_Pin);
     SET_BIT(archery.load, ARCHERY_CLIP_M);
 }
 
 __STATIC_INLINE
 void clip_middle_off(void)
 {
-    gpio_pin_reset(RELAY2_GPIO_Port, RELAY2_Pin);
+    gpio_pin_set(RELAY2_GPIO_Port, RELAY2_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_M);
     SET_BIT(archery.load, ARCHERY_LOAD_M);
 }
@@ -130,14 +130,14 @@ void clip_middle_off(void)
 __STATIC_INLINE
 void clip_right_on(void)
 {
-    gpio_pin_set(RELAY3_GPIO_Port, RELAY3_Pin);
+    gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
     SET_BIT(archery.load, ARCHERY_CLIP_R);
 }
 
 __STATIC_INLINE
 void clip_right_off(void)
 {
-    gpio_pin_reset(RELAY3_GPIO_Port, RELAY3_Pin);
+    gpio_pin_set(RELAY3_GPIO_Port, RELAY3_Pin);
     CLEAR_BIT(archery.load, ARCHERY_CLIP_R);
     SET_BIT(archery.load, ARCHERY_LOAD_M);
 }
